@@ -114,6 +114,10 @@ See `AGENTS.md` → **Internationalization (i18n)** for agent conventions.
 | Recent reads | Read a chapter → Home → Recently read |
 | Search | Home → type 2+ chars → debounced results with highlight |
 | Settings | Home gear → font size / immersive toggle |
+| Pull to refresh | Home → pull down → recently read / bookmarks refresh |
+| App version | Settings → About → version label visible |
+| Scroll to verse | Home search or history → tap result → reader scrolls to verse |
+| Error retry | Simulate DB error screen → Try again button works |
 
 ## Agent docs
 

@@ -11,3 +11,4 @@ export {
 export { radii } from "./radii";
 export { glass } from "./glass";
 export { animations } from "./animations";
+export { sharedStyles } from "./sharedStyles";

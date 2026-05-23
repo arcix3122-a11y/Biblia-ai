@@ -525,3 +525,19 @@ npx expo start
 - Validation: pending
 - Result: in-progress
 
+### START — 2026-05-23 horizontal polish pass (Cursor subagent)
+
+**Goal:** End-to-end UI consistency, structure, performance, and missing UX polish across Biblia AI (Expo 56, PL+EN).
+
+**Scope:** Shared layout primitives; loading/skeleton/empty states; pull-to-refresh; reader scroll-to-verse; Settings app version; haptics; memoized list items; error retry; i18n hardcoded strings; reduce-motion; FlatList optimizations.
+
+**Files/areas:** `src/components/layout/*`, `src/theme/*`, `HomeScreen`, `ReaderScreen`, `SettingsScreen`, `VerseRow`, `BookTile`, `ChapterTile`, `ErrorFallback`, `en.json`, `pl.json`, `README.md`.
+
+### PROGRESS — 2026-05-23 horizontal polish pass
+- Added layout primitives: `ScreenContainer`, `SectionHeader`, `LoadingState`, `EmptyState`, `sharedStyles`.
+- Home: pull-to-refresh, skeleton loading, `ErrorFallback` retry, `SectionHeader` for sections.
+- Reader: `?verse=` deep link scroll, reduce-motion, memoized `VerseRow`, FlatList tuning, haptics on chapter nav.
+- Settings: app version from `expo-constants`; Book route: loading/error polish + FlatList perf.
+- `expo-haptics` installed; `VerseRow`/`BookTile`/`ChapterTile` memoized.
+- i18n: `settings.about/appVersion/buildNumber`, `home.pullToRefresh` (PL+EN).
+

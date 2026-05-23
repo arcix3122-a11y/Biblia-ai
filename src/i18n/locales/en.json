@@ -70,7 +70,8 @@
     "languageTipBody": "Tap the gear icon → Language to choose Polish or English anytime.",
     "languageTipDismiss": "Got it",
     "languageTipOpenSettings": "Open settings",
-    "offlineReady": "Offline ready"
+    "offlineReady": "Offline ready",
+    "pullToRefresh": "Pull down to refresh your library and reading data"
   },
   "dashboard": {
     "dayStreak": "day streak",
@@ -186,7 +187,10 @@
       "green": "Green highlight",
       "rose": "Rose highlight"
     },
-    "scriptureTranslationNotice": "Scripture text is in English (KJV). The app interface follows your language setting."
+    "scriptureTranslationNotice": "Scripture text is in English (KJV). The app interface follows your language setting.",
+    "crossReferences": "Related passages",
+    "crossRefTheme": "{{theme}}",
+    "noCrossRefs": "No related passages for this chapter."
   },
   "ai": {
     "responsesRemaining": "{{remaining}} / {{limit}} responses",
@@ -296,7 +300,17 @@
     "chaptersPerDay": "{{count}} chapters / day",
     "chaptersPerDay_one": "{{count}} chapter / day",
     "decreaseGoal": "Decrease daily goal",
-    "increaseGoal": "Increase daily goal"
+    "increaseGoal": "Increase daily goal",
+    "notifications": "Daily Reminder",
+    "notificationsHint": "Receive a daily nudge to read Scripture.",
+    "notificationsEnabled": "Reminder enabled",
+    "notificationsDisabled": "Reminder disabled",
+    "notificationsTime": "Reminder time: {{hour}}:{{minute}}",
+    "notificationsPermissionDenied": "Allow notifications in device settings to enable reminders.",
+    "notificationsScheduled": "Reminder set for {{hour}}:{{minute}} daily.",
+    "about": "About",
+    "appVersion": "Version {{version}}",
+    "buildNumber": "Build {{build}}"
   },
   "languageSwitcher": {
     "pl": "PL",
@@ -307,10 +321,56 @@
     "generic": "An unexpected error occurred.",
     "unexpected": "An unexpected error occurred.",
     "somethingWrong": "Something went wrong",
-    "databaseOpenFailed": "Database failed to open"
+    "databaseOpenFailed": "Database failed to open",
+    "studyFetchFailed": "Could not load verse study analysis."
   },
   "share": {
     "brand": "Biblia AI",
     "dialogTitle": "Share verse"
+  },
+  "plan": {
+    "title": "Reading Plan",
+    "subtitle": "Bible in a Year",
+    "progressLabel": "{{percent}}% complete",
+    "dayLabel": "Day {{day}} of 365",
+    "todayAssignment": "Today's reading",
+    "noAssignment": "No chapters assigned for today.",
+    "markDone": "Mark as done",
+    "alreadyDone": "Done",
+    "startPlan": "Start plan",
+    "resetPlan": "Reset plan",
+    "resetConfirmTitle": "Reset reading plan?",
+    "resetConfirmMessage": "All progress will be lost.",
+    "chapterLabel": "{{book}} {{chapter}}",
+    "completedDays": "{{count}} days completed",
+    "notStarted": "You haven't started the plan yet.",
+    "startHint": "Read through the entire Bible in 365 days."
+  },
+  "stats": {
+    "title": "Statistics",
+    "subtitle": "Your reading journey",
+    "currentStreak": "Current streak",
+    "days": "{{count}} days",
+    "days_one": "{{count}} day",
+    "chaptersRead": "Chapters read",
+    "totalChapters": "Total chapters",
+    "activity": "Reading activity (30 days)",
+    "noActivity": "No reading activity yet. Start reading to see your stats.",
+    "oldTestament": "Old Testament",
+    "newTestament": "New Testament",
+    "otProgress": "OT progress",
+    "ntProgress": "NT progress"
+  },
+  "study": {
+    "title": "Scripture Study",
+    "translations": "Translations",
+    "originalLanguage": "Original Text",
+    "commentary": "Commentary",
+    "transliteration": "Transliteration",
+    "meaning": "Meaning",
+    "loading": "Engaging theological archives...",
+    "translationUnavailable": "Polish translation comparison requires an active connection.",
+    "offlineCommentary1": "The spiritual assistant encourages deep reflection on this verse in the context of the whole chapter.",
+    "offlineCommentary2": "Consider how this word applies to your daily walk."
   }
 }

@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -10,9 +9,13 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChapterTile } from "@/components/ChapterTile";
+import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassChrome } from "@/components/GlassChrome";
+import { LoadingState } from "@/components/layout/LoadingState";
 import { useBook, useChapters, useDatabaseReady } from "@/hooks/useScripture";
 import { colors, spacing, typography } from "@/theme";
+
+const CHAPTER_TILE_SIZE = 64 + spacing.xs * 2;
 
 export default function BookScreen() {
   const { t } = useTranslation();
@@ -20,7 +23,7 @@ export default function BookScreen() {
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const bookSlug = typeof slug === "string" ? slug : "";
-  const { ready, error } = useDatabaseReady();
+  const { ready, error, retry } = useDatabaseReady();
   const { book, loading: bookLoading } = useBook(bookSlug);
   const { chapters, loading: chaptersLoading } = useChapters(book?.id);
 
@@ -33,18 +36,29 @@ export default function BookScreen() {
     [book, router]
   );
 
+  const renderChapter = useCallback(
+    ({ item }: { item: { id: number; number: number } }) => (
+      <ChapterTile number={item.number} onPress={() => openChapter(item.number)} />
+    ),
+    [openChapter]
+  );
+
   if (!ready || bookLoading || chaptersLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={colors.accent} />
+        <LoadingState message={t("common.loading")} />
       </View>
     );
   }
 
-  if (error || !book) {
+  if (error) {
+    return <ErrorFallback message={error} onRetry={retry} />;
+  }
+
+  if (!book) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.error}>{error ?? t("book.notFound")}</Text>
+        <Text style={styles.error}>{t("book.notFound")}</Text>
       </View>
     );
   }
@@ -62,9 +76,15 @@ export default function BookScreen() {
         keyExtractor={(item) => String(item.id)}
         numColumns={4}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <ChapterTile number={item.number} onPress={() => openChapter(item.number)} />
-        )}
+        renderItem={renderChapter}
+        initialNumToRender={16}
+        maxToRenderPerBatch={12}
+        windowSize={5}
+        getItemLayout={(_, index) => ({
+          length: CHAPTER_TILE_SIZE,
+          offset: CHAPTER_TILE_SIZE * Math.floor(index / 4),
+          index,
+        })}
         ListEmptyComponent={<Text style={styles.empty}>{t("book.noChapters")}</Text>}
       />
     </View>

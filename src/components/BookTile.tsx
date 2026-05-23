@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 import { colors, radii, spacing, typography } from "@/theme";
@@ -9,7 +9,7 @@ interface BookTileProps {
   onPress: () => void;
 }
 
-export function BookTile({ book, onPress }: BookTileProps) {
+function BookTileComponent({ book, onPress }: BookTileProps) {
   const { t } = useTranslation();
 
   return (
@@ -27,6 +27,8 @@ export function BookTile({ book, onPress }: BookTileProps) {
   );
 }
 
+export const BookTile = memo(BookTileComponent);
+
 const styles = StyleSheet.create({
   tile: {
     flex: 1,
@@ -43,6 +45,7 @@ const styles = StyleSheet.create({
   pressed: {
     backgroundColor: colors.cardHover,
     borderColor: colors.accentMuted,
+    opacity: 0.92,
   },
   name: {
     ...typography.subtitle,

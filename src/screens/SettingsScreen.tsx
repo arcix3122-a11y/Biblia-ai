@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useReaderStore } from "@/store/readerStore";
 import { useAiChatStore } from "@/store/aiChatStore";
@@ -10,6 +11,8 @@ import { FontControls } from "@/components/reader/FontControls";
 import { GlassCard } from "@/components/GlassCard";
 import { getUserStats, setDailyGoal } from "@/services/stats/userStats";
 import { colors, radii, spacing, typography } from "@/theme";
+import { useReminderStore } from "@/store/reminderStore";
+import { requestNotificationPermission, scheduleDailyReminder, cancelDailyReminder } from "@/services/notifications/reminderService";
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -35,6 +38,39 @@ export default function SettingsScreen() {
     },
     [dailyGoal]
   );
+
+  const { enabled: reminderEnabled, hour, minute, setEnabled, setTime, load: loadReminder } = useReminderStore();
+
+  useEffect(() => {
+    void loadReminder();
+  }, [loadReminder]);
+
+  const handleToggleReminder = useCallback(async () => {
+    if (!reminderEnabled) {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        Alert.alert(t("settings.notifications"), t("settings.notificationsPermissionDenied"));
+        return;
+      }
+      const paddedMin = String(minute).padStart(2, "0");
+      await scheduleDailyReminder(hour, minute, t("common.appName"), t("settings.notificationsHint"));
+      setEnabled(true);
+      Alert.alert(t("settings.notifications"), t("settings.notificationsScheduled", { hour, minute: paddedMin }));
+    } else {
+      await cancelDailyReminder();
+      setEnabled(false);
+    }
+  }, [reminderEnabled, hour, minute, setEnabled, t]);
+
+  const handleHourChange = useCallback(async (delta: number) => {
+    const newHour = (hour + delta + 24) % 24;
+    setTime(newHour, minute);
+    if (reminderEnabled) {
+      const paddedMin = String(minute).padStart(2, "0");
+      await scheduleDailyReminder(newHour, minute, t("common.appName"), t("settings.notificationsHint"));
+      Alert.alert(t("settings.notifications"), t("settings.notificationsScheduled", { hour: newHour, minute: paddedMin }));
+    }
+  }, [hour, minute, reminderEnabled, setTime, t]);
 
   const healthLabel = useMemo(() => {
     if (health === "checking") {
@@ -105,6 +141,9 @@ export default function SettingsScreen() {
       },
     ]);
   };
+
+  const appVersion = Constants.expoConfig?.version ?? "1.0.0";
+  const buildNumber = Constants.nativeBuildVersion ?? null;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -242,10 +281,46 @@ export default function SettingsScreen() {
         </View>
       </GlassCard>
 
+      {/* Notifications Section */}
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.notifications")}</Text>
+        <Text style={styles.hint}>{t("settings.notificationsHint")}</Text>
+        <Pressable onPress={() => void handleToggleReminder()} style={styles.toggleRow}>
+          <Text style={styles.toggleLabel}>
+            {reminderEnabled ? t("settings.notificationsEnabled") : t("settings.notificationsDisabled")}
+          </Text>
+          <View style={[styles.pill, reminderEnabled && styles.pillOn]}>
+            <View style={[styles.knob, reminderEnabled && styles.knobOn]} />
+          </View>
+        </Pressable>
+        {reminderEnabled ? (
+          <View style={styles.timeRow}>
+            <Pressable onPress={() => void handleHourChange(-1)} style={styles.timeBtn} hitSlop={10}>
+              <Ionicons name="chevron-back" size={20} color={colors.accent} />
+            </Pressable>
+            <Text style={styles.timeLabel}>
+              {String(hour).padStart(2, "0")}:{String(minute).padStart(2, "0")}
+            </Text>
+            <Pressable onPress={() => void handleHourChange(1)} style={styles.timeBtn} hitSlop={10}>
+              <Ionicons name="chevron-forward" size={20} color={colors.accent} />
+            </Pressable>
+          </View>
+        ) : null}
+      </GlassCard>
+
       {/* Scripture Translation Section */}
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.scriptureTranslation")}</Text>
         <Text style={styles.note}>{t("settings.scriptureTranslationHint")}</Text>
+      </GlassCard>
+
+      {/* About / version */}
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.about")}</Text>
+        <Text style={styles.meta}>{t("settings.appVersion", { version: appVersion })}</Text>
+        {buildNumber ? (
+          <Text style={styles.meta}>{t("settings.buildNumber", { build: buildNumber })}</Text>
+        ) : null}
       </GlassCard>
 
       {/* Appearance Section */}
@@ -463,6 +538,23 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textPrimary,
     minWidth: 140,
+    textAlign: "center",
+  },
+  timeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: spacing.md,
+    gap: spacing.lg,
+  },
+  timeBtn: {
+    padding: spacing.xs,
+  },
+  timeLabel: {
+    ...typography.hero,
+    color: colors.accent,
+    fontWeight: "700",
+    minWidth: 72,
     textAlign: "center",
   },
 });

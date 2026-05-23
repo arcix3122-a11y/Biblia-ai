@@ -72,7 +72,8 @@
     "languageTipBody": "Stuknij ikonę koła zębatego → Język, aby w każdym momencie wybrać polski lub angielski.",
     "languageTipDismiss": "Rozumiem",
     "languageTipOpenSettings": "Otwórz ustawienia",
-    "offlineReady": "Tryb offline"
+    "offlineReady": "Tryb offline",
+    "pullToRefresh": "Przeciągnij w dół, aby odświeżyć bibliotekę i dane czytania"
   },
   "dashboard": {
     "dayStreak": "dni z rzędu",
@@ -194,7 +195,10 @@
       "green": "Zielone podświetlenie",
       "rose": "Różowe podświetlenie"
     },
-    "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku."
+    "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku.",
+    "crossReferences": "Powiązane fragmenty",
+    "crossRefTheme": "{{theme}}",
+    "noCrossRefs": "Brak powiązanych fragmentów dla tego rozdziału."
   },
   "ai": {
     "responsesRemaining": "{{remaining}} / {{limit}} odpowiedzi",
@@ -306,7 +310,17 @@
     "chaptersPerDay_few": "{{count}} rozdziały / dzień",
     "chaptersPerDay_many": "{{count}} rozdziałów / dzień",
     "decreaseGoal": "Zmniejsz cel dzienny",
-    "increaseGoal": "Zwiększ cel dzienny"
+    "increaseGoal": "Zwiększ cel dzienny",
+    "notifications": "Dzienne przypomnienie",
+    "notificationsHint": "Otrzymuj codzienne przypomnienie o czytaniu Pisma.",
+    "notificationsEnabled": "Przypomnienie włączone",
+    "notificationsDisabled": "Przypomnienie wyłączone",
+    "notificationsTime": "Godzina przypomnienia: {{hour}}:{{minute}}",
+    "notificationsPermissionDenied": "Zezwól na powiadomienia w ustawieniach urządzenia.",
+    "notificationsScheduled": "Przypomnienie ustawione na {{hour}}:{{minute}} codziennie.",
+    "about": "O aplikacji",
+    "appVersion": "Wersja {{version}}",
+    "buildNumber": "Build {{build}}"
   },
   "languageSwitcher": {
     "pl": "PL",
@@ -317,10 +331,58 @@
     "generic": "Wystąpił nieoczekiwany błąd.",
     "unexpected": "Wystąpił nieoczekiwany błąd.",
     "somethingWrong": "Coś poszło nie tak",
-    "databaseOpenFailed": "Nie udało się otworzyć bazy danych"
+    "databaseOpenFailed": "Nie udało się otworzyć bazy danych",
+    "studyFetchFailed": "Nie udało się pobrać analizy teologicznej."
   },
   "share": {
     "brand": "Biblia AI",
     "dialogTitle": "Udostępnij werset"
+  },
+  "plan": {
+    "title": "Plan czytania",
+    "subtitle": "Biblia w rok",
+    "progressLabel": "{{percent}}% ukończono",
+    "dayLabel": "Dzień {{day}} z 365",
+    "todayAssignment": "Dzisiejsze czytanie",
+    "noAssignment": "Brak rozdziałów na dzisiaj.",
+    "markDone": "Oznacz jako gotowe",
+    "alreadyDone": "Gotowe",
+    "startPlan": "Rozpocznij plan",
+    "resetPlan": "Resetuj plan",
+    "resetConfirmTitle": "Zresetować plan czytania?",
+    "resetConfirmMessage": "Cały postęp zostanie utracony.",
+    "chapterLabel": "{{book}} {{chapter}}",
+    "completedDays": "{{count}} ukończonych dni",
+    "notStarted": "Nie rozpocząłeś jeszcze planu.",
+    "startHint": "Przeczytaj całą Biblię w 365 dni."
+  },
+  "stats": {
+    "title": "Statystyki",
+    "subtitle": "Twoja podróż przez Pismo",
+    "currentStreak": "Aktualny streak",
+    "days": "{{count}} dni",
+    "days_one": "{{count}} dzień",
+    "days_few": "{{count}} dni",
+    "days_many": "{{count}} dni",
+    "chaptersRead": "Przeczytane rozdziały",
+    "totalChapters": "Wszystkich rozdziałów",
+    "activity": "Aktywność czytania (30 dni)",
+    "noActivity": "Brak aktywności. Zacznij czytać, aby zobaczyć statystyki.",
+    "oldTestament": "Stary Testament",
+    "newTestament": "Nowy Testament",
+    "otProgress": "Postęp ST",
+    "ntProgress": "Postęp NT"
+  },
+  "study": {
+    "title": "Studium Pisma",
+    "translations": "Przekłady",
+    "originalLanguage": "Tekst oryginalny",
+    "commentary": "Komentarze",
+    "transliteration": "Transliteracja",
+    "meaning": "Znaczenie",
+    "loading": "Trwa pobieranie analizy teologicznej...",
+    "translationUnavailable": "Porównanie przekładów wymaga aktywnego połączenia.",
+    "offlineCommentary1": "Duchowy asystent zachęca do głębokiego rozważania tego wersetu w kontekście całego rozdziału.",
+    "offlineCommentary2": "Rozważ, w jaki sposób to słowo odnosi się bezpośrednio do Twojego dzisiejszego życia."
   }
 }

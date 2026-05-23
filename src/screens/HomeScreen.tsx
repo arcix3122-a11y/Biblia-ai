@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,7 +13,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Swipeable } from "react-native-gesture-handler";
 import { BookTile } from "@/components/BookTile";
+import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
+import { LoadingState } from "@/components/layout/LoadingState";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
 import { ReadingPlanCard } from "@/components/dashboard/ReadingPlanCard";
 import { OfflineBadge } from "@/components/OfflineBadge";
@@ -61,8 +64,8 @@ export default function HomeScreen() {
   const [query, setQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const debouncedQuery = useDebouncedValue(query, 350);
-  const { ready, error } = useDatabaseReady();
-  const { books, loading } = useBooks(testament);
+  const { ready, error, retry } = useDatabaseReady();
+  const { books, loading, refresh: refreshBooks } = useBooks(testament);
   const { results, searching, search, clear } = useVerseSearch();
   const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
   const hasSeenLanguageTip = useOnboardingStore((s) => s.hasSeenLanguageTip);
@@ -72,6 +75,16 @@ export default function HomeScreen() {
   const loadHistory = useHistoryStore((s) => s.loadHistory);
   const bookmarks = useBookmarksStore((s) => s.bookmarks);
   const loadBookmarks = useBookmarksStore((s) => s.loadBookmarks);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([loadHistory(), loadBookmarks(), refreshBooks()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadBookmarks, loadHistory, refreshBooks]);
 
   useEffect(() => {
     void loadHistory();
@@ -115,7 +128,11 @@ export default function HomeScreen() {
           });
         }
       }
-      router.push(`/reader/${bookSlug}/${chapter}`);
+      router.push(
+        verseNumber
+          ? `/reader/${bookSlug}/${chapter}?verse=${verseNumber}`
+          : `/reader/${bookSlug}/${chapter}`
+      );
     },
     [books, router, setSelectedVerse]
   );
@@ -144,18 +161,13 @@ export default function HomeScreen() {
   if (!ready) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={styles.loadingLabel}>{t("home.preparingLibrary")}</Text>
+        <LoadingState message={t("home.preparingLibrary")} />
       </View>
     );
   }
 
   if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
-    );
+    return <ErrorFallback message={error} onRetry={retry} />;
   }
 
   const trimmedQuery = query.trim();
@@ -168,11 +180,31 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => void onRefresh()}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressBackgroundColor={colors.backgroundElevated}
+          />
+        }
+      >
         <View style={styles.brandRow}>
           <Text style={styles.brand}>{t("common.appName")}</Text>
           <View style={styles.brandActions}>
             <OfflineBadge ready={ready} />
+            <Pressable
+              onPress={() => router.push("/stats")}
+              hitSlop={12}
+              style={styles.statsBtn}
+              accessibilityLabel={t("stats.title")}
+            >
+              <Ionicons name="bar-chart-outline" size={20} color={colors.accent} />
+            </Pressable>
             <Pressable
               onPress={() => router.push("/settings")}
               hitSlop={12}
@@ -228,7 +260,7 @@ export default function HomeScreen() {
 
         {recentUnique.length > 0 ? (
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>{t("home.recentlyRead")}</Text>
+            <SectionHeader title={t("home.recentlyRead")} />
             {recentUnique.map((entry) => (
               <Pressable
                 key={`${entry.id}-${entry.viewed_at}`}
@@ -253,12 +285,12 @@ export default function HomeScreen() {
 
         {bookmarkPreview.length > 0 ? (
           <View style={styles.section}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionHeading}>{t("home.bookmarks")}</Text>
-              <Pressable onPress={() => router.push("/(tabs)/workspace")} hitSlop={8}>
-                <Text style={styles.sectionLink}>{t("common.seeAll")}</Text>
-              </Pressable>
-            </View>
+            <SectionHeader
+              title={t("home.bookmarks")}
+              actionLabel={t("common.seeAll")}
+              onAction={() => router.push("/(tabs)/workspace")}
+              actionAccessibilityLabel={t("common.seeAll")}
+            />
             {bookmarkPreview.map((item) => (
               <Pressable
                 key={item.id}
@@ -282,6 +314,17 @@ export default function HomeScreen() {
         ) : null}
 
         <ReadingPlanCard style={styles.sectionCard} />
+
+        <Pressable onPress={() => router.push("/reading-plan")} style={styles.planTeaser}>
+          <View style={styles.planTeaserIcon}>
+            <Ionicons name="earth-outline" size={20} color={colors.accent} />
+          </View>
+          <View style={styles.planTeaserText}>
+            <Text style={styles.planTeaserTitle}>{t("plan.title")}</Text>
+            <Text style={styles.planTeaserSub}>{t("plan.subtitle")}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+        </Pressable>
 
         <TopicGrid onTopicPress={openTopic} />
 
@@ -352,7 +395,7 @@ export default function HomeScreen() {
         {showSearch ? (
           <View>
             {searching ? (
-              <ActivityIndicator color={colors.accent} style={styles.searchSpinner} />
+              <LoadingState variant="inline" message={t("common.loading")} />
             ) : null}
             {!searching && results.length === 0 ? (
               <View style={styles.emptySearch}>
@@ -394,7 +437,7 @@ export default function HomeScreen() {
             </View>
 
             {loading ? (
-              <ActivityIndicator color={colors.accent} style={styles.spinner} />
+              <LoadingState variant="grid" message={t("common.loading")} />
             ) : (
               <View style={styles.bookGrid}>
                 {books.map((item) => (
@@ -439,6 +482,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
   },
+  statsBtn: { padding: spacing.xs },
   brand: {
     ...typography.label,
     color: colors.accent,

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { getReadingTypography } from "@/theme/typography";
 import { colors, spacing, typography } from "@/theme";
 import type { HighlightColor, Verse } from "@/types/scripture";
 import { getHighlightBackground } from "@/utils/highlightColors";
+import { hapticSelection } from "@/utils/haptics";
 
 interface VerseRowProps {
   verse: Verse;
@@ -17,7 +18,7 @@ interface VerseRowProps {
   onToggleBookmark: () => void;
 }
 
-export function VerseRow({
+function VerseRowComponent({
   verse,
   fontSize,
   isBookmarked,
@@ -31,20 +32,26 @@ export function VerseRow({
   const reading = getReadingTypography(fontSize);
   const highlightBg = highlightColor ? getHighlightBackground(highlightColor) : undefined;
 
+  const handleBookmarkPress = useCallback(() => {
+    void hapticSelection();
+    onToggleBookmark();
+  }, [onToggleBookmark]);
+
   return (
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
-      style={[
+      style={({ pressed }) => [
         styles.row,
         highlightBg ? { backgroundColor: highlightBg } : null,
         isSelected && styles.rowSelected,
+        pressed && styles.pressed,
       ]}
     >
       <View style={styles.header}>
         <Text style={[styles.number, isSelected && styles.numberActive]}>{verse.number}</Text>
         <Pressable
-          onPress={onToggleBookmark}
+          onPress={handleBookmarkPress}
           hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel={isBookmarked ? t("reader.removeBookmark") : t("reader.addBookmark")}
@@ -71,6 +78,8 @@ export function VerseRow({
   );
 }
 
+export const VerseRow = memo(VerseRowComponent);
+
 const styles = StyleSheet.create({
   row: {
     paddingVertical: spacing.md,
@@ -82,6 +91,9 @@ const styles = StyleSheet.create({
   rowSelected: {
     backgroundColor: colors.accentGlow,
     borderBottomColor: colors.accentMuted,
+  },
+  pressed: {
+    opacity: 0.92,
   },
   header: {
     flexDirection: "row",

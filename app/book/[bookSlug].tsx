@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -9,30 +8,54 @@ import {
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ChapterTile } from "@/components/ChapterTile";
+import { ErrorFallback } from "@/components/ErrorFallback";
+import { LoadingState } from "@/components/layout/LoadingState";
 import { useBook, useChapters, useDatabaseReady } from "@/hooks/useScripture";
 import { colors, spacing, typography } from "@/theme";
+
+const CHAPTER_TILE_SIZE = 64 + spacing.xs * 2;
 
 export default function BookChaptersRoute() {
   const { t } = useTranslation();
   const { bookSlug } = useLocalSearchParams<{ bookSlug: string }>();
   const slug = typeof bookSlug === "string" ? bookSlug : "";
   const router = useRouter();
-  const { ready, error } = useDatabaseReady();
+  const { ready, error, retry } = useDatabaseReady();
   const { book, loading: bookLoading } = useBook(slug);
   const { chapters, loading: chaptersLoading } = useChapters(book?.id);
+
+  const openChapter = useCallback(
+    (chapterNumber: number) => {
+      if (book) {
+        router.push(`/reader/${book.slug}/${chapterNumber}`);
+      }
+    },
+    [book, router]
+  );
+
+  const renderChapter = useCallback(
+    ({ item }: { item: { id: number; number: number } }) => (
+      <ChapterTile number={item.number} onPress={() => openChapter(item.number)} />
+    ),
+    [openChapter]
+  );
 
   if (!ready || bookLoading || chaptersLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={colors.accent} />
+        <LoadingState message={t("common.loading")} />
       </View>
     );
   }
 
-  if (error || !book) {
+  if (error) {
+    return <ErrorFallback message={error} onRetry={retry} />;
+  }
+
+  if (!book) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.error}>{error ?? t("book.notFound")}</Text>
+        <Text style={styles.error}>{t("book.notFound")}</Text>
       </View>
     );
   }
@@ -49,14 +72,15 @@ export default function BookChaptersRoute() {
           keyExtractor={(item) => String(item.id)}
           numColumns={4}
           contentContainerStyle={styles.grid}
-          renderItem={({ item }) => (
-            <ChapterTile
-              number={item.number}
-              onPress={() =>
-                router.push(`/reader/${book.slug}/${item.number}`)
-              }
-            />
-          )}
+          renderItem={renderChapter}
+          initialNumToRender={16}
+          maxToRenderPerBatch={12}
+          windowSize={5}
+          getItemLayout={(_, index) => ({
+            length: CHAPTER_TILE_SIZE,
+            offset: CHAPTER_TILE_SIZE * Math.floor(index / 4),
+            index,
+          })}
           ListEmptyComponent={<Text style={styles.empty}>{t("book.noChaptersImported")}</Text>}
         />
       </View>

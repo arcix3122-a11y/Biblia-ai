@@ -4,12 +4,26 @@ import type { Book, Chapter, Testament, Verse, VerseWithReference } from "@/type
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { getDatabase } from "@/services/db/database";
 
-export function useDatabaseReady(): { ready: boolean; error: string | null } {
+export function useDatabaseReady(): {
+  ready: boolean;
+  error: string | null;
+  retry: () => void;
+} {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+
+  const retry = useCallback(() => {
+    setReady(false);
+    setError(null);
+    setAttempt((value) => value + 1);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
+    setReady(false);
+    setError(null);
+
     getDatabase()
       .then(() => {
         if (mounted) {
@@ -24,9 +38,9 @@ export function useDatabaseReady(): { ready: boolean; error: string | null } {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [attempt]);
 
-  return { ready, error };
+  return { ready, error, retry };
 }
 
 export function useBooks(testament: Testament) {

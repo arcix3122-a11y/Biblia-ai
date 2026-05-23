@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Animated,
   FlatList,
   Pressable,
@@ -12,10 +11,13 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassChrome } from "@/components/GlassChrome";
+import { LoadingState } from "@/components/layout/LoadingState";
 import { ImmersiveModeToggle } from "@/components/reader/ImmersiveModeToggle";
 import { FontControls } from "@/components/reader/FontControls";
 import { ReadingCanvas } from "@/components/reader/ReadingCanvas";
+import { CrossReferencesPanel } from "@/components/reader/CrossReferencesPanel";
 import { VerseRow } from "@/components/VerseRow";
 import { useChrome } from "@/context/ChromeContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
@@ -25,12 +27,15 @@ import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
 import { HighlightColorPicker } from "@/components/reader/HighlightColorPicker";
 import { useHighlights } from "@/hooks/useHighlights";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { captureVerseStory, shareVerseImage } from "@/services/share/verseImageExporter";
 import { recordChapterRead } from "@/services/stats/userStats";
 import { useHistoryStore } from "@/store/historyStore";
 import { useReaderStore } from "@/store/readerStore";
 import { useSelectionStore } from "@/store/selectionStore";
 import { animations, colors, radii, spacing, typography } from "@/theme";
+import { hapticLight } from "@/utils/haptics";
+import type { Verse } from "@/types/scripture";
 
 export default function ReaderScreen() {
   const { t } = useTranslation();
@@ -38,14 +43,17 @@ export default function ReaderScreen() {
   const router = useRouter();
   const { setTabBarHidden } = useChrome();
   const chromeOpacity = useRef(new Animated.Value(1)).current;
-  const { bookSlug, chapter: chapterParam } = useLocalSearchParams<{
+  const { bookSlug, chapter: chapterParam, verse: verseParam } = useLocalSearchParams<{
     bookSlug: string;
     chapter: string;
+    verse?: string;
   }>();
   const slug = typeof bookSlug === "string" ? bookSlug : "";
   const chapterNumber = Number(chapterParam) || 1;
+  const verseFromRoute = verseParam ? Number(verseParam) : undefined;
 
-  const { ready, error: dbError } = useDatabaseReady();
+  const reducedMotion = useReducedMotion();
+  const { ready, error: dbError, retry: retryDatabase } = useDatabaseReady();
   const { book, loading: bookLoading } = useBook(slug);
   const { verses, loading: versesLoading } = useChapterVerses(book?.id, chapterNumber);
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
@@ -64,34 +72,44 @@ export default function ReaderScreen() {
     setTabBarHidden(immersiveMode);
     Animated.timing(chromeOpacity, {
       toValue: immersiveMode ? 0 : 1,
-      duration: animations.immersiveFade.duration,
+      duration: reducedMotion ? 0 : animations.immersiveFade.duration,
       easing: animations.immersiveFade.easing,
       useNativeDriver: true,
     }).start();
     return () => setTabBarHidden(false);
-  }, [chromeOpacity, immersiveMode, setTabBarHidden]);
+  }, [chromeOpacity, immersiveMode, reducedMotion, setTabBarHidden]);
 
-  // Auto-scroll to selected verse
+  const scrollTargetVerse = useMemo(() => {
+    if (
+      selectedVerse &&
+      book &&
+      selectedVerse.bookId === book.id &&
+      selectedVerse.chapter === chapterNumber
+    ) {
+      return selectedVerse.verse;
+    }
+    if (verseFromRoute && Number.isFinite(verseFromRoute)) {
+      return verseFromRoute;
+    }
+    return undefined;
+  }, [book, chapterNumber, selectedVerse, verseFromRoute]);
+
+  // Auto-scroll to selected or deep-linked verse
   useEffect(() => {
-    if (selectedVerse && book && verses.length > 0) {
-      if (
-        selectedVerse.bookId === book.id &&
-        selectedVerse.chapter === chapterNumber
-      ) {
-        const index = verses.findIndex((v) => v.number === selectedVerse.verse);
-        if (index !== -1) {
-          const timer = setTimeout(() => {
-            flatListRef.current?.scrollToIndex({
-              index,
-              animated: true,
-              viewPosition: 0.3,
-            });
-          }, 350);
-          return () => clearTimeout(timer);
-        }
+    if (scrollTargetVerse && book && verses.length > 0) {
+      const index = verses.findIndex((v) => v.number === scrollTargetVerse);
+      if (index !== -1) {
+        const timer = setTimeout(() => {
+          flatListRef.current?.scrollToIndex({
+            index,
+            animated: !reducedMotion,
+            viewPosition: 0.3,
+          });
+        }, reducedMotion ? 0 : 350);
+        return () => clearTimeout(timer);
       }
     }
-  }, [book, chapterNumber, selectedVerse, verses]);
+  }, [book, reducedMotion, scrollTargetVerse, verses]);
 
   useEffect(() => {
     if (book && verses.length > 0) {
@@ -105,6 +123,7 @@ export default function ReaderScreen() {
       if (!book) {
         return;
       }
+      void hapticLight();
       const adjacent = await scriptureRepo.getAdjacentChapter(
         book.id,
         chapterNumber,
@@ -166,18 +185,55 @@ export default function ReaderScreen() {
     }
   }, [selectedVerse, sharing]);
 
+  const renderVerse = useCallback(
+    ({ item }: { item: Verse }) => (
+      <VerseRow
+        verse={item}
+        fontSize={fontSize}
+        isBookmarked={isBookmarked(item.id)}
+        isSelected={
+          selectedVerse != null &&
+          book != null &&
+          selectedVerse.bookId === book.id &&
+          selectedVerse.chapter === chapterNumber &&
+          selectedVerse.verse === item.number
+        }
+        highlightColor={getHighlightColor(item.id)}
+        onPress={() => selectVerse(item.number, item.text)}
+        onLongPress={() => selectVerse(item.number, item.text)}
+        onToggleBookmark={() =>
+          book ? void toggleBookmark(item.id, book.id, chapterNumber, item.number) : undefined
+        }
+      />
+    ),
+    [
+      book,
+      chapterNumber,
+      fontSize,
+      getHighlightColor,
+      isBookmarked,
+      selectVerse,
+      selectedVerse,
+      toggleBookmark,
+    ]
+  );
+
   if (!ready || bookLoading || versesLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={colors.accent} />
+        <LoadingState message={t("common.loading")} />
       </View>
     );
   }
 
-  if (dbError || !book) {
+  if (dbError) {
+    return <ErrorFallback message={dbError} onRetry={retryDatabase} />;
+  }
+
+  if (!book) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.error}>{dbError ?? t("reader.bookNotFound")}</Text>
+        <Text style={styles.error}>{t("reader.bookNotFound")}</Text>
       </View>
     );
   }
@@ -209,6 +265,11 @@ export default function ReaderScreen() {
           ref={flatListRef}
           data={verses}
           keyExtractor={(item) => String(item.id)}
+          renderItem={renderVerse}
+          initialNumToRender={12}
+          maxToRenderPerBatch={8}
+          windowSize={7}
+          removeClippedSubviews
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
           ListHeaderComponent={
@@ -225,31 +286,18 @@ export default function ReaderScreen() {
             setTimeout(() => {
               flatListRef.current?.scrollToIndex({
                 index: info.index,
-                animated: true,
+                animated: !reducedMotion,
                 viewPosition: 0.3,
               });
-            }, 100);
+            }, reducedMotion ? 0 : 100);
           }}
-          renderItem={({ item }) => (
-            <VerseRow
-              verse={item}
-              fontSize={fontSize}
-              isBookmarked={isBookmarked(item.id)}
-              isSelected={
-                selectedVerse?.bookId === book.id &&
-                selectedVerse.chapter === chapterNumber &&
-                selectedVerse.verse === item.number
-              }
-              highlightColor={getHighlightColor(item.id)}
-              onPress={() => selectVerse(item.number, item.text)}
-              onLongPress={() => selectVerse(item.number, item.text)}
-              onToggleBookmark={() =>
-                void toggleBookmark(item.id, book.id, chapterNumber, item.number)
-              }
-            />
-          )}
           ListEmptyComponent={
             <Text style={styles.empty}>{t("reader.chapterUnavailable")}</Text>
+          }
+          ListFooterComponent={
+            !immersiveMode ? (
+              <CrossReferencesPanel bookSlug={book.slug} chapter={chapterNumber} />
+            ) : null
           }
         />
       </ReadingCanvas>
