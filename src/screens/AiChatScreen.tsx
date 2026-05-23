@@ -27,8 +27,14 @@ export default function AiChatScreen() {
   const messages = useAiChatStore((s) => s.messages);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const resetChat = useAiChatStore((s) => s.resetChat);
+  const ensureWelcomeMessage = useAiChatStore((s) => s.ensureWelcomeMessage);
   const limit = useAiChatStore((s) => s.limit);
-  const { sendMessage, sendWithContext, isThinking, canSend, remaining, lastError, clearError, lastInput } = useSpiritualAssistant();
+  const { sendMessage, sendWithContext, isThinking, canSend, remaining, connectionWarning, clearConnectionWarning, lastInput } =
+    useSpiritualAssistant();
+
+  useEffect(() => {
+    ensureWelcomeMessage();
+  }, [ensureWelcomeMessage]);
 
   const scrollToEnd = () => {
     requestAnimationFrame(() => {
@@ -43,7 +49,7 @@ export default function AiChatScreen() {
   }, [isThinking]);
 
   const handleRetry = async () => {
-    clearError();
+    clearConnectionWarning();
     if (lastInput) {
       const sent = await sendMessage(lastInput);
       if (sent) {
@@ -67,7 +73,7 @@ export default function AiChatScreen() {
     }
   };
 
-  const disabled = !canSend() || isThinking || input.trim().length === 0 || lastError !== null;
+  const disabled = !canSend() || isThinking || input.trim().length === 0;
 
   return (
     <KeyboardAvoidingView
@@ -127,11 +133,14 @@ export default function AiChatScreen() {
         </View>
       ) : null}
 
-      {lastError ? (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorBannerText}>{lastError}</Text>
+      {connectionWarning ? (
+        <View style={styles.warningBanner}>
+          <Text style={styles.warningBannerText}>{connectionWarning}</Text>
           <Pressable onPress={() => void handleRetry()} style={styles.retryButton}>
             <Text style={styles.retryButtonText}>{t("ai.retry")}</Text>
+          </Pressable>
+          <Pressable onPress={clearConnectionWarning} style={styles.dismissButton}>
+            <Text style={styles.dismissButtonText}>{t("common.dismiss")}</Text>
           </Pressable>
         </View>
       ) : null}
@@ -148,7 +157,7 @@ export default function AiChatScreen() {
             placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
             placeholderTextColor={colors.textMuted}
             style={styles.input}
-            editable={canSend() && !isThinking && !lastError}
+            editable={canSend() && !isThinking}
             multiline
             maxLength={500}
           />
@@ -290,6 +299,29 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.accent,
     textAlign: "center",
+  },
+  warningBanner: {
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: colors.accentGlow,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    gap: spacing.sm,
+  },
+  warningBannerText: {
+    ...typography.caption,
+    color: colors.accent,
+  },
+  dismissButton: {
+    alignSelf: "flex-start",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  dismissButtonText: {
+    ...typography.caption,
+    color: colors.textMuted,
   },
   errorBanner: {
     marginHorizontal: spacing.md,

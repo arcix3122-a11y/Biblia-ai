@@ -6,6 +6,10 @@ import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useReaderStore } from "@/store/readerStore";
 import { useAiChatStore } from "@/store/aiChatStore";
+import {
+  buildLlmApiConfig,
+  checkLlmConnection,
+} from "@/services/ai/llmClient";
 import { useSpiritualAssistant } from "@/hooks/useSpiritualAssistant";
 import { FontControls } from "@/components/reader/FontControls";
 import { GlassCard } from "@/components/GlassCard";
@@ -14,6 +18,7 @@ import { getLastSyncAt } from "@/services/sync/syncEngine";
 import { getSupabaseClient } from "@/services/supabase/supabaseClient";
 import { formatNoteDate } from "@/utils/formatDate";
 import { useLocaleStore } from "@/store/localeStore";
+import { resetDatabaseForDev, resetDatabaseInit } from "@/services/db/database";
 import { colors, radii, spacing, typography } from "@/theme";
 import { useReminderStore } from "@/store/reminderStore";
 import { requestNotificationPermission, scheduleDailyReminder, cancelDailyReminder } from "@/services/notifications/reminderService";
@@ -32,6 +37,7 @@ export default function SettingsScreen() {
 
   const { hasApiKey, provider, model, endpoint } = useSpiritualAssistant();
   const [health, setHealth] = useState<"idle" | "checking" | "ok" | "error">("idle");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [dailyGoal, setDailyGoalState] = useState(1);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [ecosystemVisible, setEcosystemVisible] = useState(false);
@@ -99,50 +105,28 @@ export default function SettingsScreen() {
   }, [health, t]);
 
   const runHealthCheck = useCallback(async () => {
-    if (!hasApiKey || !endpoint || !model) {
-      setHealth("error");
-      return;
-    }
-
-    const apiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
-    if (!apiKey) {
+    if (!hasApiKey) {
       setHealth("error");
       return;
     }
 
     setHealth("checking");
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
-
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1,
-          temperature: 0,
-          messages: [{ role: "user", content: "ping" }],
-          stream: false,
-        }),
-        signal: controller.signal,
-      });
-
-      setHealth(response.ok ? "ok" : "error");
+      const config = buildLlmApiConfig();
+      const ok = await checkLlmConnection(config);
+      setHealth(ok ? "ok" : "error");
     } catch {
       setHealth("error");
-    } finally {
-      clearTimeout(timeout);
     }
-  }, [endpoint, hasApiKey, model]);
+  }, [hasApiKey]);
 
   useEffect(() => {
+    if (!advancedOpen || !hasApiKey) {
+      return;
+    }
     void runHealthCheck();
-  }, [runHealthCheck]);
+  }, [advancedOpen, hasApiKey, runHealthCheck]);
 
   const handleResetQuota = () => {
     Alert.alert(t("settings.resetQuotaTitle"), t("settings.resetQuotaMessage"), [
@@ -153,6 +137,27 @@ export default function SettingsScreen() {
         onPress: () => {
           resetChat();
           Alert.alert(t("common.success"), t("settings.resetQuotaSuccess"));
+        },
+      },
+    ]);
+  };
+
+  const handleClearLibrary = () => {
+    Alert.alert(t("settings.clearLibraryTitle"), t("settings.clearLibraryMessage"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("settings.clearLibraryConfirm"),
+        style: "destructive",
+        onPress: () => {
+          void (async () => {
+            try {
+              await resetDatabaseForDev();
+              resetDatabaseInit();
+              Alert.alert(t("common.success"), t("settings.clearLibrarySuccess"));
+            } catch {
+              Alert.alert(t("errors.somethingWrong"), t("errors.generic"));
+            }
+          })();
         },
       },
     ]);
@@ -229,7 +234,7 @@ export default function SettingsScreen() {
       {/* AI Companion Section */}
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.aiCompanionStatus")}</Text>
-        <Text style={styles.hint}>{t("settings.aiServiceHint")}</Text>
+        <Text style={styles.hint}>{t("settings.aiCompanionHint")}</Text>
 
         <View style={styles.aiStatusContainer}>
           <View style={styles.aiStatusRow}>
@@ -238,39 +243,6 @@ export default function SettingsScreen() {
               {hasApiKey ? t("settings.aiStatusConfigured") : t("settings.aiStatusMissing")}
             </Text>
           </View>
-
-          {hasApiKey ? (
-            <View style={styles.aiDetails}>
-              <Text style={styles.aiDetailText}>
-                {t("settings.aiProviderValue", { value: provider })}
-              </Text>
-              <Text style={styles.aiDetailText}>
-                {t("settings.aiModelValue", { value: model })}
-              </Text>
-              {endpoint ? (
-                <Text style={styles.aiDetailText} numberOfLines={1}>
-                  {t("settings.aiEndpointValue", { value: endpoint })}
-                </Text>
-              ) : null}
-
-              <View style={styles.healthRow}>
-                <View
-                  style={[
-                    styles.healthDot,
-                    health === "ok"
-                      ? styles.healthDotOk
-                      : health === "checking"
-                        ? styles.healthDotChecking
-                        : styles.healthDotError,
-                  ]}
-                />
-                <Text style={styles.aiDetailText}>{healthLabel}</Text>
-                <Pressable onPress={() => void runHealthCheck()} style={styles.healthRefresh}>
-                  <Ionicons name="refresh" size={14} color={colors.accent} />
-                </Pressable>
-              </View>
-            </View>
-          ) : null}
 
           {/* Quota Progress */}
           <View style={styles.quotaSection}>
@@ -294,6 +266,56 @@ export default function SettingsScreen() {
             <Ionicons name="refresh-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
             <Text style={styles.resetButtonText}>{t("ai.clearChat")}</Text>
           </Pressable>
+
+          <Pressable onPress={() => setAdvancedOpen((open) => !open)} style={styles.advancedToggle}>
+            <Text style={styles.advancedToggleText}>{t("settings.advanced")}</Text>
+            <Ionicons
+              name={advancedOpen ? "chevron-up" : "chevron-down"}
+              size={16}
+              color={colors.textMuted}
+            />
+          </Pressable>
+
+          {advancedOpen ? (
+            <View style={styles.advancedPanel}>
+              <Text style={styles.hint}>{t("settings.advancedHint")}</Text>
+
+              {hasApiKey ? (
+                <View style={styles.aiDetails}>
+                  <Text style={styles.aiDetailText}>
+                    {t("settings.aiProviderValue", { value: provider })}
+                  </Text>
+                  <Text style={styles.aiDetailText}>
+                    {t("settings.aiModelValue", { value: model })}
+                  </Text>
+                  {endpoint ? (
+                    <Text style={styles.aiDetailText} numberOfLines={1}>
+                      {t("settings.aiEndpointValue", { value: endpoint })}
+                    </Text>
+                  ) : null}
+
+                  <View style={styles.healthRow}>
+                    <View
+                      style={[
+                        styles.healthDot,
+                        health === "ok"
+                          ? styles.healthDotOk
+                          : health === "checking"
+                            ? styles.healthDotChecking
+                            : styles.healthDotError,
+                      ]}
+                    />
+                    <Text style={styles.aiDetailText}>{healthLabel}</Text>
+                    <Pressable onPress={() => void runHealthCheck()} style={styles.healthRefresh}>
+                      <Ionicons name="refresh" size={14} color={colors.accent} />
+                    </Pressable>
+                  </View>
+                </View>
+              ) : (
+                <Text style={styles.note}>{t("settings.aiStatusMissing")}</Text>
+              )}
+            </View>
+          ) : null}
         </View>
       </GlassCard>
 
@@ -368,6 +390,16 @@ export default function SettingsScreen() {
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.appearance")}</Text>
         <Text style={styles.note}>{t("settings.appearanceNote")}</Text>
+      </GlassCard>
+
+      {/* Advanced / library reset */}
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.advanced")}</Text>
+        <Text style={styles.hint}>{t("settings.advancedHint")}</Text>
+        <Pressable onPress={handleClearLibrary} style={styles.dangerButton}>
+          <Ionicons name="trash-outline" size={16} color={colors.danger} style={{ marginRight: 6 }} />
+          <Text style={styles.dangerButtonText}>{t("settings.clearLibraryData")}</Text>
+        </Pressable>
       </GlassCard>
 
       <EcosystemModal visible={ecosystemVisible} onClose={() => setEcosystemVisible(false)} />
@@ -557,6 +589,24 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontWeight: "600",
   },
+  advancedToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  advancedToggleText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontWeight: "600",
+  },
+  advancedPanel: {
+    gap: spacing.sm,
+    paddingTop: spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: colors.glassBorder,
+  },
   goalRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -614,6 +664,22 @@ const styles = StyleSheet.create({
   ecosystemButtonText: {
     ...typography.caption,
     color: colors.accent,
+    fontWeight: "600",
+  },
+  dangerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.backgroundElevated,
+    borderWidth: 1,
+    borderColor: colors.danger,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  dangerButtonText: {
+    ...typography.caption,
+    color: colors.danger,
     fontWeight: "600",
   },
 });

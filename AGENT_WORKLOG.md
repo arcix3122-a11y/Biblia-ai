@@ -5,6 +5,97 @@ Add one short entry per completed task.
 
 ---
 
+## 2026-05-23 — START (fix AI Companion end-to-end)
+
+- **Agent:** Cursor subagent
+- **Cel:** Naprawa zakładki Asystent (pusty czat, brak welcome) i połączenia Groq (Błąd połączenia mimo klucza).
+- **Zakres:** `useSpiritualAssistant`, `aiChatStore`, `AiChatScreen`, panel AI w Settings, i18n PL/EN.
+- **Walidacja:** `npm run typecheck` przed DONE.
+
+---
+
+## 2026-05-23 — DONE (fix AI Companion end-to-end)
+
+- **Wynik:** Welcome zawsze widoczny (`ensureWelcomeMessage` + rehydrate); Groq przez wspólny `llmClient.ts`; przy błędzie API — banner + lokalny mock, czat nie blokuje inputu.
+- **Settings:** diagnostyka LLM przeniesiona do sekcji „Zaawansowane” (domyślnie zwinięta).
+- **Pliki:** `llmClient.ts`, `useSpiritualAssistant.ts`, `aiChatStore.ts`, `AiChatScreen.tsx`, `SettingsScreen.tsx`, `en.json`, `pl.json`, `bookNames.ts` (TS fix).
+- **Walidacja:** `npm run typecheck` — 0 błędów.
+- **Limit 20/20:** bez zmian — quota tylko przy udanym live API.
+
+---
+
+### START — Przebudowa UX + AI + języki [2026-05-23]
+
+**Stan po sesji naprawczej:** aplikacja **uruchamia się** w Expo Go (typecheck OK, seed DB domknięty w worklogu), ale użytkownik raportuje **katastrofę UX** — mieszane języki, AI niedziałające, przeładowany interfejs, brak spójności PL UI vs angielska Biblia/księgi. To **nowa faza** — nie „wydmuszka techniczna”, lecz **produkt nieużywalny dla polskiego użytkownika pierwszego dnia**.
+
+#### Co biorę na klatę (parent coordinator + 3 agentów implementacyjnych)
+
+| Rola | Zakres | Odpowiedzialność |
+|------|--------|------------------|
+| **Parent coordinator** (ten wpis) | Orkiestracja, worklog, kryteria akceptacji, brak edycji TSX w tej fazie START | Rozbicie P0, przydział agentów, weryfikacja smoke testu Expo Go po każdym agencie, aktualizacja `AGENTS.md` → sekcja **UX principles** |
+| **Agent UX-A — AI & Companion** | Naprawa Groq/live LLM, health-check, pusty chat, retry, mock fallback | `useSpiritualAssistant.ts`, `AiChatScreen.tsx`, `SettingsScreen.tsx` (sekcja AI), `.env.example`, klucze `ai.*` / `errors.*` |
+| **Agent UX-B — Języki & Pismo** | Spójność PL/EN: nazwy ksiąg, banner KJV, szablony AI z lokalnymi skrótami | `BookTile`, `BookScreen`, `ReaderScreen`, mapa ksiąg w locale lub `src/data/bookNames.ts`, `en.json` / `pl.json`, `WorkspaceScreen` (skróty PL) |
+| **Agent UX-C — Uproszczenie shell** | First-run, Home, Settings — mniej kart/sekcji, ukrycie dev-only, sync UX | `HomeScreen.tsx`, `SettingsScreen.tsx`, `EcosystemModal.tsx`, `onboardingStore.ts`, `OfflineBadge.tsx`, `syncEngine.ts` |
+
+**Kryterium końcowe fazy:** polski użytkownik bez README → Home w <15 s → wybiera księgę po **polskiej etykiecie** → czyta KJV z widocznym disclaimerem → wysyła wiadomość w Companion (live lub czytelny mock) → Settings nie przytłacza (>3 sekcje above-the-fold ukryte w „Zaawansowane”).
+
+#### Problemy ze screenshotów użytkownika (diagnoza)
+
+| # | Obserwacja (screenshot / raport) | Prawdopodobna przyczyna w repo | Wpływ |
+|---|----------------------------------|--------------------------------|-------|
+| 1 | **Companion pusty** — brak odpowiedzi AI, martwy input | Groq health-check `settings.aiHealthError` = „Błąd połączenia”; `useSpiritualAssistant` wymaga `EXPO_PUBLIC_AI_API_KEY`; brak klucza lub błąd sieci/API → `lastError` blokuje wysyłkę (`AiChatScreen` `disabled` gdy `lastError !== null`) | P0 — core value prop martwy |
+| 2 | **Settings overload** — ~10 kart (`GlassCard`): język, font, cel, immersive, AI status+quota+provider+model+endpoint, powiadomienia, cloud sync, tłumaczenie Pisma, ekosystem, about, appearance | Feature creep wielu agentów (Antigravity AI status, Claude notifications/stats, Copilot sync) bez progressive disclosure | P0 — nowy użytkownik ucieka |
+| 3 | **Numbers 20** — użytkownik pyta czy pełna Biblia na urządzeniu | `assets/bible-seed.json` = **66 ksiąg / ~6,87 MB / 31100 wersetów** (commit Copilot 13:16); wcześniejszy mobile seed (4 księgi) w worklogu **nie utrzymał się** w HEAD lub urządzenie ma stary SQLite | P0 — mylące oczekiwania + wolny pierwszy seed |
+| 4 | **PL UI + angielskie nazwy ksiąg** (`Genesis`, `Numbers`, `John` w siatce i nagłówkach) | `BookTile` / `BookScreen` renderują `book.name` z SQLite (KJV EN); brak `bookNames` mapy per locale | P0 — „mixed language” bez tłumaczenia Pisma |
+| 5 | **Cloud sync: „Jeszcze nie zsynchronizowano”** | `getLastSyncAt()` null; wymaga Supabase Anonymous Auth w Dashboard + `EXPO_PUBLIC_SUPABASE_*` + online; sync fire-and-forget bez widocznego retry | P1→P0 jeśli user oczekuje sync day-one |
+| 6 | **Floating „debug pill”** (zielona pastylka na Home) | Prawdopodobnie `OfflineBadge` (`home.offlineReady` — „Biblioteka offline gotowa”) lub overlay Expo dev; brak `__DEV__` gate | P1 — wygląda jak debug, nie produkt |
+| 7 | **EcosystemModal przy starcie** — SolidCode apps, cytat, animacje | Antigravity: auto-show gdy `!hasSeenEcosystemModal` po `ready` na Home | P1 — blokuje pierwsze wrażenie czytnika |
+| 8 | **Home przeładowany** — dashboard streak, plany×2, VOTD, topics, search, language tip, offline badge, stats btn | Równoległe feature’y bez hierarchii informacji | P0 — cognitive overload |
+
+#### Antigravity — co zostawić vs co psuje UX
+
+| Moduł Antigravity | Wartość | Werdykt |
+|-------------------|---------|---------|
+| **Workspace** (notatnik, zakładki, SelectionToolbar→note) | Silny differentiator; działa po odblokowaniu DB | **Zostawić** — schować za tab, nie na first-run |
+| **Verse Study** (`app/study.tsx`, `useVerseStudy`) | Premium depth; wymaga AI | **Zostawić** — entry tylko z czytnika (long-press), nie promować na Home |
+| **EcosystemModal×2** (onboarding + premium quote) | Marketing SolidCode | **Odłożyć** z auto-show — link tylko w Settings → Ecosystem; nie przy pierwszym launch |
+| **Settings AI status** (health, quota, provider, model, endpoint) | Dev-friendly | **Przenieść** do „Zaawansowane / Deweloper”; user widzi tylko „Połączono / Brak klucza / Spróbuj ponownie” |
+| **Stats OT/NT + AI retry banner** | OK dla power userów | **Zostawić** — stats via ikona; retry banner tylko gdy błąd, nie permanentny |
+| **Import pełnej Biblii** (Copilot, nie Antigravity) | 66 ksiąg lokalnie | **Decyzja produktowa:** mobile seed (4 księgi demo) vs full offline — obecnie repo = **full** |
+
+---
+
+## PLAN P0 — Przebudowa UX [2026-05-23]
+
+| Problem | Agent | Pliki | Kryterium akceptacji |
+|---------|-------|-------|----------------------|
+| **P0-1** Groq / live AI — „Błąd połączenia”, chat nie odpowiada | UX-A | `src/hooks/useSpiritualAssistant.ts`, `src/screens/AiChatScreen.tsx`, `src/screens/SettingsScreen.tsx`, `.env.example`, `src/i18n/locales/en.json`, `pl.json` | Settings health = OK **lub** czytelny stan „brak klucza”; wysłanie wiadomości w Companion zwraca odpowiedź (live **lub** mock PL/EN); retry działa; `npm run typecheck` 0 |
+| **P0-2** Companion zablokowany przy błędzie (`lastError` → disabled input) | UX-A | `src/screens/AiChatScreen.tsx`, `useSpiritualAssistant.ts` | Po błędzie API użytkownik może ponowić **lub** przejść na mock bez restartu; banner błędu + przycisk retry widoczne |
+| **P0-3** Mieszane języki — polski UI, angielskie nazwy ksiąg w siatce/nagłówkach | UX-B | `src/components/BookTile.tsx`, `src/screens/BookScreen.tsx`, `src/screens/ReaderScreen.tsx`, `src/screens/HomeScreen.tsx`, nowy `src/data/bookDisplayNames.ts` lub `book.*` w locale JSON | UI locale PL → etykiety ksiąg po polsku (np. „Księga Rodzaju”, „Liczb”); EN → angielskie; **tekst wersetów** nadal KJV EN |
+| **P0-4** Brak wyraźnej informacji „Pismo po angielsku (KJV)” dla PL usera | UX-B | `src/screens/ReaderScreen.tsx`, `SettingsScreen.tsx`, `en.json`, `pl.json` | Banner KJV widoczny przy pierwszym wejściu w czytnik (PL); dismissable; Settings → sekcja tłumaczenia bez żargonu |
+| **P0-5** Settings — 10+ sekcji, przytłacza nowego użytkownika | UX-C | `src/screens/SettingsScreen.tsx`, `en.json`, `pl.json` | Above-the-fold: Język, Czytelnik (font+immersive), AI (skrót), O aplikacji; reszta w „Zaawansowane” (powiadomienia, sync, ekosystem, AI dev, cel dzienny) |
+| **P0-6** Home — cognitive overload (dashboard, 2 plany, tip, badge, stats, EcosystemModal) | UX-C | `src/screens/HomeScreen.tsx`, `src/components/EcosystemModal.tsx`, `src/store/onboardingStore.ts`, `HomeScreen` sections | First-run: search + siatka ksiąg + continue reading; **bez** auto EcosystemModal; plany/stats/tip opóźnione lub zwinięte; smoke: nowy user trafia w czytnik ≤3 tapy |
+| **P0-7** Seed Biblii — 66 ksiąg / 6,7 MB vs oczekiwanie „demo” / Numbers 20 confusion | UX-C (+ coord) | `assets/bible-seed.json`, `scripts/create-mobile-seed.mjs`, `src/services/db/seed.ts`, `README.md` | Jawna decyzja w worklog + README: **mobile seed 4 księgi** (szybki Expo Go) **albo** full 66 z progress UI; chapter picker nie sugeruje pełnej Biblii jeśli seed demo; reinstall instrukcja |
+| **P0-8** Cloud sync pokazuje „Jeszcze nie zsynchronizowano” bez akcji | UX-C | `src/services/sync/syncEngine.ts`, `SettingsScreen.tsx`, `app/_layout.tsx`, `README.md` | Gdy Supabase skonfigurowany: pierwszy sync w ≤30 s online **lub** przycisk „Synchronizuj teraz” + komunikat gdy Anonymous Auth wyłączony w Dashboard |
+
+**P0 count: 8**
+
+---
+
+### DONE — Przebudowa UX + AI + języki [2026-05-23]
+
+**Status:** ⏳ **Oczekuje agentów implementacyjnych** (UX-A, UX-B, UX-C).
+
+| Agent | Oczekiwany DONE | Walidacja |
+|-------|-----------------|-----------|
+| UX-A | AI live/mock + retry + Settings health | Expo Go: wyślij wiadomość PL → odpowiedź; Settings ≠ „Błąd połączenia” (przy poprawnym `.env`) |
+| UX-B | Polskie nazwy ksiąg + KJV disclaimer | Home PL → „Liczb” nie „Numbers”; czytnik z bannerem KJV |
+| UX-C | Uproszczony Home/Settings, seed decision, sync UX | Nowy user ≤3 tapy do czytnika; Settings ≤4 sekcje visible; sync retry lub jasny komunikat |
+
+**Parent coordinator DONE:** po zamknięciu wszystkich trzech agentów — smoke test end-to-end, aktualizacja tej sekcji, `npm run typecheck`, `npm run check:locales`.
+
+---
+
 ### START — Przejęcie sesji 2026-05-23
 
 - **Biorę na klatę:** naprawa mojibake PL/EN (`pl.json`/`en.json`); mobile-first seed DB (4 fragmenty zamiast 6,7 MB / 31100 wersetów); odblokowanie Home/AI/Workspace (timeout init 30 s, retry, flaga `@biblia-ai/db-seeded`); merge z pracą równoległych agentów (Antigravity Workspace/Study, Copilot full import, Cursor sync/polish).
@@ -755,10 +846,10 @@ npx expo start
 
 ## 2026-05-23 14:38
 - Agent: Antigravity
-- Task: START - Naprawa krytycznego mojibake (błędnego kodowania) w plikach pl.json i en.json oraz zdiagnozowanie i usunięcie blokady ładowania biblioteki Pisma (seeding / DB init)
-- Changes: pending
-- Validation: pending
-- Result: in-progress
+- Task: DONE - Naprawa krytycznego mojibake (błędnego kodowania) w plikach pl.json i en.json oraz zdiagnozowanie i usunięcie blokady ładowania biblioteki Pisma (seeding / DB init)
+- Changes: src/services/db/database.ts, src/services/db/seed.ts, assets/bible-seed.json, src/i18n/locales/en.json, src/i18n/locales/pl.json
+- Validation: Restored 100% clean Polish locales from c12c8be, fixed en.json invalid codes, optimized SQLite seeding via batched insertions (chunks of 100 verses), and resolved migrations table-not-found crash via try/catch in database.ts. Passed `npm run typecheck` cleanly.
+- Result: done
 
 ---
 
@@ -783,3 +874,10 @@ npx expo start
 - Changes: assets/bible-seed.json (4 księgi / 94 wersety), scripts/create-mobile-seed.mjs, database.ts (reset init + retry), useScripture.ts (timeout 30s), HomeScreen.tsx (error przed spinnerem), _layout.tsx, en.json/pl.json (databaseInitTimeout, mojibake)
 - Validation: npm run typecheck — 0 błędów
 - Result: done — pierwszy launch powinien zakończyć seed <10s na telefonie średniej klasy
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: START - Lokalizacja nazw ksiąg (PL/EN) i reset biblioteki w Ustawieniach
+- Changes: pending
+- Validation: pending
+- Result: in-progress

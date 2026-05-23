@@ -16,6 +16,7 @@ interface AiChatState {
   canSend: () => boolean;
   remaining: () => number;
   resetChat: () => void;
+  ensureWelcomeMessage: () => void;
 }
 
 function createMessage(role: ChatMessage["role"], content: string): ChatMessage {
@@ -29,6 +30,13 @@ function createMessage(role: ChatMessage["role"], content: string): ChatMessage 
 
 function welcomeMessage(): ChatMessage {
   return createMessage("assistant", i18n.t("ai.welcomeMessage"));
+}
+
+function needsWelcomeMessage(messages: ChatMessage[]): boolean {
+  if (messages.length === 0) {
+    return true;
+  }
+  return !messages.some((message) => message.role === "assistant");
 }
 
 export const useAiChatStore = create<AiChatState>()(
@@ -64,6 +72,14 @@ export const useAiChatStore = create<AiChatState>()(
           messages: [createMessage("assistant", i18n.t("ai.chatCleared"))],
           messageCount: 0,
         }),
+
+      ensureWelcomeMessage: () => {
+        const { messages } = get();
+        if (!needsWelcomeMessage(messages)) {
+          return;
+        }
+        set({ messages: [welcomeMessage(), ...messages] });
+      },
     }),
     {
       name: "@biblia-ai/chat",
@@ -72,6 +88,14 @@ export const useAiChatStore = create<AiChatState>()(
         messages: state.messages,
         messageCount: state.messageCount,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) {
+          return;
+        }
+        if (needsWelcomeMessage(state.messages)) {
+          state.messages = [welcomeMessage(), ...state.messages];
+        }
+      },
     }
   )
 );
