@@ -9,6 +9,8 @@ import { ChromeProvider } from "@/context/ChromeContext";
 import { initI18n } from "@/i18n";
 import { initializeErrorLogger, logError } from "@/services/errors/errorLogger";
 import { getDatabase } from "@/services/db/database";
+import { ensureAnonymousSession } from "@/services/supabase/supabaseClient";
+import { initSyncEngine, scheduleSync } from "@/services/sync/syncEngine";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHighlightsStore } from "@/store/highlightsStore";
 import { useHistoryStore } from "@/store/historyStore";
@@ -109,6 +111,15 @@ export default function RootLayout() {
 
     installGlobalErrorHandler();
     initializeErrorLogger();
+    initSyncEngine();
+
+    void ensureAnonymousSession()
+      .then(() => {
+        scheduleSync();
+      })
+      .catch((err: unknown) => {
+        logError(err, "AnonymousAuthInit");
+      });
 
     void getDatabase()
       .then(() => {

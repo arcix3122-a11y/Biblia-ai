@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { scheduleSync, queueNoteDelete } from "@/services/sync/syncEngine";
 
 export interface Note {
   id: string;
@@ -61,6 +62,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
 
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedNotes));
     set({ notes: updatedNotes });
+    scheduleSync();
     return targetId!;
   },
 
@@ -69,5 +71,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     const updatedNotes = notes.filter((n) => n.id !== id);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedNotes));
     set({ notes: updatedNotes });
+    await queueNoteDelete(id);
+    scheduleSync();
   },
 }));

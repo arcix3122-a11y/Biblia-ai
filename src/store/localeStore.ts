@@ -20,6 +20,8 @@ export const useLocaleStore = create<LocaleState>()(
       setLocale: async (locale) => {
         await i18n.changeLanguage(locale);
         set({ locale });
+        const { scheduleSync } = await import("@/services/sync/syncEngine");
+        scheduleSync();
       },
     }),
     {

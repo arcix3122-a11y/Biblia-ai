@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { scheduleSync } from "@/services/sync/syncEngine";
 import type { HighlightColor } from "@/types/scripture";
 import * as highlightsRepo from "@/services/db/highlightsRepository";
 
@@ -33,13 +34,20 @@ export const useHighlightsStore = create<HighlightsState>((set, get) => ({
     const next = new Map(get().highlightColors);
     next.set(verseId, color);
     set({ highlightColors: next });
+    scheduleSync();
   },
 
   clearHighlight: async (verseId) => {
+    const reference = await highlightsRepo.findHighlightReferenceByVerseId(verseId);
     await highlightsRepo.removeVerseHighlight(verseId);
     const next = new Map(get().highlightColors);
     next.delete(verseId);
     set({ highlightColors: next });
+    if (reference) {
+      const { queueHighlightDelete } = await import("@/services/sync/syncEngine");
+      await queueHighlightDelete(reference.book_slug, reference.chapter, reference.verse);
+    }
+    scheduleSync();
   },
 
   getHighlightColor: (verseId) => get().highlightColors.get(verseId),

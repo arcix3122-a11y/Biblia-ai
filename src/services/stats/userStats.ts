@@ -66,6 +66,8 @@ async function readStored(): Promise<StoredStats> {
 
 async function writeStored(stats: StoredStats): Promise<void> {
   await AsyncStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  const { scheduleSync } = await import("@/services/sync/syncEngine");
+  scheduleSync();
 }
 
 function normalizeChaptersForToday(stored: StoredStats): StoredStats {

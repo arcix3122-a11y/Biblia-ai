@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { scheduleSync } from "@/services/sync/syncEngine";
 
 interface YearPlanState {
   startDate: string | null; // ISO date string YYYY-MM-DD
@@ -41,22 +42,32 @@ export const useYearPlanStore = create<YearPlanState>((set, get) => ({
 
   startPlan: async () => {
     const startDate = new Date().toISOString().split("T")[0]!;
-    const state = { startDate, completedDays: [] as number[] };
+    const state = {
+      startDate,
+      completedDays: [] as number[],
+      updated_at: new Date().toISOString(),
+    };
     await AsyncStorage.setItem(KEY, JSON.stringify(state));
-    set({ ...state, loaded: true });
+    set({ startDate: state.startDate, completedDays: state.completedDays, loaded: true });
+    scheduleSync();
   },
 
   resetPlan: async () => {
     await AsyncStorage.removeItem(KEY);
     set({ startDate: null, completedDays: [], loaded: true });
+    scheduleSync();
   },
 
   markDayComplete: async (day) => {
     const { completedDays, startDate } = get();
     if (completedDays.includes(day)) return;
     const next = [...completedDays, day];
-    await AsyncStorage.setItem(KEY, JSON.stringify({ startDate, completedDays: next }));
+    await AsyncStorage.setItem(
+      KEY,
+      JSON.stringify({ startDate, completedDays: next, updated_at: new Date().toISOString() })
+    );
     set({ completedDays: next });
+    scheduleSync();
   },
 
   isDayComplete: (day) => get().completedDays.includes(day),

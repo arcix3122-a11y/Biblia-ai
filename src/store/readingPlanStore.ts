@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { FOUNDATION_WEEK_PLAN } from "@/data/readingPlans";
+import { scheduleSync } from "@/services/sync/syncEngine";
 
 const STORAGE_KEY = "@biblia-ai/reading-plan";
 
@@ -59,9 +60,14 @@ export const useReadingPlanStore = create<ReadingPlanState>((set, get) => ({
     const next = [...completedDays, day].sort((a, b) => a - b);
     await AsyncStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ planId: FOUNDATION_WEEK_PLAN.id, completedDays: next })
+      JSON.stringify({
+        planId: FOUNDATION_WEEK_PLAN.id,
+        completedDays: next,
+        updated_at: new Date().toISOString(),
+      })
     );
     set({ completedDays: next });
+    scheduleSync();
   },
 
   isDayComplete: (day) => get().completedDays.includes(day),
@@ -69,8 +75,13 @@ export const useReadingPlanStore = create<ReadingPlanState>((set, get) => ({
   resetProgress: async () => {
     await AsyncStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ planId: FOUNDATION_WEEK_PLAN.id, completedDays: [] })
+      JSON.stringify({
+        planId: FOUNDATION_WEEK_PLAN.id,
+        completedDays: [],
+        updated_at: new Date().toISOString(),
+      })
     );
     set({ completedDays: [] });
+    scheduleSync();
   },
 }));

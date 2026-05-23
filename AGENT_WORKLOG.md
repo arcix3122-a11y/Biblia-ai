@@ -5,6 +5,34 @@ Add one short entry per completed task.
 
 ---
 
+## 2026-05-23 — START (subagent — Supabase Anonymous Auth + cloud sync)
+
+**Cel:** Zero-friction sync danych użytkownika (highlights, notatki, plany czytania, streak/cel/język) przez Supabase Anonymous Auth — bez ekranów logowania.
+
+**Zakres:**
+- Auth: wspólny klient Supabase z AsyncStorage, `signInAnonymously()` w `_layout.tsx`, helper `getSessionUserId()`
+- Migracja: `002_anonymous_cloud_sync.sql` (user_profiles, verse_highlights, user_notes_sync, reading_plans_progress + RLS)
+- syncEngine: online/offline, merge latest `updated_at`, idempotent upserts, debounce z store'ów
+- Wiring: highlightsStore, notesStore, readingPlanStore, yearPlanStore, userStats, localeStore
+
+**Kryteria sukcesu:** migracja na projekcie Supabase, typecheck 0 błędów, sync fire-and-forget po mutacjach lokalnych.
+
+## 2026-05-23 — PROGRESS (subagent — Supabase Anonymous Auth + cloud sync)
+
+- Migracja `anonymous_cloud_sync` zastosowana na projekcie `txwksirnvzoifcdpniby`
+- Klient Supabase + syncEngine + wiring store'ów zaimplementowane
+- `npm run typecheck` — 0 błędów
+
+## 2026-05-23 — DONE (subagent — Supabase Anonymous Auth + cloud sync)
+
+- Silent anonymous auth (`signInAnonymously`) + sesja w AsyncStorage; migracja cloud sync na `txwksirnvzoifcdpniby`
+- syncEngine (NetInfo, merge LWW, debounce) dla highlights, notatek, planów i profilu użytkownika
+- Store'y wired — mutacje lokalne wywołują `scheduleSync()` bez blokowania UI
+- **Wymagane ręcznie:** Dashboard → Authentication → Providers → **Anonymous → Enable**
+- Commit: `feat: anonymous Supabase cloud sync` (tylko pliki sync)
+
+---
+
 ## 2026-05-23 — START (Claude Code orchestrator — polish & structure pass)
 
 **Goal:** Audit project, identify structural/UX gaps, ship improvements end-to-end:
@@ -572,3 +600,15 @@ npx expo start
 
 **Notes:** `expo-haptics` added via `--legacy-peer-deps`. Untracked parallel-agent files (notifications, stats route, reading-plan) remain uncommitted.
 
+
+## 2026-05-23 — DONE (Agent: study-wiring)
+- Task: Wire study screen into reader + add i18n study namespace
+- Changes: ReaderScreen.tsx (study button in selection toolbar), en.json + pl.json (study.* keys updated + errors.studyFetchFailed updated), app/study.tsx (Platform already imported — no fix needed)
+- Validation: npm run typecheck — 0 errors
+- Result: done
+
+## 2026-05-23 — DONE (Agent: home-plan-polish)
+- Task: Fix stale "coming soon" copy; improve reading plan section UX; show year plan progress
+- Changes: en.json + pl.json (planTeaserTitle, planTeaserSub, plansHeading), HomeScreen.tsx (year plan progress card, plansSection wrapper with SectionHeader, progress bar when plan started, "Start →" CTA when not started)
+- Validation: npm run typecheck — 0 errors
+- Result: done
