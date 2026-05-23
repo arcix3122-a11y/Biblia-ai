@@ -25,6 +25,7 @@ import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { colors, radii, spacing, typography } from "@/theme";
 import { GlassCard } from "@/components/GlassCard";
 import { useLocaleStore } from "@/store/localeStore";
+import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { formatNoteDate, formatSavedDate } from "@/utils/formatDate";
 
 export default function WorkspaceScreen() {
@@ -166,7 +167,7 @@ export default function WorkspaceScreen() {
 
           setSelectedVerse({
             bookId: book.id,
-            bookName: book.name,
+            bookName: getBookDisplayName(book.slug, locale, book.name),
             bookSlug: book.slug,
             chapter,
             verse,
@@ -179,7 +180,7 @@ export default function WorkspaceScreen() {
         console.warn("Failed to parse linked verse:", err);
       }
     },
-    [router, setSelectedVerse]
+    [locale, router, setSelectedVerse]
   );
 
   const handleDeleteBookmark = useCallback((item: any) => {
@@ -498,7 +499,13 @@ export default function WorkspaceScreen() {
                     >
                       <Ionicons name="book" size={16} color={colors.accent} style={{ marginRight: 6 }} />
                       <Text style={styles.bookmarkCardRef}>
-                        {item.book_name ?? t("common.book")} {item.chapter}:{item.verse}
+                        {formatBookReference(
+                          item.book_slug,
+                          item.chapter,
+                          item.verse,
+                          locale,
+                          item.book_name ?? t("common.book")
+                        )}
                       </Text>
                     </Pressable>
                     <Pressable

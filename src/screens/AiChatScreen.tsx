@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { ContextPills } from "@/components/ai/ContextPills";
 import { ChatBubble } from "@/components/ChatBubble";
@@ -27,14 +28,19 @@ export default function AiChatScreen() {
   const messages = useAiChatStore((s) => s.messages);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const resetChat = useAiChatStore((s) => s.resetChat);
-  const ensureWelcomeMessage = useAiChatStore((s) => s.ensureWelcomeMessage);
   const limit = useAiChatStore((s) => s.limit);
-  const { sendMessage, sendWithContext, isThinking, canSend, remaining, connectionWarning, clearConnectionWarning, lastInput } =
-    useSpiritualAssistant();
+  const {
+    sendMessage,
+    sendWithContext,
+    isThinking,
+    canSend,
+    remaining,
+    connectionWarning: lastError,
+    clearConnectionWarning: clearError,
+    lastInput,
+  } = useSpiritualAssistant();
 
-  useEffect(() => {
-    ensureWelcomeMessage();
-  }, [ensureWelcomeMessage]);
+  const showStarter = messages.length <= 1;
 
   const scrollToEnd = () => {
     requestAnimationFrame(() => {
@@ -49,7 +55,7 @@ export default function AiChatScreen() {
   }, [isThinking]);
 
   const handleRetry = async () => {
-    clearConnectionWarning();
+    clearError();
     if (lastInput) {
       const sent = await sendMessage(lastInput);
       if (sent) {
@@ -73,7 +79,7 @@ export default function AiChatScreen() {
     }
   };
 
-  const disabled = !canSend() || isThinking || input.trim().length === 0;
+  const disabled = !canSend() || isThinking || input.trim().length === 0 || lastError !== null;
 
   return (
     <KeyboardAvoidingView
@@ -81,21 +87,6 @@ export default function AiChatScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={88}
     >
-      <View style={styles.badgeRow}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {t("ai.responsesRemaining", { remaining: remaining(), limit })}
-          </Text>
-        </View>
-        <Pressable
-          onPress={resetChat}
-          style={styles.clearButton}
-          accessibilityLabel={t("ai.clearChat")}
-        >
-          <Text style={styles.clearButtonText}>{t("common.clear")}</Text>
-        </Pressable>
-      </View>
-
       {selectedVerse ? (
         <View style={styles.contextBanner}>
           <Text style={styles.contextLabel}>{t("ai.selectedVerse")}</Text>
@@ -105,6 +96,14 @@ export default function AiChatScreen() {
           <Text style={styles.contextSnippet} numberOfLines={2}>
             {selectedVerse.text}
           </Text>
+        </View>
+      ) : showStarter ? (
+        <View style={styles.starterArea}>
+          <View style={styles.starterIconWrap}>
+            <Ionicons name="chatbubble-ellipses-outline" size={28} color={colors.accent} />
+          </View>
+          <Text style={styles.starterTitle}>{t("ai.starterTitle")}</Text>
+          <Text style={styles.starterHint}>{t("ai.starterHint")}</Text>
         </View>
       ) : (
         <Text style={styles.contextHint}>{t("ai.contextHint")}</Text>
@@ -133,19 +132,28 @@ export default function AiChatScreen() {
         </View>
       ) : null}
 
-      {connectionWarning ? (
-        <View style={styles.warningBanner}>
-          <Text style={styles.warningBannerText}>{connectionWarning}</Text>
+      {lastError ? (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerText}>{lastError}</Text>
           <Pressable onPress={() => void handleRetry()} style={styles.retryButton}>
             <Text style={styles.retryButtonText}>{t("ai.retry")}</Text>
-          </Pressable>
-          <Pressable onPress={clearConnectionWarning} style={styles.dismissButton}>
-            <Text style={styles.dismissButtonText}>{t("common.dismiss")}</Text>
           </Pressable>
         </View>
       ) : null}
 
-      <GlassChrome>
+      <GlassChrome style={styles.composerChrome}>
+        <View style={styles.composerMeta}>
+          <Text style={styles.quotaText}>
+            {t("ai.responsesRemaining", { remaining: remaining(), limit })}
+          </Text>
+          <Pressable
+            onPress={resetChat}
+            hitSlop={8}
+            accessibilityLabel={t("ai.clearChat")}
+          >
+            <Text style={styles.clearLink}>{t("common.clear")}</Text>
+          </Pressable>
+        </View>
         <ContextPills
           onSelectTemplate={(id) => void handlePill(id)}
           disabled={!selectedVerse || !canSend() || isThinking}
@@ -157,7 +165,7 @@ export default function AiChatScreen() {
             placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
             placeholderTextColor={colors.textMuted}
             style={styles.input}
-            editable={canSend() && !isThinking}
+            editable={canSend() && !isThinking && !lastError}
             multiline
             maxLength={500}
           />
@@ -179,39 +187,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.canvas,
   },
-  badgeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    gap: spacing.sm,
-  },
-  clearButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.pill,
+  starterArea: {
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+    padding: spacing.lg,
+    borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
+    alignItems: "center",
+    gap: spacing.sm,
   },
-  clearButtonText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  badge: {
-    backgroundColor: colors.accentGlow,
+  starterIconWrap: {
+    width: 52,
+    height: 52,
     borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.accentMuted,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    backgroundColor: colors.accentGlow,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.xs,
   },
-  badgeText: {
-    ...typography.caption,
-    color: colors.accent,
+  starterTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+    textAlign: "center",
+  },
+  starterHint: {
+    ...typography.body,
+    color: colors.textMuted,
+    textAlign: "center",
+    lineHeight: 22,
   },
   contextBanner: {
     marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
     marginBottom: spacing.sm,
     padding: spacing.md,
     borderRadius: radii.lg,
@@ -237,10 +247,12 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
     marginBottom: spacing.sm,
   },
   list: {
     paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
     flexGrow: 1,
   },
   thinking: {
@@ -254,19 +266,40 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
   },
+  composerChrome: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.glassBorder,
+  },
+  composerMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+  },
+  quotaText: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  clearLink: {
+    ...typography.caption,
+    color: colors.accent,
+  },
   composer: {
     flexDirection: "row",
     alignItems: "flex-end",
     padding: spacing.md,
+    paddingTop: spacing.sm,
     gap: spacing.sm,
   },
   input: {
     flex: 1,
+    minHeight: 44,
     maxHeight: 120,
     backgroundColor: colors.inputBackground,
     borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
+    borderColor: colors.accentMuted,
     color: colors.textPrimary,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -275,8 +308,8 @@ const styles = StyleSheet.create({
   send: {
     backgroundColor: colors.accent,
     borderRadius: radii.md,
+    minHeight: 44,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
     justifyContent: "center",
   },
   sendDisabled: {
@@ -287,7 +320,8 @@ const styles = StyleSheet.create({
     color: colors.canvas,
   },
   limitBanner: {
-    margin: spacing.md,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
     padding: spacing.md,
     borderRadius: radii.lg,
     backgroundColor: colors.accentGlow,
@@ -299,29 +333,6 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.accent,
     textAlign: "center",
-  },
-  warningBanner: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-    backgroundColor: colors.accentGlow,
-    borderWidth: 1,
-    borderColor: colors.accentMuted,
-    gap: spacing.sm,
-  },
-  warningBannerText: {
-    ...typography.caption,
-    color: colors.accent,
-  },
-  dismissButton: {
-    alignSelf: "flex-start",
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  dismissButtonText: {
-    ...typography.caption,
-    color: colors.textMuted,
   },
   errorBanner: {
     marginHorizontal: spacing.md,

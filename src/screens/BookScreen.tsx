@@ -8,6 +8,8 @@ import {
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { ChapterTile } from "@/components/ChapterTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassChrome } from "@/components/GlassChrome";
@@ -19,6 +21,7 @@ const CHAPTER_TILE_SIZE = 64 + spacing.xs * 2;
 
 export default function BookScreen() {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -67,7 +70,7 @@ export default function BookScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <GlassChrome style={styles.header}>
-        <Text style={styles.title}>{book.name}</Text>
+        <Text style={styles.title}>{getBookDisplayName(book.slug, locale, book.name)}</Text>
         <Text style={styles.meta}>{t("book.chaptersAvailable", { count: chapters.length })}</Text>
       </GlassChrome>
 

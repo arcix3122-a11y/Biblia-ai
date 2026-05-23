@@ -11,6 +11,8 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useYearPlanStore } from "@/store/yearPlanStore";
 import { getAssignmentsForDay } from "@/data/readingPlan";
@@ -20,6 +22,7 @@ import { colors, radii, spacing, typography } from "@/theme";
 
 export default function ReadingPlanScreen() {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const {
@@ -125,7 +128,10 @@ export default function ReadingPlanScreen() {
                   >
                     <Ionicons name="book-outline" size={16} color={colors.accent} />
                     <Text style={styles.chapterText}>
-                      {t("plan.chapterLabel", { book: item.bookName, chapter: item.chapter })}
+                      {t("plan.chapterLabel", {
+                        book: getBookDisplayName(item.bookSlug, locale, item.bookName),
+                        chapter: item.chapter,
+                      })}
                     </Text>
                     <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
                   </Pressable>

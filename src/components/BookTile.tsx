@@ -1,6 +1,8 @@
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { useTranslation } from "react-i18next";
+import { getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { colors, radii, spacing, typography } from "@/theme";
 import type { Book } from "@/types/scripture";
 
@@ -11,16 +13,18 @@ interface BookTileProps {
 
 function BookTileComponent({ book, onPress }: BookTileProps) {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
+  const displayName = getBookDisplayName(book.slug, locale, book.name);
 
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
       accessibilityRole="button"
-      accessibilityLabel={t("book.openBook", { name: book.name })}
+      accessibilityLabel={t("book.openBook", { name: displayName })}
     >
       <Text style={styles.name} numberOfLines={2}>
-        {book.name}
+        {displayName}
       </Text>
       <Text style={styles.meta}>{t("book.chapterCount", { count: book.chapter_count })}</Text>
     </Pressable>

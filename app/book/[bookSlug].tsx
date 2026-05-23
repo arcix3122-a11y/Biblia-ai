@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { ChapterTile } from "@/components/ChapterTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { LoadingState } from "@/components/layout/LoadingState";
@@ -17,6 +19,7 @@ const CHAPTER_TILE_SIZE = 64 + spacing.xs * 2;
 
 export default function BookChaptersRoute() {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const { bookSlug } = useLocalSearchParams<{ bookSlug: string }>();
   const slug = typeof bookSlug === "string" ? bookSlug : "";
   const router = useRouter();
@@ -62,7 +65,9 @@ export default function BookChaptersRoute() {
 
   return (
     <>
-      <Stack.Screen options={{ title: book.name }} />
+      <Stack.Screen
+        options={{ title: getBookDisplayName(book.slug, locale, book.name) }}
+      />
       <View style={styles.container}>
         <Text style={styles.subtitle}>
           {t("book.chaptersAvailable", { count: chapters.length })}

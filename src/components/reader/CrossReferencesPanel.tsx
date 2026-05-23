@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { useRouter } from "expo-router";
 import { getCrossReferences } from "@/data/crossReferences";
 import { colors, radii, spacing, typography } from "@/theme";
@@ -13,6 +15,7 @@ interface Props {
 
 export function CrossReferencesPanel({ bookSlug, chapter }: Props) {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const crossRef = getCrossReferences(bookSlug, chapter);
@@ -42,7 +45,7 @@ export function CrossReferencesPanel({ bookSlug, chapter }: Props) {
               >
                 <View style={styles.refInfo}>
                   <Text style={styles.refTitle}>
-                    {ref.bookName} {ref.chapter}
+                    {getBookDisplayName(ref.bookSlug, locale, ref.bookName)} {ref.chapter}
                   </Text>
                   <Text style={styles.refTheme}>{ref.theme}</Text>
                 </View>

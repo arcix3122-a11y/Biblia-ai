@@ -11,6 +11,8 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassChrome } from "@/components/GlassChrome";
 import { LoadingState } from "@/components/layout/LoadingState";
@@ -22,7 +24,6 @@ import { VerseRow } from "@/components/VerseRow";
 import { useChrome } from "@/context/ChromeContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useBook, useChapterVerses, useDatabaseReady } from "@/hooks/useScripture";
-import { audioEngine } from "@/services/audio/audioEngine";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
 import { HighlightColorPicker } from "@/components/reader/HighlightColorPicker";
@@ -31,6 +32,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { captureVerseStory, shareVerseImage } from "@/services/share/verseImageExporter";
 import { recordChapterRead } from "@/services/stats/userStats";
 import { useHistoryStore } from "@/store/historyStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { useReaderStore } from "@/store/readerStore";
 import { useSelectionStore } from "@/store/selectionStore";
 import { animations, colors, radii, spacing, typography } from "@/theme";
@@ -39,6 +41,7 @@ import type { Verse } from "@/types/scripture";
 
 export default function ReaderScreen() {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { setTabBarHidden } = useChrome();
@@ -61,6 +64,8 @@ export default function ReaderScreen() {
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { getHighlightColor, setHighlight, clearHighlight } = useHighlights();
   const recordPosition = useHistoryStore((s) => s.recordPosition);
+  const hasDismissedKjvBanner = useOnboardingStore((s) => s.hasDismissedKjvBanner);
+  const dismissKjvBanner = useOnboardingStore((s) => s.dismissKjvBanner);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
 
@@ -143,28 +148,15 @@ export default function ReaderScreen() {
       }
       setSelectedVerse({
         bookId: book.id,
-        bookName: book.name,
+        bookName: getBookDisplayName(book.slug, locale, book.name),
         bookSlug: book.slug,
         chapter: chapterNumber,
         verse: verseNumber,
         text,
       });
     },
-    [book, chapterNumber, setSelectedVerse]
+    [book, chapterNumber, locale, setSelectedVerse]
   );
-
-  const loadAudioPreview = useCallback(async () => {
-    if (!book) {
-      return;
-    }
-    await audioEngine.load({
-      bookId: book.id,
-      bookName: book.name,
-      bookSlug: book.slug,
-      chapter: chapterNumber,
-    });
-    await audioEngine.play();
-  }, [book, chapterNumber]);
 
   const selectedVerseId = selectedVerse
     ? verses.find((v) => v.number === selectedVerse.verse)?.id
@@ -238,6 +230,8 @@ export default function ReaderScreen() {
     );
   }
 
+  const bookDisplayName = getBookDisplayName(book.slug, locale, book.name);
+
   return (
     <View style={[styles.container, { paddingTop: immersiveMode ? insets.top : 0 }]}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -249,7 +243,7 @@ export default function ReaderScreen() {
               <Text style={styles.back}>← {t("common.back")}</Text>
             </Pressable>
             <Text style={styles.heading}>
-              {book.name} {chapterNumber}
+              {bookDisplayName} {chapterNumber}
             </Text>
             <FontControls
               fontSize={fontSize}
@@ -273,12 +267,19 @@ export default function ReaderScreen() {
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
           ListHeaderComponent={
-            !immersiveMode ? (
+            !immersiveMode && !hasDismissedKjvBanner ? (
               <View style={styles.translationNotice}>
-                <Ionicons name="information-circle-outline" size={14} color={colors.textMuted} />
-                <Text style={styles.translationNoticeText}>
+                <Text style={styles.translationNoticeText} numberOfLines={1}>
                   {t("reader.scriptureTranslationNotice")}
                 </Text>
+                <Pressable
+                  onPress={dismissKjvBanner}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("reader.dismissTranslationNotice")}
+                >
+                  <Ionicons name="close" size={16} color={colors.textMuted} />
+                </Pressable>
               </View>
             ) : null
           }
@@ -318,7 +319,13 @@ export default function ReaderScreen() {
                 <Ionicons name="sparkles" size={14} color={colors.accent} style={{ marginRight: 6 }} />
                 <Text style={styles.selectionRef} numberOfLines={1}>
                   {t("reader.selected", {
-                    reference: `${selectedVerse.bookName} ${selectedVerse.chapter}:${selectedVerse.verse}`,
+                    reference: formatBookReference(
+                      selectedVerse.bookSlug,
+                      selectedVerse.chapter,
+                      selectedVerse.verse,
+                      locale,
+                      selectedVerse.bookName
+                    ),
                   })}
                 </Text>
               </View>
@@ -330,18 +337,31 @@ export default function ReaderScreen() {
                 />
               ) : null}
 
-              {/* Premium Deep Scripture Study Button */}
               <Pressable
                 onPress={() => router.push("/study")}
                 style={styles.selectionBtnPrimary}
               >
                 <Ionicons name="school-outline" size={16} color={colors.canvas} style={{ marginRight: 6 }} />
                 <Text style={styles.selectionBtnTextPrimary}>
-                  {t("reader.deepStudy") || "Deep Scripture Study"}
+                  {t("reader.deepStudy")}
                 </Text>
               </Pressable>
 
               <View style={styles.selectionActions}>
+                <Pressable
+                  onPress={() => router.push("/ai")}
+                  style={styles.selectionBtn}
+                >
+                  <Ionicons name="chatbubble-ellipses" size={16} color={colors.accent} />
+                  <Text style={styles.selectionBtnText}>{t("reader.aiAssistant")}</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => router.push("/workspace")}
+                  style={styles.selectionBtn}
+                >
+                  <Ionicons name="journal" size={16} color={colors.accent} />
+                  <Text style={styles.selectionBtnText}>{t("reader.notebook")}</Text>
+                </Pressable>
                 <Pressable
                   onPress={() => void onShareSelectedVerse()}
                   disabled={sharing}
@@ -353,32 +373,11 @@ export default function ReaderScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  onPress={() => router.push("/ai")}
-                  style={styles.selectionBtn}
-                >
-                  <Ionicons name="chatbubble-ellipses" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>{t("reader.aiAssistant")}</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => router.push("/study")}
-                  style={styles.selectionBtn}
-                >
-                  <Ionicons name="school-outline" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>{t("study.studyAction")}</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => router.push("/workspace")}
-                  style={styles.selectionBtn}
-                >
-                  <Ionicons name="journal" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>{t("reader.notebook")}</Text>
-                </Pressable>
-                <Pressable
                   onPress={() => setSelectedVerse(null)}
-                  style={[styles.selectionBtn, { borderColor: "rgba(239, 68, 68, 0.2)" }]}
+                  style={[styles.selectionBtn, styles.selectionBtnCancel]}
                 >
                   <Ionicons name="close-circle" size={16} color={colors.danger} />
-                  <Text style={[styles.selectionBtnText, { color: colors.danger }]}>
+                  <Text style={[styles.selectionBtnText, styles.selectionBtnTextCancel]}>
                     {t("common.cancel")}
                   </Text>
                 </Pressable>
@@ -386,32 +385,31 @@ export default function ReaderScreen() {
               <View style={styles.offscreen} pointerEvents="none">
                 <ShareVerseCard
                   ref={shareRef}
-                  reference={`${selectedVerse.bookName} ${selectedVerse.chapter}:${selectedVerse.verse}`}
+                  reference={formatBookReference(
+                    selectedVerse.bookSlug,
+                    selectedVerse.chapter,
+                    selectedVerse.verse,
+                    locale,
+                    selectedVerse.bookName
+                  )}
                   text={selectedVerse.text}
                 />
               </View>
             </View>
           ) : (
-            <>
-              <View style={styles.bottomRow}>
-                <ImmersiveModeToggle
-                  immersive={immersiveMode}
-                  onToggle={toggleImmersiveMode}
-                  chromeOpacity={chromeOpacity}
-                />
-                <Pressable onPress={() => void loadAudioPreview()} style={styles.audioStub}>
-                  <Text style={styles.audioStubText}>{t("reader.listen")}</Text>
-                </Pressable>
-              </View>
-              <View style={styles.nav}>
-                <Pressable onPress={() => void navigateChapter("prev")} style={styles.navButton}>
-                  <Text style={styles.navText}>{t("reader.previous")}</Text>
-                </Pressable>
-                <Pressable onPress={() => void navigateChapter("next")} style={styles.navButton}>
-                  <Text style={styles.navText}>{t("reader.next")}</Text>
-                </Pressable>
-              </View>
-            </>
+            <View style={styles.nav}>
+              <Pressable onPress={() => void navigateChapter("prev")} style={styles.navButton}>
+                <Text style={styles.navText}>{t("reader.previous")}</Text>
+              </Pressable>
+              <ImmersiveModeToggle
+                immersive={immersiveMode}
+                onToggle={toggleImmersiveMode}
+                chromeOpacity={chromeOpacity}
+              />
+              <Pressable onPress={() => void navigateChapter("next")} style={styles.navButton}>
+                <Text style={styles.navText}>{t("reader.next")}</Text>
+              </Pressable>
+            </View>
           )}
         </Animated.View>
       ) : (
@@ -468,26 +466,10 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingHorizontal: spacing.md,
   },
-  bottomRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: spacing.sm,
-  },
-  audioStub: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-  },
-  audioStubText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
   nav: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   navButton: {
     padding: spacing.sm,
@@ -541,7 +523,7 @@ const styles = StyleSheet.create({
   },
   selectionBtn: {
     flexGrow: 1,
-    flexBasis: "45%",
+    flexBasis: "47%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -552,10 +534,16 @@ const styles = StyleSheet.create({
     borderColor: colors.glassBorder,
     backgroundColor: colors.bubbleUser,
   },
+  selectionBtnCancel: {
+    borderColor: "rgba(239, 68, 68, 0.2)",
+  },
   selectionBtnText: {
     ...typography.caption,
     color: colors.textPrimary,
     fontWeight: "600",
+  },
+  selectionBtnTextCancel: {
+    color: colors.danger,
   },
   selectionBtnPrimary: {
     flexDirection: "row",
@@ -579,16 +567,20 @@ const styles = StyleSheet.create({
   },
   translationNotice: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.xs,
-    marginBottom: spacing.md,
-    paddingHorizontal: spacing.xs,
+    alignItems: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.md,
+    backgroundColor: colors.backgroundElevated,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
   },
   translationNoticeText: {
     ...typography.caption,
     color: colors.textMuted,
     flex: 1,
-    lineHeight: 18,
   },
   offscreen: {
     position: "absolute",

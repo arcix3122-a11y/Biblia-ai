@@ -13,14 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Swipeable } from "react-native-gesture-handler";
 import { BookTile } from "@/components/BookTile";
-import { EcosystemModal } from "@/components/EcosystemModal";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
 import { LoadingState } from "@/components/layout/LoadingState";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
 import { ReadingPlanCard } from "@/components/dashboard/ReadingPlanCard";
-import { OfflineBadge } from "@/components/OfflineBadge";
 import { TopicGrid } from "@/components/topics/TopicGrid";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
@@ -34,6 +32,7 @@ import * as scriptureRepo from "@/services/db/scriptureRepository";
 import type { Book, Testament, VerseWithReference } from "@/types/scripture";
 import { useLocaleStore } from "@/store/localeStore";
 import { getDeviceLocale } from "@/i18n";
+import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { HighlightedText } from "@/utils/highlightText";
 import { formatShortDate } from "@/utils/formatDate";
 import { colors, radii, spacing, typography } from "@/theme";
@@ -72,9 +71,6 @@ export default function HomeScreen() {
   const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
   const hasSeenLanguageTip = useOnboardingStore((s) => s.hasSeenLanguageTip);
   const dismissLanguageTip = useOnboardingStore((s) => s.dismissLanguageTip);
-  const hasSeenEcosystemModal = useOnboardingStore((s) => s.hasSeenEcosystemModal);
-  const dismissEcosystemModal = useOnboardingStore((s) => s.dismissEcosystemModal);
-  const [ecosystemModalVisible, setEcosystemModalVisible] = useState(false);
   const lastRead = useHistoryStore((s) => s.lastRead);
   const recent = useHistoryStore((s) => s.recent);
   const loadHistory = useHistoryStore((s) => s.loadHistory);
@@ -102,16 +98,6 @@ export default function HomeScreen() {
   }, [loadHistory, loadBookmarks, yearPlanLoad]);
 
   useEffect(() => {
-    if (ready && !hasSeenEcosystemModal) {
-      const timer = setTimeout(() => {
-        setEcosystemModalVisible(true);
-        dismissEcosystemModal();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [ready, hasSeenEcosystemModal, dismissEcosystemModal]);
-
-  useEffect(() => {
     const trimmed = debouncedQuery.trim();
     if (trimmed.length >= MIN_SEARCH_LEN) {
       void search(trimmed);
@@ -120,8 +106,8 @@ export default function HomeScreen() {
     }
   }, [clear, debouncedQuery, search]);
 
-  const recentUnique = useMemo(() => dedupeRecent(recent, 5), [recent]);
-  const bookmarkPreview = useMemo(() => bookmarks.slice(0, 3), [bookmarks]);
+  const recentUnique = useMemo(() => dedupeRecent(recent, 3), [recent]);
+  const bookmarkPreview = useMemo(() => bookmarks.slice(0, 2), [bookmarks]);
 
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
 
@@ -140,7 +126,7 @@ export default function HomeScreen() {
         if (book) {
           setSelectedVerse({
             bookId: book.id,
-            bookName: book.name,
+            bookName: getBookDisplayName(book.slug, locale, book.name),
             bookSlug: book.slug,
             chapter,
             verse: verseNumber,
@@ -154,7 +140,7 @@ export default function HomeScreen() {
           : `/reader/${bookSlug}/${chapter}`
       );
     },
-    [books, router, setSelectedVerse]
+    [books, locale, router, setSelectedVerse]
   );
 
   const openSearchHit = useCallback(
@@ -170,6 +156,19 @@ export default function HomeScreen() {
       void openReader(lastRead.book_slug, lastRead.chapter, lastRead.verse);
     }
   }, [lastRead, openReader]);
+
+  const startReading = useCallback(() => {
+    if (lastRead?.book_slug) {
+      resumeReading();
+      return;
+    }
+    const firstBook = books[0];
+    if (firstBook) {
+      router.push(`/book/${firstBook.slug}`);
+      return;
+    }
+    router.push("/book/genesis");
+  }, [books, lastRead, resumeReading, router]);
 
   const openTopic = useCallback(
     (slug: string) => {
@@ -215,36 +214,32 @@ export default function HomeScreen() {
       >
         <View style={styles.brandRow}>
           <Text style={styles.brand}>{t("common.appName")}</Text>
-          <View style={styles.brandActions}>
-            <OfflineBadge ready={ready} />
-            <Pressable
-              onPress={() => router.push("/stats")}
-              hitSlop={12}
-              style={styles.statsBtn}
-              accessibilityLabel={t("stats.title")}
-            >
-              <Ionicons name="bar-chart-outline" size={20} color={colors.accent} />
-            </Pressable>
-            <Pressable
-              onPress={() => router.push("/settings")}
-              hitSlop={12}
-              accessibilityLabel={t("home.openSettings")}
-            >
-              <Ionicons name="settings-outline" size={22} color={colors.accent} />
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={() => router.push("/settings")}
+            hitSlop={12}
+            accessibilityLabel={t("home.openSettings")}
+          >
+            <Ionicons name="settings-outline" size={22} color={colors.accent} />
+          </Pressable>
         </View>
+
+        <Pressable
+          onPress={startReading}
+          style={({ pressed }) => [styles.primaryCta, pressed && styles.primaryCtaPressed]}
+          accessibilityRole="button"
+          accessibilityLabel={t("home.readScripture")}
+        >
+          <Ionicons name="book-outline" size={20} color={colors.canvas} />
+          <Text style={styles.primaryCtaText}>{t("home.readScripture")}</Text>
+        </Pressable>
 
         <MomentumDashboard style={styles.dashboard} />
 
         {!hasSeenLanguageTip ? (
           <GlassCard style={styles.languageTip}>
             <View style={styles.languageTipContent}>
-              <Ionicons name="language-outline" size={20} color={colors.accent} />
-              <View style={styles.languageTipText}>
-                <Text style={styles.languageTipTitle}>{t("home.languageTipTitle")}</Text>
-                <Text style={styles.languageTipBody}>{t("home.languageTipBody")}</Text>
-              </View>
+              <Ionicons name="language-outline" size={18} color={colors.accent} />
+              <Text style={styles.languageTipBody}>{t("home.languageTipBody")}</Text>
             </View>
             <View style={styles.languageTipActions}>
               <Pressable
@@ -272,104 +267,29 @@ export default function HomeScreen() {
             <GlassCard style={styles.sectionCard}>
               <Text style={styles.sectionLabel}>{t("home.continueReading")}</Text>
               <Text style={styles.sectionTitle}>
-                {lastRead.book_name ?? t("common.scripture")} {lastRead.chapter}:{lastRead.verse}
+                {formatBookReference(
+                  lastRead.book_slug,
+                  lastRead.chapter,
+                  lastRead.verse,
+                  locale,
+                  lastRead.book_name ?? t("common.scripture")
+                )}
               </Text>
             </GlassCard>
           </Pressable>
         ) : null}
 
-        {recentUnique.length > 0 ? (
-          <View style={styles.section}>
-            <SectionHeader title={t("home.recentlyRead")} />
-            {recentUnique.map((entry) => (
-              <Pressable
-                key={`${entry.id}-${entry.viewed_at}`}
-                onPress={() => {
-                  if (entry.book_slug) {
-                    void openReader(entry.book_slug, entry.chapter, entry.verse);
-                  }
-                }}
-              >
-                <GlassCard style={styles.listRow}>
-                  <Text style={styles.listRowTitle}>
-                    {entry.book_name ?? t("common.scripture")} {entry.chapter}:{entry.verse}
-                  </Text>
-                  <Text style={styles.listRowMeta}>
-                    {formatShortDate(entry.viewed_at, locale)}
-                  </Text>
-                </GlassCard>
-              </Pressable>
-            ))}
-          </View>
-        ) : null}
+        <ReadingPlanCard style={styles.sectionCard} />
 
-        {bookmarkPreview.length > 0 ? (
-          <View style={styles.section}>
-            <SectionHeader
-              title={t("home.bookmarks")}
-              actionLabel={t("common.seeAll")}
-              onAction={() => router.push("/(tabs)/workspace")}
-              actionAccessibilityLabel={t("common.seeAll")}
-            />
-            {bookmarkPreview.map((item) => (
-              <Pressable
-                key={item.id}
-                onPress={() => {
-                  if (item.book_slug) {
-                    void openReader(item.book_slug, item.chapter, item.verse, item.verse_text ?? "");
-                  }
-                }}
-              >
-                <GlassCard style={styles.listRow}>
-                  <Text style={styles.listRowTitle}>
-                    {item.book_name ?? t("common.scripture")} {item.chapter}:{item.verse}
-                  </Text>
-                  <Text style={styles.listRowSnippet} numberOfLines={2}>
-                    {item.verse_text ?? ""}
-                  </Text>
-                </GlassCard>
-              </Pressable>
-            ))}
-          </View>
-        ) : null}
-
-        <View style={styles.plansSection}>
-          <SectionHeader title={t("home.plansHeading")} />
-          <ReadingPlanCard style={styles.sectionCard} />
-          <Pressable onPress={() => router.push("/reading-plan")} style={styles.planTeaser}>
-            <View style={styles.planTeaserIcon}>
-              <Ionicons name="earth-outline" size={20} color={colors.accent} />
-            </View>
-            {yearPlanStartDate ? (
-              <View style={styles.planTeaserText}>
-                <Text style={styles.planTeaserTitle}>{t("home.planTeaserTitle")}</Text>
-                <Text style={styles.planTeaserSub}>
-                  {t("plan.dayLabel", { day: yearPlanGetCurrentDay() })}
-                </Text>
-                <View style={styles.progressBarTrack}>
-                  <View
-                    style={[
-                      styles.progressBarFill,
-                      { width: `${yearPlanGetProgress()}%` },
-                    ]}
-                  />
-                </View>
-                <Text style={styles.progressBarLabel}>
-                  {t("plan.progressLabel", { percent: yearPlanGetProgress() })}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.planTeaserText}>
-                <Text style={styles.planTeaserTitle}>{t("home.planTeaserTitle")}</Text>
-                <Text style={styles.planTeaserSub}>{t("home.planTeaserSub")}</Text>
-                <Text style={styles.planTeaserStart}>{t("plan.startPlan")} →</Text>
-              </View>
-            )}
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+        {yearPlanStartDate ? (
+          <Pressable onPress={() => router.push("/reading-plan")} style={styles.planLink}>
+            <Ionicons name="earth-outline" size={16} color={colors.accent} />
+            <Text style={styles.planLinkText}>
+              {t("plan.dayLabel", { day: yearPlanGetCurrentDay() })} · {t("plan.progressLabel", { percent: yearPlanGetProgress() })}
+            </Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
           </Pressable>
-        </View>
-
-        <TopicGrid onTopicPress={openTopic} />
+        ) : null}
 
         <TextInput
           value={query}
@@ -452,7 +372,13 @@ export default function HomeScreen() {
             {results.map((item) => (
               <Pressable key={item.id} onPress={() => openSearchHit(item)} style={styles.searchHit}>
                 <Text style={styles.searchRef}>
-                  {item.book_name} {item.chapter_number}:{item.number}
+                  {formatBookReference(
+                    item.book_slug,
+                    item.chapter_number,
+                    item.number,
+                    locale,
+                    item.book_name
+                  )}
                 </Text>
                 <HighlightedText
                   text={item.text}
@@ -478,6 +404,7 @@ export default function HomeScreen() {
                 </Pressable>
               ))}
             </View>
+            <Text style={styles.verseTextNotice}>{t("home.verseTextLocaleNotice")}</Text>
 
             {loading ? (
               <LoadingState variant="grid" message={t("common.loading")} />
@@ -492,11 +419,77 @@ export default function HomeScreen() {
             )}
           </>
         )}
+
+        {(recentUnique.length > 0 || bookmarkPreview.length > 0) ? (
+          <View style={styles.secondarySection}>
+            {recentUnique.length > 0 ? (
+              <View style={styles.section}>
+                <SectionHeader title={t("home.recentlyRead")} />
+                {recentUnique.map((entry) => (
+                  <Pressable
+                    key={`${entry.id}-${entry.viewed_at}`}
+                    onPress={() => {
+                      if (entry.book_slug) {
+                        void openReader(entry.book_slug, entry.chapter, entry.verse);
+                      }
+                    }}
+                  >
+                    <GlassCard style={styles.listRow}>
+                      <Text style={styles.listRowTitle}>
+                        {formatBookReference(
+                          entry.book_slug,
+                          entry.chapter,
+                          entry.verse,
+                          locale,
+                          entry.book_name ?? t("common.scripture")
+                        )}
+                      </Text>
+                      <Text style={styles.listRowMeta}>
+                        {formatShortDate(entry.viewed_at, locale)}
+                      </Text>
+                    </GlassCard>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+
+            {bookmarkPreview.length > 0 ? (
+              <View style={styles.section}>
+                <SectionHeader
+                  title={t("home.bookmarks")}
+                  actionLabel={t("common.seeAll")}
+                  onAction={() => router.push("/(tabs)/workspace")}
+                  actionAccessibilityLabel={t("common.seeAll")}
+                />
+                {bookmarkPreview.map((item) => (
+                  <Pressable
+                    key={item.id}
+                    onPress={() => {
+                      if (item.book_slug) {
+                        void openReader(item.book_slug, item.chapter, item.verse, item.verse_text ?? "");
+                      }
+                    }}
+                  >
+                    <GlassCard style={styles.listRow}>
+                      <Text style={styles.listRowTitle}>
+                        {formatBookReference(
+                          item.book_slug,
+                          item.chapter,
+                          item.verse,
+                          locale,
+                          item.book_name ?? t("common.scripture")
+                        )}
+                      </Text>
+                    </GlassCard>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+
+        <TopicGrid onTopicPress={openTopic} />
       </ScrollView>
-      <EcosystemModal
-        visible={ecosystemModalVisible}
-        onClose={() => setEcosystemModalVisible(false)}
-      />
     </View>
   );
 }
@@ -524,21 +517,39 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: spacing.md,
   },
-  brandActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  statsBtn: { padding: spacing.xs },
   brand: {
     ...typography.label,
     color: colors.accent,
+  },
+  primaryCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.accent,
+    borderRadius: radii.lg,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
+  },
+  primaryCtaPressed: {
+    opacity: 0.9,
+  },
+  primaryCtaText: {
+    ...typography.subtitle,
+    color: colors.canvas,
+    fontWeight: "700",
   },
   dashboard: {
     marginBottom: spacing.md,
   },
   section: {
     marginBottom: spacing.md,
+  },
+  secondarySection: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.glassBorder,
   },
   sectionCard: {
     marginBottom: spacing.md,
@@ -551,23 +562,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...typography.subtitle,
     color: colors.textPrimary,
-  },
-  sectionHeading: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginBottom: spacing.sm,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-  },
-  sectionHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: spacing.sm,
-  },
-  sectionLink: {
-    ...typography.caption,
-    color: colors.accent,
   },
   listRow: {
     marginBottom: spacing.sm,
@@ -582,10 +576,6 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
   },
-  listRowSnippet: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
   search: {
     backgroundColor: colors.inputBackground,
     borderRadius: radii.lg,
@@ -594,7 +584,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    marginTop: spacing.lg,
+    marginTop: spacing.sm,
     marginBottom: spacing.xs,
     ...typography.body,
   },
@@ -627,6 +617,12 @@ const styles = StyleSheet.create({
   tabTextActive: {
     color: colors.accent,
   },
+  verseTextNotice: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: "center",
+    marginBottom: spacing.md,
+  },
   bookGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -635,19 +631,6 @@ const styles = StyleSheet.create({
   bookCell: {
     width: "50%",
     padding: spacing.xs,
-  },
-  spinner: {
-    marginTop: spacing.xl,
-  },
-  loadingLabel: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginTop: spacing.md,
-  },
-  error: {
-    ...typography.body,
-    color: colors.danger,
-    textAlign: "center",
   },
   emptySearch: {
     alignItems: "center",
@@ -678,30 +661,20 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
   },
-  searchSpinner: {
-    marginVertical: spacing.md,
-  },
   languageTip: {
     marginBottom: spacing.md,
     padding: spacing.md,
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   languageTipContent: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: spacing.sm,
   },
-  languageTipText: {
-    flex: 1,
-  },
-  languageTipTitle: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
   languageTipBody: {
     ...typography.caption,
     color: colors.textMuted,
+    flex: 1,
   },
   languageTipActions: {
     flexDirection: "row",
@@ -764,61 +737,16 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
   },
-  planTeaser: {
+  planLink: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    backgroundColor: colors.backgroundElevated,
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
     marginBottom: spacing.md,
   },
-  planTeaserIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(229, 169, 60, 0.12)",
-  },
-  planTeaserText: {
+  planLinkText: {
+    ...typography.caption,
+    color: colors.textSecondary,
     flex: 1,
-  },
-  planTeaserTitle: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-    fontWeight: "700",
-  },
-  planTeaserSub: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  planTeaserStart: {
-    ...typography.caption,
-    color: colors.accent,
-    marginTop: spacing.xs,
-  },
-  plansSection: {
-    marginBottom: spacing.md,
-  },
-  progressBarTrack: {
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.glassBorder,
-    marginTop: spacing.sm,
-    overflow: "hidden",
-  },
-  progressBarFill: {
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.accent,
-  },
-  progressBarLabel: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginTop: spacing.xs,
   },
 });

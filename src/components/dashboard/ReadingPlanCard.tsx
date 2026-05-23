@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { getBookDisplayName } from "@/i18n/bookNames";
+import { useLocaleStore } from "@/store/localeStore";
 import { GlassCard } from "@/components/GlassCard";
 import {
   FOUNDATION_WEEK_PLAN,
@@ -18,6 +20,7 @@ interface ReadingPlanCardProps {
 
 export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const router = useRouter();
   const completedDays = useReadingPlanStore((s) => s.completedDays);
   const loadProgress = useReadingPlanStore((s) => s.loadProgress);
@@ -37,11 +40,9 @@ export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
 
   useEffect(() => {
     void scriptureRepo.getBookBySlug(activeDay.bookSlug).then((book) => {
-      if (book) {
-        setBookLabel(book.name);
-      }
+      setBookLabel(getBookDisplayName(activeDay.bookSlug, locale, book?.name));
     });
-  }, [activeDay.bookSlug]);
+  }, [activeDay.bookSlug, locale]);
 
   const openReading = useCallback(() => {
     void markDayComplete(activeDay.day);

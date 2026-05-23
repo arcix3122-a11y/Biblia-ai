@@ -881,3 +881,19 @@ npx expo start
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: DONE - Lokalizacja nazw ksiąg (PL/EN) i reset biblioteki w Ustawieniach
+- Konwencja PL: forma dopełniacza jak w nagłówkach „Księga …” (Rodzaju, Mateusza) — bez prefiksu „Księga” w kafelkach; EN = nazwy KJV z `books.*` w locale JSON.
+- Podpięto `getBookDisplayName` / `formatBookReference` w BookTile, Home (siatka, wyszukiwarka, zakładki, ostatnio czytane), Reader, BookScreen, Workspace, TopicResults, ReadingPlan.
+- Home: jednorazowy podtytuł „Tekst wersetów: angielski (KJV)” pod zakładkami ST/NT.
+- Ustawienia → Zaawansowane → Wyczyść dane biblioteki (`resetDatabaseForDev`) — już w `233997d`, potwierdzone.
+- Walidacja: `npm run typecheck` 0 błędów; `npm run check:locales` 432 klucze OK.
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: START - Uproszczenie UX (Home, Ustawienia, zakładki, czytnik, AI) — mniej bałaganu, onboarding-friendly
+- Changes: pending
+- Validation: pending
+- Result: in-progress
