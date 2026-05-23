@@ -5,6 +5,39 @@ Add one short entry per completed task.
 
 ---
 
+## 2026-05-23 — START (audyt repozytorium — Cursor subagent)
+
+**Cel:** Audyt stanu repo bez zmian w kodzie produkcyjnym — git, worklog, luki vs README, backlog P0/P1/P2.
+
+**Zakres:** Odczyt pełnego `AGENT_WORKLOG.md`; `git status` + `git log -15`; skan modułów (notifications, stats, sync, study); weryfikacja staged/unstaged vs wpisy ACTION REQUIRED.
+
+**Kryteria sukcesu:** Tabela `PLAN KONKRETNY — backlog`; wpis DONE (≤5 punktów PL); liczba itemów P0/P1/P2.
+
+---
+
+## PLAN KONKRETNY — backlog
+
+| Priorytet | Zadanie | Kto | Status | Pliki |
+|-----------|---------|-----|--------|-------|
+| **P0** | Commit unstaged batch (~13 plików: study wiring, home plan polish, AI retry banner, stats OT/NT, bump `expo-notifications`/`expo-device` SDK56) | Developer z git | niezcommitowane | `HomeScreen.tsx`, `ReaderScreen.tsx`, `AiChatScreen.tsx`, `StatsScreen.tsx`, `historyRepository.ts`, `useSpiritualAssistant.ts`, `en.json`, `pl.json`, `package.json`, `app.json`, `metro.config.js` |
+| **P0** | Push `1fc8b18` (cloud sync) — branch `master` +1 względem `origin/master` | Developer z git | oczekuje push | `git push -u origin HEAD` |
+| **P0** | Włączyć **Anonymous Auth** w Supabase Dashboard (Providers → Anonymous → Enable) | User Supabase Dashboard | wymagane ręcznie | Supabase projekt `txwksirnvzoifcdpniby`, migracja `002_anonymous_cloud_sync.sql` już zastosowana |
+| **P0** | Smoke test cloud sync (highlight → reinstall / drugie urządzenie → merge LWW) | Agent implementacyjny | nie udokumentowany | `syncEngine.ts`, `supabaseClient.ts`, `highlightsStore.ts`, `notesStore.ts`, `readingPlanStore.ts`, `yearPlanStore.ts` |
+| **P0** | Naprawić regresję UTF-8 w unstaged `en.json`/`pl.json` (BOM, mojibake `â€¦`/`â†’`) przed commitem | Agent implementacyjny | regresja w working tree | `src/i18n/locales/en.json`, `pl.json` |
+| **P1** | `expo-notifications` — dodać plugin + uprawnienia w `app.json`; QA na urządzeniu fizycznym | Agent implementacyjny | brak pluginu w `app.json` | `app.json`, `reminderService.ts`, `SettingsScreen.tsx`, `reminderStore.ts` |
+| **P1** | Deep links / typed routes — `study`, `stats`, `reading-plan`, `?verse=` scroll | Agent implementacyjny | częściowo (reader `?verse=` OK) | `app/_layout.tsx`, `app/study.tsx`, `app/stats.tsx`, `app/reading-plan.tsx` |
+| **P1** | Reading plans polish — year-plan card + usunięcie „coming soon” (unstaged Home) | Agent implementacyjny | w working tree | `HomeScreen.tsx`, `yearPlanStore.ts`, `en.json`, `pl.json` |
+| **P1** | README vs rzeczywistość — pełna Biblia (66/1189/31100), brak sekcji: stats, reminders, sync, study | Agent docs | rozbieżność | `README.md`, `assets/bible-seed.json` |
+| **P1** | Study screen — usunąć hardcoded fallbacki `t("study.x") \|\| "..."` | Agent implementacyjny | częściowo | `app/study.tsx`, `en.json`, `pl.json` |
+| **P2** | Automated tests (Jest / Detox / Maestro) — brak suite | Agent implementacyjny | brak | `package.json`, `src/**` |
+| **P2** | Professional audio Bible (obecnie TTS stub via `expo-speech`) | Product / Agent implementacyjny | backlog | `audioEngine.ts`, `GlobalAudioBar.tsx` |
+| **P2** | Parallel translations (side-by-side; single KJV SQLite) | Product | backlog | `scriptureRepository.ts`, `assets/bible-seed.json` |
+| **P2** | AGENTS.md — opcjonalna sekcja operacyjna (cloud sync, backlog, Supabase checklist) | Agent docs | opcjonalnie | `AGENTS.md` |
+
+> **Uwaga audytu:** blok **ACTION REQUIRED** poniżej jest **przestarzały** (stan sprzed commitów `4bbd5c5`, `c3f8fd8`, `1fc8b18`). Aktualny stan: competitive parity + session-2 **zcommitowane**; pozostaje **13 plików unstaged** + **1 commit do push**.
+
+---
+
 ## 2026-05-23 — START (subagent — Supabase Anonymous Auth + cloud sync)
 
 **Cel:** Zero-friction sync danych użytkownika (highlights, notatki, plany czytania, streak/cel/język) przez Supabase Anonymous Auth — bez ekranów logowania.
@@ -71,6 +104,22 @@ Add one short entry per completed task.
 **Remaining open gaps:** professional audio Bible narration (TTS only), parallel translations (single KJV DB).
 
 ---
+
+## 2026-05-23 — START (Cursor subagent — P0 gaps)
+
+**Cel:** Domknąć luki P0: sync sanity (last sync), README Anonymous Auth, skrypt paritety locale, naprawa kluczy i18n, restore przypomnień, route stats, commity unstaged.
+
+**Kryteria:** `npm run typecheck` 0 błędów; PL+EN dla nowego UI; logiczne commity (git identity skonfigurowane).
+
+## 2026-05-23 — DONE (Cursor subagent — P0 gaps)
+
+- syncEngine: `getLastSyncAt`, zapis po udanym sync; offline bez crashy (try/catch + early return)
+- Settings: sekcja Cloud sync (last sync / never) gdy Supabase skonfigurowany
+- README: Anonymous Auth w Supabase + `.env.example` już OK
+- `scripts/check-locale-parity.mjs` + `npm run check:locales` (328 kluczy PL+EN)
+- i18n: `reader.deepStudy`, plural `_few/_many` w EN, klucze `settings.cloudSync*`
+- `_layout`: route stats, restore daily reminder po starcie
+- Commity: UX polish + P0 infra (patrz git log)
 
 ## ACTION REQUIRED / WYMAGANE DZIAŁANIE
 
@@ -558,10 +607,10 @@ npx expo start
 
 ## 2026-05-23 13:42
 - Agent: Antigravity
-- Task: START - Wdrożenie premium modułu 'Centrum Studiowania Wersetu' (Verse Study Portal: porównywanie przekładów, oryginalne języki, komentarze AI)
-- Changes: pending
-- Validation: pending
-- Result: in-progress
+- Task: Wdrożenie premium modułu 'Centrum Studiowania Wersetu' (Verse Study Portal: porównywanie przekładów, oryginalne języki, komentarze AI)
+- Changes: src/hooks/useVerseStudy.ts, app/study.tsx, app/_layout.tsx, src/screens/ReaderScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (0 błędów, pełen sukces)
+- Result: done
 
 ### START — 2026-05-23 horizontal polish pass (Cursor subagent)
 
@@ -612,3 +661,27 @@ npx expo start
 - Changes: en.json + pl.json (planTeaserTitle, planTeaserSub, plansHeading), HomeScreen.tsx (year plan progress card, plansSection wrapper with SectionHeader, progress bar when plan started, "Start →" CTA when not started)
 - Validation: npm run typecheck — 0 errors
 - Result: done
+
+
+## 2026-05-23 13:58
+- Agent: Antigravity
+- Task: Rozbudowa statystyk OT/NT, obsługa błędów asystenta AI oraz dynamiczny postęp planów czytania na HomeScreen
+- Changes: src/screens/StatsScreen.tsx, src/services/db/historyRepository.ts, src/screens/AiChatScreen.tsx, src/screens/HomeScreen.tsx, AGENT_WORKLOG.md
+- Validation: npm run typecheck (0 błędów, pełen sukces)
+- Result: done
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent (audyt)
+- Task: DONE - Audyt repo: git, worklog, luki, backlog P0/P1/P2
+- Changes: AGENT_WORKLOG.md (START audytu, tabela PLAN KONKRETNY, DONE)
+- Validation: `git status`, `git log -15`, `npm run typecheck` (0 błędów), skan `src/` + `app/` + README vs `bible-seed.json` (66 ksiąg)
+- Result: done
+
+### DONE — audyt 2026-05-23 (≤5 punktów)
+
+- **Git:** `master` +1 commit (`1fc8b18` cloud sync) do push; **13 plików unstaged** (study, home plan, AI retry, stats, deps) — blok ACTION REQUIRED nieaktualny.
+- **Zcommitowane funkcje:** competitive parity (`4bbd5c5`), session-2 notifications/stats/xrefs/year-plan (`c3f8fd8`), anonymous cloud sync (`1fc8b18`); brak untracked modułów notifications/stats.
+- **Luki krytyczne (P0×5):** commit unstaged batch, push, Supabase Anonymous toggle, smoke test sync, naprawa UTF-8 w locale JSON.
+- **README:** nadal opisuje sample seed (4 fragmenty) — seed faktycznie **66 ksiąg / 31100 wersetów**; brak dokumentacji stats/reminders/sync/study.
+- **Typecheck:** `npm run typecheck` — 0 błędów (stan working tree).
+

@@ -10,12 +10,18 @@ import { useSpiritualAssistant } from "@/hooks/useSpiritualAssistant";
 import { FontControls } from "@/components/reader/FontControls";
 import { GlassCard } from "@/components/GlassCard";
 import { getUserStats, setDailyGoal } from "@/services/stats/userStats";
+import { getLastSyncAt } from "@/services/sync/syncEngine";
+import { getSupabaseClient } from "@/services/supabase/supabaseClient";
+import { formatNoteDate } from "@/utils/formatDate";
+import { useLocaleStore } from "@/store/localeStore";
 import { colors, radii, spacing, typography } from "@/theme";
 import { useReminderStore } from "@/store/reminderStore";
 import { requestNotificationPermission, scheduleDailyReminder, cancelDailyReminder } from "@/services/notifications/reminderService";
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
+  const supabaseConfigured = Boolean(getSupabaseClient());
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
     useReaderStore();
   const resetChat = useAiChatStore((s) => s.resetChat);
@@ -26,10 +32,18 @@ export default function SettingsScreen() {
   const { hasApiKey, provider, model, endpoint } = useSpiritualAssistant();
   const [health, setHealth] = useState<"idle" | "checking" | "ok" | "error">("idle");
   const [dailyGoal, setDailyGoalState] = useState(1);
+  const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
 
   useEffect(() => {
     void getUserStats().then((stats) => setDailyGoalState(stats.dailyGoal));
   }, []);
+
+  useEffect(() => {
+    if (!supabaseConfigured) {
+      return;
+    }
+    void getLastSyncAt().then(setLastSyncAt);
+  }, [supabaseConfigured]);
 
   const adjustDailyGoal = useCallback(
     (delta: number) => {
@@ -307,6 +321,18 @@ export default function SettingsScreen() {
           </View>
         ) : null}
       </GlassCard>
+
+      {supabaseConfigured ? (
+        <GlassCard style={styles.card}>
+          <Text style={styles.sectionTitle}>{t("settings.cloudSync")}</Text>
+          <Text style={styles.hint}>{t("settings.cloudSyncHint")}</Text>
+          <Text style={styles.meta}>
+            {lastSyncAt
+              ? t("settings.lastSyncAt", { time: formatNoteDate(lastSyncAt, locale) })
+              : t("settings.lastSyncNever")}
+          </Text>
+        </GlassCard>
+      ) : null}
 
       {/* Scripture Translation Section */}
       <GlassCard style={styles.card}>

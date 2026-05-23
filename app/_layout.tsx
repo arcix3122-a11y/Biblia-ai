@@ -7,6 +7,7 @@ import { GlobalAudioBar } from "@/components/audio/GlobalAudioBar";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 import { ChromeProvider } from "@/context/ChromeContext";
 import { initI18n } from "@/i18n";
+import i18n from "@/i18n";
 import { initializeErrorLogger, logError } from "@/services/errors/errorLogger";
 import { getDatabase } from "@/services/db/database";
 import { ensureAnonymousSession } from "@/services/supabase/supabaseClient";
@@ -17,6 +18,7 @@ import { useHistoryStore } from "@/store/historyStore";
 import { useLocaleStore } from "@/store/localeStore";
 import { useReminderStore } from "@/store/reminderStore";
 import { useYearPlanStore } from "@/store/yearPlanStore";
+import { scheduleDailyReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
 import { colors } from "@/theme";
 
 LogBox.ignoreLogs(["Non-serializable values were found in the navigation state"]);
@@ -70,6 +72,7 @@ function RootStack() {
       <Stack.Screen name="topic/[slug]" options={{ title: t("navigation.topic") }} />
       <Stack.Screen name="settings" options={{ title: t("navigation.settings") }} />
       <Stack.Screen name="reading-plan" options={{ headerShown: false }} />
+      <Stack.Screen name="stats" options={{ headerShown: false }} />
       <Stack.Screen
         name="study"
         options={{
@@ -126,7 +129,22 @@ export default function RootLayout() {
         void useBookmarksStore.getState().loadBookmarks();
         void useHighlightsStore.getState().loadHighlights();
         void useHistoryStore.getState().loadHistory();
-        void useReminderStore.getState().load();
+        void useReminderStore.getState().load().then(async () => {
+          const { enabled, hour, minute } = useReminderStore.getState();
+          if (!enabled) {
+            return;
+          }
+          const granted = await requestNotificationPermission();
+          if (!granted) {
+            return;
+          }
+          await scheduleDailyReminder(
+            hour,
+            minute,
+            i18n.t("common.appName"),
+            i18n.t("settings.notificationsHint")
+          );
+        });
         void useYearPlanStore.getState().load();
       })
       .catch((err: unknown) => {

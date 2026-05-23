@@ -14,6 +14,7 @@ import type { Note } from "@/store/notesStore";
 import type { HighlightColor } from "@/types/scripture";
 
 const DEBOUNCE_MS = 2500;
+const LAST_SYNC_KEY = "@biblia-ai/last-sync-at";
 const NOTES_KEY = "@biblia-ai/notes";
 const READING_PLAN_KEY = "@biblia-ai/reading-plan";
 const YEAR_PLAN_KEY = "@biblia-ai/year-plan";
@@ -129,6 +130,10 @@ export async function queueNoteDelete(noteId: string): Promise<void> {
   }
 }
 
+export async function getLastSyncAt(): Promise<string | null> {
+  return AsyncStorage.getItem(LAST_SYNC_KEY);
+}
+
 export function scheduleSync(): void {
   if (syncTimer) {
     clearTimeout(syncTimer);
@@ -163,6 +168,7 @@ export async function runSync(): Promise<void> {
     await syncNotes(userId);
     await syncReadingPlans(userId);
     await syncUserProfile(userId);
+    await AsyncStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
   } catch (error) {
     logError(error, "SyncEngine");
   } finally {

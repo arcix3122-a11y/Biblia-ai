@@ -21,13 +21,20 @@ Create `.env` (never commit secrets):
 
 | Variable | Purpose |
 |----------|---------|
-| `EXPO_PUBLIC_SUPABASE_URL` | Remote `error_logs` table (offline queue flushes on app active) |
-| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `EXPO_PUBLIC_SUPABASE_URL` | Supabase project URL — error logging + anonymous cloud sync |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (safe with RLS policies) |
 | `EXPO_PUBLIC_AI_API_KEY` | OpenAI-compatible chat API (Groq supported via custom URL) |
 | `EXPO_PUBLIC_AI_API_URL` | Defaults to OpenAI chat completions |
 | `EXPO_PUBLIC_AI_MODEL` | Defaults to `gpt-4o-mini` |
 
-Without AI keys, the Companion tab uses local mock responses. Without Supabase, errors queue in AsyncStorage.
+Without AI keys, the Companion tab uses local mock responses. Without Supabase, errors queue in AsyncStorage and cloud sync is skipped.
+
+### Supabase setup (cloud sync + error logs)
+
+1. Copy `.env.example` → `.env` and set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
+2. Apply migrations under `supabase/migrations/` to your project.
+3. **Enable Anonymous Auth:** Supabase Dashboard → **Authentication** → **Providers** → **Anonymous** → **Enable**. The app calls `signInAnonymously()` on launch — no login screens.
+4. RLS policies on sync tables restrict rows to `auth.uid()`; the anon key is safe in the client when Anonymous Auth is enabled.
 
 ## Cyber-Monastery design system
 
@@ -117,7 +124,9 @@ See `AGENTS.md` → **Internationalization (i18n)** for agent conventions.
 | Pull to refresh | Home → pull down → recently read / bookmarks refresh |
 | App version | Settings → About → version label visible |
 | Scroll to verse | Home search or history → tap result → reader scrolls to verse |
-| Error retry | Simulate DB error screen → Try again button works |
+| Error retry | Companion → send message with bad API key → error banner + Retry |
+| Cloud sync status | Settings → Cloud sync → last sync time (when Supabase configured) |
+| Locale parity | `npm run check:locales` → 0 missing keys |
 
 ## Agent docs
 
