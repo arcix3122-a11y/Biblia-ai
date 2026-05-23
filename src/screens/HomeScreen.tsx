@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Swipeable } from "react-native-gesture-handler";
 import { BookTile } from "@/components/BookTile";
+import { EcosystemModal } from "@/components/EcosystemModal";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
 import { LoadingState } from "@/components/layout/LoadingState";
@@ -71,6 +72,9 @@ export default function HomeScreen() {
   const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
   const hasSeenLanguageTip = useOnboardingStore((s) => s.hasSeenLanguageTip);
   const dismissLanguageTip = useOnboardingStore((s) => s.dismissLanguageTip);
+  const hasSeenEcosystemModal = useOnboardingStore((s) => s.hasSeenEcosystemModal);
+  const dismissEcosystemModal = useOnboardingStore((s) => s.dismissEcosystemModal);
+  const [ecosystemModalVisible, setEcosystemModalVisible] = useState(false);
   const lastRead = useHistoryStore((s) => s.lastRead);
   const recent = useHistoryStore((s) => s.recent);
   const loadHistory = useHistoryStore((s) => s.loadHistory);
@@ -96,6 +100,16 @@ export default function HomeScreen() {
     void loadBookmarks();
     void yearPlanLoad();
   }, [loadHistory, loadBookmarks, yearPlanLoad]);
+
+  useEffect(() => {
+    if (ready && !hasSeenEcosystemModal) {
+      const timer = setTimeout(() => {
+        setEcosystemModalVisible(true);
+        dismissEcosystemModal();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [ready, hasSeenEcosystemModal, dismissEcosystemModal]);
 
   useEffect(() => {
     const trimmed = debouncedQuery.trim();
@@ -479,6 +493,10 @@ export default function HomeScreen() {
           </>
         )}
       </ScrollView>
+      <EcosystemModal
+        visible={ecosystemModalVisible}
+        onClose={() => setEcosystemModalVisible(false)}
+      />
     </View>
   );
 }

@@ -17,6 +17,7 @@ import { useLocaleStore } from "@/store/localeStore";
 import { colors, radii, spacing, typography } from "@/theme";
 import { useReminderStore } from "@/store/reminderStore";
 import { requestNotificationPermission, scheduleDailyReminder, cancelDailyReminder } from "@/services/notifications/reminderService";
+import { EcosystemModal } from "@/components/EcosystemModal";
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export default function SettingsScreen() {
   const [health, setHealth] = useState<"idle" | "checking" | "ok" | "error">("idle");
   const [dailyGoal, setDailyGoalState] = useState(1);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
+  const [ecosystemVisible, setEcosystemVisible] = useState(false);
 
   useEffect(() => {
     void getUserStats().then((stats) => setDailyGoalState(stats.dailyGoal));
@@ -340,6 +342,19 @@ export default function SettingsScreen() {
         <Text style={styles.note}>{t("settings.scriptureTranslationHint")}</Text>
       </GlassCard>
 
+      {/* Our Apps / Ecosystem Section */}
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.ecosystem")}</Text>
+        <Text style={styles.hint}>{t("settings.ecosystemHint")}</Text>
+        <Pressable
+          onPress={() => setEcosystemVisible(true)}
+          style={styles.ecosystemButton}
+        >
+          <Ionicons name="apps-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
+          <Text style={styles.ecosystemButtonText}>{t("settings.ecosystemView")}</Text>
+        </Pressable>
+      </GlassCard>
+
       {/* About / version */}
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.about")}</Text>
@@ -354,6 +369,8 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>{t("settings.appearance")}</Text>
         <Text style={styles.note}>{t("settings.appearanceNote")}</Text>
       </GlassCard>
+
+      <EcosystemModal visible={ecosystemVisible} onClose={() => setEcosystemVisible(false)} />
     </ScrollView>
   );
 }
@@ -582,5 +599,21 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     minWidth: 72,
     textAlign: "center",
+  },
+  ecosystemButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.backgroundElevated,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  ecosystemButtonText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "600",
   },
 });

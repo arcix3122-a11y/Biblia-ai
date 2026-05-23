@@ -1,8 +1,9 @@
-﻿{
+{
   "common": {
     "appName": "Biblia AI",
     "back": "Back",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "save": "Save",
     "clear": "Clear",
@@ -325,6 +326,9 @@
     "cloudSyncHint": "Highlights, notes, and reading progress sync when online. Requires Anonymous Auth in Supabase.",
     "lastSyncAt": "Last sync: {{time}}",
     "lastSyncNever": "Not synced yet (offline or first launch).",
+    "ecosystem": "Our Apps",
+    "ecosystemHint": "Explore other minimalistic, ultra-fast utilities designed by SolidCode.",
+    "ecosystemView": "Discover Ecosystem",
     "about": "About",
     "appVersion": "Version {{version}}",
     "buildNumber": "Build {{build}}"
@@ -392,6 +396,25 @@
     "offlineCommentary1": "Consider reading this verse in the context of the full chapter.",
     "offlineCommentary2": "Reflect on how this word applies to your day today.",
     "studyAction": "Study"
+  },
+  "ecosystem": {
+    "welcomeTitle": "Welcome to the Ecosystem! 🌟",
+    "quoteIntro": "One of the Dominican fathers said:",
+    "quoteText": "\"The Bible must be comfortable for you. Comfortable in your hand, but also comfortable to understand.\"",
+    "quoteExplanation": "That's why instead of an old app that hadn't been developed for months, I created Biblia AI. You can customize it to your needs, and the built-in spiritual companion will answer any question you have...",
+    "continueCTA": "Explore Ecosystem ➔",
+    "activeApp": "ACTIVE APP",
+    "install": "GET APP",
+    "installed": "Installed & Active",
+    "intro": "Thank you for downloading our app! We build minimalistic, ultra-fast, local-first tools without unnecessary spam. Check out what else we have created for you:",
+    "viewInStore": "View in Store",
+    "seeAllApps": "See all SolidCode apps",
+    "bibliaDesc": "Your personal spiritual companion and mobile center for studying the Holy Scripture. Theological analysis, original languages, and offline reading plans.",
+    "kaucjaDesc": "Earn on ecology. Find the nearest bottle machine, check occupancy status, collect points, and redeem coupons.",
+    "prawoJazdyDesc": "Revolutionary theory learning. Play 'Tinder of road signs', solve smart tests, and pass the state exam.",
+    "smartNajemDesc": "Professional property management. Generate secure agreements, settle utilities, and track payments on your phone."
   }
 }
+
+
 
