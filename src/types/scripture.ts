@@ -42,6 +42,15 @@ export interface Bookmark {
   verse_text?: string;
 }
 
+export type HighlightColor = "gold" | "blue" | "green" | "rose";
+
+export interface VerseHighlight {
+  id: number;
+  verse_id: number;
+  color: HighlightColor;
+  created_at: string;
+}
+
 export interface ReadingHistoryEntry {
   id: number;
   book_id: number;

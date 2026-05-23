@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const CREATE_TABLES_SQL = `
 PRAGMA foreign_keys = ON;
@@ -55,4 +55,16 @@ CREATE INDEX IF NOT EXISTS idx_chapters_book ON chapters (book_id, number);
 CREATE INDEX IF NOT EXISTS idx_verses_chapter ON verses (chapter_id, number);
 CREATE INDEX IF NOT EXISTS idx_bookmarks_verse ON bookmarks (verse_id);
 CREATE INDEX IF NOT EXISTS idx_history_viewed ON reading_history (viewed_at DESC);
+`;
+
+export const MIGRATION_V2_SQL = `
+CREATE TABLE IF NOT EXISTS verse_highlights (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  verse_id INTEGER NOT NULL REFERENCES verses(id) ON DELETE CASCADE,
+  color TEXT NOT NULL CHECK (color IN ('gold', 'blue', 'green', 'rose')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (verse_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_highlights_verse ON verse_highlights (verse_id);
 `;

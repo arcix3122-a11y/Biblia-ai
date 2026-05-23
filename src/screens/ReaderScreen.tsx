@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -22,7 +22,11 @@ import { useBookmarks } from "@/hooks/useBookmarks";
 import { useBook, useChapterVerses, useDatabaseReady } from "@/hooks/useScripture";
 import { audioEngine } from "@/services/audio/audioEngine";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
-import { recordDailyRead } from "@/services/stats/userStats";
+import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
+import { HighlightColorPicker } from "@/components/reader/HighlightColorPicker";
+import { useHighlights } from "@/hooks/useHighlights";
+import { captureVerseStory, shareVerseImage } from "@/services/share/verseImageExporter";
+import { recordChapterRead } from "@/services/stats/userStats";
 import { useHistoryStore } from "@/store/historyStore";
 import { useReaderStore } from "@/store/readerStore";
 import { useSelectionStore } from "@/store/selectionStore";
@@ -47,11 +51,14 @@ export default function ReaderScreen() {
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
     useReaderStore();
   const { isBookmarked, toggleBookmark } = useBookmarks();
+  const { getHighlightColor, setHighlight, clearHighlight } = useHighlights();
   const recordPosition = useHistoryStore((s) => s.recordPosition);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
 
   const flatListRef = useRef<FlatList>(null);
+  const shareRef = useRef<View>(null);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     setTabBarHidden(immersiveMode);
@@ -89,7 +96,7 @@ export default function ReaderScreen() {
   useEffect(() => {
     if (book && verses.length > 0) {
       void recordPosition(book.id, chapterNumber, verses[0]?.number ?? 1);
-      void recordDailyRead();
+      void recordChapterRead(book.slug, chapterNumber);
     }
   }, [book, chapterNumber, recordPosition, verses]);
 
@@ -139,6 +146,25 @@ export default function ReaderScreen() {
     });
     await audioEngine.play();
   }, [book, chapterNumber]);
+
+  const selectedVerseId = selectedVerse
+    ? verses.find((v) => v.number === selectedVerse.verse)?.id
+    : undefined;
+
+  const onShareSelectedVerse = useCallback(async () => {
+    if (!selectedVerse || sharing) {
+      return;
+    }
+    setSharing(true);
+    try {
+      const uri = await captureVerseStory(shareRef);
+      if (uri) {
+        await shareVerseImage(uri);
+      }
+    } finally {
+      setSharing(false);
+    }
+  }, [selectedVerse, sharing]);
 
   if (!ready || bookLoading || versesLoading) {
     return (
@@ -214,6 +240,7 @@ export default function ReaderScreen() {
                 selectedVerse.chapter === chapterNumber &&
                 selectedVerse.verse === item.number
               }
+              highlightColor={getHighlightColor(item.id)}
               onPress={() => selectVerse(item.number, item.text)}
               onLongPress={() => selectVerse(item.number, item.text)}
               onToggleBookmark={() =>
@@ -247,7 +274,24 @@ export default function ReaderScreen() {
                   })}
                 </Text>
               </View>
+              {selectedVerseId ? (
+                <HighlightColorPicker
+                  activeColor={getHighlightColor(selectedVerseId)}
+                  onSelect={(color) => void setHighlight(selectedVerseId, color)}
+                  onClear={() => void clearHighlight(selectedVerseId)}
+                />
+              ) : null}
               <View style={styles.selectionActions}>
+                <Pressable
+                  onPress={() => void onShareSelectedVerse()}
+                  disabled={sharing}
+                  style={styles.selectionBtn}
+                >
+                  <Ionicons name="share-outline" size={16} color={colors.accent} />
+                  <Text style={styles.selectionBtnText}>
+                    {sharing ? t("common.preparing") : t("reader.shareVerse")}
+                  </Text>
+                </Pressable>
                 <Pressable
                   onPress={() => router.push("/ai")}
                   style={styles.selectionBtn}
@@ -271,6 +315,13 @@ export default function ReaderScreen() {
                     {t("common.cancel")}
                   </Text>
                 </Pressable>
+              </View>
+              <View style={styles.offscreen} pointerEvents="none">
+                <ShareVerseCard
+                  ref={shareRef}
+                  reference={`${selectedVerse.bookName} ${selectedVerse.chapter}:${selectedVerse.verse}`}
+                  text={selectedVerse.text}
+                />
               </View>
             </View>
           ) : (
@@ -418,10 +469,12 @@ const styles = StyleSheet.create({
   },
   selectionActions: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   selectionBtn: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: "45%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -449,5 +502,11 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     flex: 1,
     lineHeight: 18,
+  },
+  offscreen: {
+    position: "absolute",
+    left: -9999,
+    top: 0,
+    opacity: 0,
   },
 });

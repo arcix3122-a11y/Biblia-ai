@@ -29,5 +29,13 @@ export function useSearchHistory() {
     setHistory([]);
   }, []);
 
-  return { history, addToHistory, clearHistory };
+  const removeFromHistory = useCallback(async (query: string) => {
+    setHistory((prev) => {
+      const next = prev.filter((item) => item !== query);
+      void AsyncStorage.setItem(KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  return { history, addToHistory, clearHistory, removeFromHistory };
 }

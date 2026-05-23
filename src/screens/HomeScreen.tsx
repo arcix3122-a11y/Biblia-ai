@@ -11,9 +11,12 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { Swipeable } from "react-native-gesture-handler";
 import { BookTile } from "@/components/BookTile";
 import { GlassCard } from "@/components/GlassCard";
 import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
+import { ReadingPlanCard } from "@/components/dashboard/ReadingPlanCard";
+import { OfflineBadge } from "@/components/OfflineBadge";
 import { TopicGrid } from "@/components/topics/TopicGrid";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
@@ -56,11 +59,12 @@ export default function HomeScreen() {
   const router = useRouter();
   const [testament, setTestament] = useState<Testament>("OT");
   const [query, setQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const debouncedQuery = useDebouncedValue(query, 350);
   const { ready, error } = useDatabaseReady();
   const { books, loading } = useBooks(testament);
   const { results, searching, search, clear } = useVerseSearch();
-  const { history, addToHistory, clearHistory } = useSearchHistory();
+  const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
   const hasSeenLanguageTip = useOnboardingStore((s) => s.hasSeenLanguageTip);
   const dismissLanguageTip = useOnboardingStore((s) => s.dismissLanguageTip);
   const lastRead = useHistoryStore((s) => s.lastRead);
@@ -160,19 +164,23 @@ export default function HomeScreen() {
     trimmedQuery.length > 0 && trimmedQuery.length < MIN_SEARCH_LEN
       ? t("home.searchHint", { count: MIN_SEARCH_LEN - trimmedQuery.length })
       : null;
+  const showSearchHistory = isSearchFocused && history.length > 0;
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.brandRow}>
           <Text style={styles.brand}>{t("common.appName")}</Text>
-          <Pressable
-            onPress={() => router.push("/settings")}
-            hitSlop={12}
-            accessibilityLabel={t("home.openSettings")}
-          >
-            <Ionicons name="settings-outline" size={22} color={colors.accent} />
-          </Pressable>
+          <View style={styles.brandActions}>
+            <OfflineBadge ready={ready} />
+            <Pressable
+              onPress={() => router.push("/settings")}
+              hitSlop={12}
+              accessibilityLabel={t("home.openSettings")}
+            >
+              <Ionicons name="settings-outline" size={22} color={colors.accent} />
+            </Pressable>
+          </View>
         </View>
 
         <MomentumDashboard style={styles.dashboard} />
@@ -273,22 +281,15 @@ export default function HomeScreen() {
           </View>
         ) : null}
 
-        <View style={styles.planTeaser}>
-          <View style={styles.planTeaserIcon}>
-            <Ionicons name="calendar-outline" size={20} color={colors.accent} />
-          </View>
-          <View style={styles.planTeaserText}>
-            <Text style={styles.planTeaserTitle}>{t("home.planTeaserTitle")}</Text>
-            <Text style={styles.planTeaserSub}>{t("home.planTeaserSub")}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-        </View>
+        <ReadingPlanCard style={styles.sectionCard} />
 
         <TopicGrid onTopicPress={openTopic} />
 
         <TextInput
           value={query}
           onChangeText={setQuery}
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
           placeholder={t("home.searchPlaceholder")}
           placeholderTextColor={colors.textMuted}
           style={styles.search}
@@ -305,7 +306,7 @@ export default function HomeScreen() {
         />
         {searchHint ? <Text style={styles.searchHint}>{searchHint}</Text> : null}
 
-        {!showSearch && history.length > 0 ? (
+        {showSearchHistory ? (
           <View style={styles.searchHistory}>
             <View style={styles.searchHistoryHeader}>
               <Text style={styles.searchHistoryTitle}>{t("home.recentSearches")}</Text>
@@ -318,19 +319,33 @@ export default function HomeScreen() {
                 <Text style={styles.searchHistoryClear}>{t("home.clearSearchHistory")}</Text>
               </Pressable>
             </View>
-            <View style={styles.searchHistoryChips}>
-              {history.map((item) => (
+            {history.map((item) => (
+              <Swipeable
+                key={item}
+                overshootRight={false}
+                renderRightActions={() => (
+                  <Pressable
+                    onPress={() => void removeFromHistory(item)}
+                    style={styles.searchHistoryDelete}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("common.delete")}
+                  >
+                    <Ionicons name="trash-outline" size={16} color={colors.canvas} />
+                    <Text style={styles.searchHistoryDeleteText}>{t("common.delete")}</Text>
+                  </Pressable>
+                )}
+              >
                 <Pressable
-                  key={item}
                   onPress={() => setQuery(item)}
-                  style={styles.searchHistoryChip}
+                  style={styles.searchHistoryItem}
                   accessibilityRole="button"
                   accessibilityLabel={item}
                 >
-                  <Text style={styles.searchHistoryChipText}>{item}</Text>
+                  <Ionicons name="time-outline" size={14} color={colors.textMuted} />
+                  <Text style={styles.searchHistoryText}>{item}</Text>
                 </Pressable>
-              ))}
-            </View>
+              </Swipeable>
+            ))}
           </View>
         ) : null}
 
@@ -418,6 +433,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: spacing.md,
+  },
+  brandActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
   brand: {
     ...typography.label,
@@ -624,20 +644,32 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.accent,
   },
-  searchHistoryChips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.xs,
+  searchHistoryDelete: {
+    width: 88,
+    marginBottom: spacing.xs,
+    borderRadius: radii.md,
+    backgroundColor: colors.danger,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
   },
-  searchHistoryChip: {
+  searchHistoryDeleteText: {
+    ...typography.caption,
+    color: colors.canvas,
+  },
+  searchHistoryItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    borderRadius: radii.pill,
+    borderRadius: radii.md,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.sm,
     backgroundColor: colors.inputBackground,
   },
-  searchHistoryChipText: {
+  searchHistoryText: {
     ...typography.caption,
     color: colors.textSecondary,
   },

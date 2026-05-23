@@ -3,13 +3,15 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { getReadingTypography } from "@/theme/typography";
 import { colors, spacing, typography } from "@/theme";
-import type { Verse } from "@/types/scripture";
+import type { HighlightColor, Verse } from "@/types/scripture";
+import { getHighlightBackground } from "@/utils/highlightColors";
 
 interface VerseRowProps {
   verse: Verse;
   fontSize: number;
   isBookmarked: boolean;
   isSelected: boolean;
+  highlightColor?: HighlightColor;
   onPress: () => void;
   onLongPress: () => void;
   onToggleBookmark: () => void;
@@ -20,18 +22,24 @@ export function VerseRow({
   fontSize,
   isBookmarked,
   isSelected,
+  highlightColor,
   onPress,
   onLongPress,
   onToggleBookmark,
 }: VerseRowProps) {
   const { t } = useTranslation();
   const reading = getReadingTypography(fontSize);
+  const highlightBg = highlightColor ? getHighlightBackground(highlightColor) : undefined;
 
   return (
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
-      style={[styles.row, isSelected && styles.rowSelected]}
+      style={[
+        styles.row,
+        highlightBg ? { backgroundColor: highlightBg } : null,
+        isSelected && styles.rowSelected,
+      ]}
     >
       <View style={styles.header}>
         <Text style={[styles.number, isSelected && styles.numberActive]}>{verse.number}</Text>

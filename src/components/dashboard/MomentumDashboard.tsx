@@ -6,6 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { GlassCard } from "@/components/GlassCard";
 import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
@@ -18,7 +19,11 @@ import type { VerseWithReference } from "@/types/scripture";
 
 export function MomentumDashboard({ style }: MomentumDashboardProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [streakDays, setStreakDays] = useState(0);
+  const [chaptersReadToday, setChaptersReadToday] = useState(0);
+  const [dailyGoal, setDailyGoal] = useState(1);
+  const [goalMetToday, setGoalMetToday] = useState(false);
   const [verse, setVerse] = useState<VerseWithReference | null>(null);
   const [loading, setLoading] = useState(true);
   const [sharing, setSharing] = useState(false);
@@ -28,13 +33,21 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
     setLoading(true);
     const [stats, votd] = await Promise.all([getUserStats(), getVerseOfTheDay()]);
     setStreakDays(stats.streakDays);
+    setChaptersReadToday(stats.chaptersReadToday);
+    setDailyGoal(stats.dailyGoal);
+    setGoalMetToday(stats.goalMetToday);
     setVerse(votd);
     setLoading(false);
   }, []);
 
   useEffect(() => {
     void load();
-    void recordDailyRead().then((stats) => setStreakDays(stats.streakDays));
+    void recordDailyRead().then((stats) => {
+      setStreakDays(stats.streakDays);
+      setChaptersReadToday(stats.chaptersReadToday);
+      setDailyGoal(stats.dailyGoal);
+      setGoalMetToday(stats.goalMetToday);
+    });
   }, [load]);
 
   const onShare = useCallback(async () => {
@@ -52,6 +65,13 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
     }
   }, [sharing, verse]);
 
+  const openVerse = useCallback(() => {
+    if (!verse) {
+      return;
+    }
+    router.push(`/reader/${verse.book_slug}/${verse.chapter_number}`);
+  }, [router, verse]);
+
   if (loading) {
     return (
       <GlassCard style={style}>
@@ -66,21 +86,31 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
 
   return (
     <GlassCard style={style}>
-      <View style={styles.row}>
-        <View style={styles.streakBlock}>
-          <Text style={styles.streakValue}>{streakDays}</Text>
-          <Text style={styles.streakLabel}>{t("dashboard.dayStreak")}</Text>
+      <View style={styles.statsRow}>
+        <View style={styles.statBlock}>
+          <Text style={styles.statValue}>{streakDays}</Text>
+          <Text style={styles.statLabel}>{t("dashboard.dayStreak")}</Text>
         </View>
         <View style={styles.divider} />
+        <View style={styles.statBlock}>
+          <Text style={[styles.statValue, goalMetToday && styles.statValueMet]}>
+            {chaptersReadToday}/{dailyGoal}
+          </Text>
+          <Text style={styles.statLabel}>{t("dashboard.dailyGoal")}</Text>
+        </View>
+      </View>
+
+      <View style={styles.row}>
         <View style={styles.verseBlock}>
           <Text style={styles.sectionLabel}>{t("dashboard.verseOfTheDay")}</Text>
           {verse ? (
-            <>
+            <Pressable onPress={openVerse} accessibilityRole="button">
               <Text style={styles.reference}>{reference}</Text>
               <Text style={styles.verseText} numberOfLines={3}>
                 {verse.text}
               </Text>
-            </>
+              <Text style={styles.openHint}>{t("dashboard.tapToRead")}</Text>
+            </Pressable>
           ) : (
             <Text style={styles.verseText}>{t("dashboard.readToday")}</Text>
           )}
@@ -109,23 +139,32 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
 }
 
 const styles = StyleSheet.create({
-  row: {
+  statsRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: spacing.md,
+    marginBottom: spacing.md,
   },
-  streakBlock: {
-    minWidth: 72,
+  statBlock: {
+    flex: 1,
     alignItems: "center",
   },
-  streakValue: {
+  statValue: {
     ...typography.hero,
     color: colors.accent,
   },
-  streakLabel: {
+  statValueMet: {
+    color: colors.success,
+  },
+  statLabel: {
     ...typography.caption,
     color: colors.textMuted,
     marginTop: spacing.xs,
+    textAlign: "center",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "flex-start",
   },
   divider: {
     width: StyleSheet.hairlineWidth,
@@ -148,6 +187,11 @@ const styles = StyleSheet.create({
   verseText: {
     ...typography.body,
     color: colors.textPrimary,
+  },
+  openHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
   },
   shareButton: {
     marginTop: spacing.md,

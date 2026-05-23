@@ -71,7 +71,8 @@
     "languageTipTitle": "Wskazówka: zmiana języka",
     "languageTipBody": "Stuknij ikonę koła zębatego → Język, aby w każdym momencie wybrać polski lub angielski.",
     "languageTipDismiss": "Rozumiem",
-    "languageTipOpenSettings": "Otwórz ustawienia"
+    "languageTipOpenSettings": "Otwórz ustawienia",
+    "offlineReady": "Tryb offline"
   },
   "dashboard": {
     "dayStreak": "dni z rzędu",
@@ -84,7 +85,21 @@
     "shareStoryImage": "Udostępnij obraz",
     "shareStory": "Udostępnij obraz",
     "preparingShare": "Przygotowywanie…",
-    "preparing": "Przygotowywanie…"
+    "preparing": "Przygotowywanie…",
+    "dailyGoal": "Cel dzienny",
+    "tapToRead": "Stuknij, aby otworzyć w czytniku"
+  },
+  "readingPlan": {
+    "foundationTitle": "Tydzień fundamentów",
+    "foundationSubtitle": "Siedem rozdziałów z przewodnikiem — lokalnie, bez konta.",
+    "dayProgress": "Dzień {{current}} z {{total}}",
+    "completedCount": "{{count}} / {{total}} ukończone",
+    "todaysReading": "Dzisiejsze czytanie",
+    "chapterRef": "{{book}} {{chapter}}",
+    "readNow": "Czytaj teraz",
+    "readAgain": "Czytaj ponownie",
+    "planComplete": "Plan ukończony",
+    "planCompleteHint": "Ukończyłeś wszystkie siedem dni. Możesz zacząć od nowa w dowolnym momencie."
   },
   "topics": {
     "heading": "Przeglądaj według tematu",
@@ -149,13 +164,6 @@
     "chapterCount_one": "{{count}} rozdział",
     "chapterCount_few": "{{count}} rozdziały",
     "chapterCount_many": "{{count}} rozdziałów",
-    "chapterA11y": "Rozdział {{number}}",
-    "noChaptersImported": "Brak zaimportowanych rozdziałów tej księgi.",
-    "openBook": "Otwórz {{name}}",
-    "chapterCount": "{{count}} rozdziałów",
-    "chapterCount_one": "{{count}} rozdział",
-    "chapterCount_few": "{{count}} rozdziały",
-    "chapterCount_many": "{{count}} rozdziałów",
     "chapterA11y": "Rozdział {{number}}"
   },
   "reader": {
@@ -177,8 +185,15 @@
     "fontPreview": "Pan moim pasterzem",
     "addBookmark": "Dodaj zakładkę",
     "removeBookmark": "Usuń zakładkę",
-    "addBookmark": "Dodaj zakładkę",
-    "removeBookmark": "Usuń zakładkę",
+    "shareVerse": "Udostępnij",
+    "highlight": "Podświetlenie",
+    "clearHighlight": "Usuń podświetlenie",
+    "highlightColor": {
+      "gold": "Złote podświetlenie",
+      "blue": "Niebieskie podświetlenie",
+      "green": "Zielone podświetlenie",
+      "rose": "Różowe podświetlenie"
+    },
     "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku."
   },
   "ai": {
@@ -269,9 +284,13 @@
     "languagePl": "Polski",
     "languageEn": "Angielski",
     "aiService": "Usługa AI",
+    "aiCompanionStatus": "Status Asystenta AI",
     "aiServiceHint": "Diagnostyka konfiguracji dostawcy LLM na żywo.",
     "aiStatusConfigured": "Status: klucz API skonfigurowany",
     "aiStatusMissing": "Status: brak klucza API",
+    "aiHealthChecking": "Trwa sprawdzanie połączenia…",
+    "aiHealthOk": "Połączenie działa poprawnie",
+    "aiHealthError": "Błąd połączenia",
     "aiProviderValue": "Dostawca: {{value}}",
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
@@ -279,7 +298,15 @@
     "scriptureTranslationHint": "Tekst wersetów w lokalnej bazie jest po angielsku (KJV). Lokalizowany jest tylko interfejs aplikacji.",
     "resetQuotaTitle": "Zresetować limit i wyczyścić czat?",
     "resetQuotaMessage": "To wyczyści historię czatu w Towarzyszu i przywróci dzienny limit wiadomości.",
-    "resetQuotaSuccess": "Czat wyczyszczony, dzienny limit przywrócony."
+    "resetQuotaSuccess": "Czat wyczyszczony, dzienny limit przywrócony.",
+    "dailyReadingGoal": "Dzienny cel czytania",
+    "dailyReadingGoalHint": "Licz unikalne rozdziały czytane dziennie — widoczne na ekranie głównym.",
+    "chaptersPerDay": "{{count}} rozdziałów / dzień",
+    "chaptersPerDay_one": "{{count}} rozdział / dzień",
+    "chaptersPerDay_few": "{{count}} rozdziały / dzień",
+    "chaptersPerDay_many": "{{count}} rozdziałów / dzień",
+    "decreaseGoal": "Zmniejsz cel dzienny",
+    "increaseGoal": "Zwiększ cel dzienny"
   },
   "languageSwitcher": {
     "pl": "PL",

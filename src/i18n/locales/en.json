@@ -69,7 +69,8 @@
     "languageTipTitle": "Tip: switch language",
     "languageTipBody": "Tap the gear icon → Language to choose Polish or English anytime.",
     "languageTipDismiss": "Got it",
-    "languageTipOpenSettings": "Open settings"
+    "languageTipOpenSettings": "Open settings",
+    "offlineReady": "Offline ready"
   },
   "dashboard": {
     "dayStreak": "day streak",
@@ -80,7 +81,21 @@
     "shareStoryImage": "Share story image",
     "shareStory": "Share story image",
     "preparingShare": "Preparing…",
-    "preparing": "Preparing…"
+    "preparing": "Preparing…",
+    "dailyGoal": "Daily goal",
+    "tapToRead": "Tap to read in the reader"
+  },
+  "readingPlan": {
+    "foundationTitle": "Foundation week",
+    "foundationSubtitle": "Seven guided chapters — stored locally, no account needed.",
+    "dayProgress": "Day {{current}} of {{total}}",
+    "completedCount": "{{count}} / {{total}} done",
+    "todaysReading": "Today's reading",
+    "chapterRef": "{{book}} {{chapter}}",
+    "readNow": "Read now",
+    "readAgain": "Read again",
+    "planComplete": "Plan complete",
+    "planCompleteHint": "You finished all seven days. Start a new week anytime by reading again."
   },
   "topics": {
     "heading": "Explore by topic",
@@ -141,11 +156,6 @@
     "openBook": "Open {{name}}",
     "chapterCount": "{{count}} chapters",
     "chapterCount_one": "{{count}} chapter",
-    "chapterA11y": "Chapter {{number}}",
-    "noChaptersImported": "No chapters imported for this book yet.",
-    "openBook": "Open {{name}}",
-    "chapterCount": "{{count}} chapters",
-    "chapterCount_one": "{{count}} chapter",
     "chapterA11y": "Chapter {{number}}"
   },
   "reader": {
@@ -167,6 +177,15 @@
     "fontPreview": "The Lord is my shepherd",
     "addBookmark": "Add bookmark",
     "removeBookmark": "Remove bookmark",
+    "shareVerse": "Share",
+    "highlight": "Highlight",
+    "clearHighlight": "Remove highlight",
+    "highlightColor": {
+      "gold": "Gold highlight",
+      "blue": "Blue highlight",
+      "green": "Green highlight",
+      "rose": "Rose highlight"
+    },
     "scriptureTranslationNotice": "Scripture text is in English (KJV). The app interface follows your language setting."
   },
   "ai": {
@@ -257,9 +276,13 @@
     "languagePl": "Polish",
     "languageEn": "English",
     "aiService": "AI service",
+    "aiCompanionStatus": "AI Companion Status",
     "aiServiceHint": "Live diagnostics for the configured LLM provider.",
     "aiStatusConfigured": "Status: API key configured",
     "aiStatusMissing": "Status: API key missing",
+    "aiHealthChecking": "Connection check in progress…",
+    "aiHealthOk": "Connection healthy",
+    "aiHealthError": "Connection failed",
     "aiProviderValue": "Provider: {{value}}",
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
@@ -267,7 +290,13 @@
     "scriptureTranslationHint": "Verse text in the local database is English (KJV). Only app labels and navigation are localized.",
     "resetQuotaTitle": "Reset quota and clear chat?",
     "resetQuotaMessage": "This clears your Companion chat history and restores the daily message limit.",
-    "resetQuotaSuccess": "Chat cleared and daily limit restored."
+    "resetQuotaSuccess": "Chat cleared and daily limit restored.",
+    "dailyReadingGoal": "Daily reading goal",
+    "dailyReadingGoalHint": "Track unique chapters read per day on your Home dashboard.",
+    "chaptersPerDay": "{{count}} chapters / day",
+    "chaptersPerDay_one": "{{count}} chapter / day",
+    "decreaseGoal": "Decrease daily goal",
+    "increaseGoal": "Increase daily goal"
   },
   "languageSwitcher": {
     "pl": "PL",

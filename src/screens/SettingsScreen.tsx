@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import { useAiChatStore } from "@/store/aiChatStore";
 import { useSpiritualAssistant } from "@/hooks/useSpiritualAssistant";
 import { FontControls } from "@/components/reader/FontControls";
 import { GlassCard } from "@/components/GlassCard";
+import { getUserStats, setDailyGoal } from "@/services/stats/userStats";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function SettingsScreen() {
@@ -15,8 +16,81 @@ export default function SettingsScreen() {
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
     useReaderStore();
   const resetChat = useAiChatStore((s) => s.resetChat);
+  const limit = useAiChatStore((s) => s.limit);
+  const messageCount = useAiChatStore((s) => s.messageCount);
+  const remainingCount = Math.max(0, limit - messageCount);
 
-  const { hasApiKey, provider, model, endpoint, remaining, limit } = useSpiritualAssistant();
+  const { hasApiKey, provider, model, endpoint } = useSpiritualAssistant();
+  const [health, setHealth] = useState<"idle" | "checking" | "ok" | "error">("idle");
+  const [dailyGoal, setDailyGoalState] = useState(1);
+
+  useEffect(() => {
+    void getUserStats().then((stats) => setDailyGoalState(stats.dailyGoal));
+  }, []);
+
+  const adjustDailyGoal = useCallback(
+    (delta: number) => {
+      const next = Math.min(5, Math.max(1, dailyGoal + delta));
+      void setDailyGoal(next).then((stats) => setDailyGoalState(stats.dailyGoal));
+    },
+    [dailyGoal]
+  );
+
+  const healthLabel = useMemo(() => {
+    if (health === "checking") {
+      return t("settings.aiHealthChecking");
+    }
+    if (health === "ok") {
+      return t("settings.aiHealthOk");
+    }
+    return t("settings.aiHealthError");
+  }, [health, t]);
+
+  const runHealthCheck = useCallback(async () => {
+    if (!hasApiKey || !endpoint || !model) {
+      setHealth("error");
+      return;
+    }
+
+    const apiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
+    if (!apiKey) {
+      setHealth("error");
+      return;
+    }
+
+    setHealth("checking");
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1,
+          temperature: 0,
+          messages: [{ role: "user", content: "ping" }],
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+
+      setHealth(response.ok ? "ok" : "error");
+    } catch {
+      setHealth("error");
+    } finally {
+      clearTimeout(timeout);
+    }
+  }, [endpoint, hasApiKey, model]);
+
+  useEffect(() => {
+    void runHealthCheck();
+  }, [runHealthCheck]);
 
   const handleResetQuota = () => {
     Alert.alert(t("settings.resetQuotaTitle"), t("settings.resetQuotaMessage"), [
@@ -56,6 +130,31 @@ export default function SettingsScreen() {
         <Text style={styles.meta}>{t("settings.currentSize", { size: fontSize })}</Text>
       </GlassCard>
 
+      {/* Daily reading goal */}
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.dailyReadingGoal")}</Text>
+        <Text style={styles.hint}>{t("settings.dailyReadingGoalHint")}</Text>
+        <View style={styles.goalRow}>
+          <Pressable
+            onPress={() => adjustDailyGoal(-1)}
+            style={styles.goalButton}
+            accessibilityLabel={t("settings.decreaseGoal")}
+          >
+            <Text style={styles.goalButtonText}>−</Text>
+          </Pressable>
+          <Text style={styles.goalValue}>
+            {t("settings.chaptersPerDay", { count: dailyGoal })}
+          </Text>
+          <Pressable
+            onPress={() => adjustDailyGoal(1)}
+            style={styles.goalButton}
+            accessibilityLabel={t("settings.increaseGoal")}
+          >
+            <Text style={styles.goalButtonText}>+</Text>
+          </Pressable>
+        </View>
+      </GlassCard>
+
       {/* Immersive Reading Section */}
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.immersiveReading")}</Text>
@@ -74,7 +173,7 @@ export default function SettingsScreen() {
 
       {/* AI Companion Section */}
       <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.aiService")}</Text>
+        <Text style={styles.sectionTitle}>{t("settings.aiCompanionStatus")}</Text>
         <Text style={styles.hint}>{t("settings.aiServiceHint")}</Text>
 
         <View style={styles.aiStatusContainer}>
@@ -98,6 +197,23 @@ export default function SettingsScreen() {
                   {t("settings.aiEndpointValue", { value: endpoint })}
                 </Text>
               ) : null}
+
+              <View style={styles.healthRow}>
+                <View
+                  style={[
+                    styles.healthDot,
+                    health === "ok"
+                      ? styles.healthDotOk
+                      : health === "checking"
+                        ? styles.healthDotChecking
+                        : styles.healthDotError,
+                  ]}
+                />
+                <Text style={styles.aiDetailText}>{healthLabel}</Text>
+                <Pressable onPress={() => void runHealthCheck()} style={styles.healthRefresh}>
+                  <Ionicons name="refresh" size={14} color={colors.accent} />
+                </Pressable>
+              </View>
             </View>
           ) : null}
 
@@ -105,14 +221,14 @@ export default function SettingsScreen() {
           <View style={styles.quotaSection}>
             <View style={styles.quotaHeader}>
               <Text style={styles.quotaTitle}>
-                {t("ai.responsesRemaining", { remaining: remaining(), limit })}
+                {t("ai.responsesRemaining", { remaining: remainingCount, limit })}
               </Text>
             </View>
             <View style={styles.progressBarBg}>
               <View
                 style={[
                   styles.progressBarFill,
-                  { width: `${Math.min(100, (remaining() / limit) * 100)}%` },
+                  { width: `${Math.min(100, (remainingCount / limit) * 100)}%` },
                 ]}
               />
             </View>
@@ -251,6 +367,31 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.xs,
   },
+  healthRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  healthDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  healthDotOk: {
+    backgroundColor: "#22c55e",
+  },
+  healthDotChecking: {
+    backgroundColor: "#f59e0b",
+  },
+  healthDotError: {
+    backgroundColor: colors.danger,
+  },
+  healthRefresh: {
+    marginLeft: "auto",
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+  },
   aiDetailText: {
     ...typography.caption,
     color: colors.textSecondary,
@@ -297,5 +438,31 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.accent,
     fontWeight: "600",
+  },
+  goalRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.md,
+  },
+  goalButton: {
+    width: 40,
+    height: 40,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.backgroundElevated,
+  },
+  goalButtonText: {
+    ...typography.subtitle,
+    color: colors.accent,
+  },
+  goalValue: {
+    ...typography.body,
+    color: colors.textPrimary,
+    minWidth: 140,
+    textAlign: "center",
   },
 });

@@ -10,6 +10,7 @@ import { initI18n } from "@/i18n";
 import { initializeErrorLogger, logError } from "@/services/errors/errorLogger";
 import { getDatabase } from "@/services/db/database";
 import { useBookmarksStore } from "@/store/bookmarksStore";
+import { useHighlightsStore } from "@/store/highlightsStore";
 import { useHistoryStore } from "@/store/historyStore";
 import { useLocaleStore } from "@/store/localeStore";
 import { colors } from "@/theme";
@@ -102,6 +103,7 @@ export default function RootLayout() {
     void getDatabase()
       .then(() => {
         void useBookmarksStore.getState().loadBookmarks();
+        void useHighlightsStore.getState().loadHighlights();
         void useHistoryStore.getState().loadHistory();
       })
       .catch((err: unknown) => {
