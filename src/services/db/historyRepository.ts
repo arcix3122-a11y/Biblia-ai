@@ -66,3 +66,20 @@ export async function countDistinctChaptersRead(): Promise<number> {
   );
   return row?.count ?? 0;
 }
+
+export async function countDistinctChaptersReadByTestament(
+  testament: "OT" | "NT"
+): Promise<number> {
+  const db = await getDatabase();
+  const row = await db.getFirstAsync<{ count: number }>(
+    `SELECT COUNT(*) AS count
+     FROM (
+       SELECT DISTINCT h.book_id, h.chapter
+       FROM reading_history h
+       INNER JOIN books b ON b.id = h.book_id
+       WHERE b.testament = ?
+     )`,
+    testament
+  );
+  return row?.count ?? 0;
+}

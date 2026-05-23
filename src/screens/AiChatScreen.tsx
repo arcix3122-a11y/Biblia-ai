@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -28,12 +28,28 @@ export default function AiChatScreen() {
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const resetChat = useAiChatStore((s) => s.resetChat);
   const limit = useAiChatStore((s) => s.limit);
-  const { sendMessage, sendWithContext, isThinking, canSend, remaining } = useSpiritualAssistant();
+  const { sendMessage, sendWithContext, isThinking, canSend, remaining, lastError, clearError, lastInput } = useSpiritualAssistant();
 
   const scrollToEnd = () => {
     requestAnimationFrame(() => {
       listRef.current?.scrollToEnd({ animated: true });
     });
+  };
+
+  useEffect(() => {
+    if (!isThinking) {
+      scrollToEnd();
+    }
+  }, [isThinking]);
+
+  const handleRetry = async () => {
+    clearError();
+    if (lastInput) {
+      const sent = await sendMessage(lastInput);
+      if (sent) {
+        scrollToEnd();
+      }
+    }
   };
 
   const handleSend = async () => {
@@ -51,7 +67,7 @@ export default function AiChatScreen() {
     }
   };
 
-  const disabled = !canSend() || isThinking || input.trim().length === 0;
+  const disabled = !canSend() || isThinking || input.trim().length === 0 || lastError !== null;
 
   return (
     <KeyboardAvoidingView
@@ -111,6 +127,15 @@ export default function AiChatScreen() {
         </View>
       ) : null}
 
+      {lastError ? (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerText}>{lastError}</Text>
+          <Pressable onPress={() => void handleRetry()} style={styles.retryButton}>
+            <Text style={styles.retryButtonText}>{t("ai.retry")}</Text>
+          </Pressable>
+        </View>
+      ) : null}
+
       <GlassChrome>
         <ContextPills
           onSelectTemplate={(id) => void handlePill(id)}
@@ -123,7 +148,7 @@ export default function AiChatScreen() {
             placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
             placeholderTextColor={colors.textMuted}
             style={styles.input}
-            editable={canSend() && !isThinking}
+            editable={canSend() && !isThinking && !lastError}
             multiline
             maxLength={500}
           />
@@ -265,5 +290,33 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.accent,
     textAlign: "center",
+  },
+  errorBanner: {
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: colors.danger,
+    borderWidth: 1,
+    borderColor: colors.danger,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  errorBannerText: {
+    ...typography.caption,
+    color: colors.canvas,
+    flex: 1,
+  },
+  retryButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.canvas,
+  },
+  retryButtonText: {
+    ...typography.caption,
+    color: colors.canvas,
   },
 });

@@ -30,19 +30,25 @@ export default function StatsScreen() {
   const [loading, setLoading] = useState(true);
   const [streak, setStreak] = useState(0);
   const [chaptersRead, setChaptersRead] = useState(0);
+  const [otRead, setOtRead] = useState(0);
+  const [ntRead, setNtRead] = useState(0);
   const [activeDates, setActiveDates] = useState<string[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [stats, dates, chaps] = await Promise.all([
+        const [stats, dates, chaps, ot, nt] = await Promise.all([
           getUserStats(),
           historyRepo.getDistinctReadDates(30),
           historyRepo.countDistinctChaptersRead(),
+          historyRepo.countDistinctChaptersReadByTestament("OT"),
+          historyRepo.countDistinctChaptersReadByTestament("NT"),
         ]);
         setStreak(stats.streakDays);
         setActiveDates(dates);
         setChaptersRead(chaps);
+        setOtRead(ot);
+        setNtRead(nt);
       } catch {
         // ignore
       } finally {
@@ -91,18 +97,56 @@ export default function StatsScreen() {
             </GlassCard>
           </View>
 
-          {/* Overall Progress */}
+          {/* Overall + OT/NT Progress */}
           <GlassCard style={styles.card}>
             <View style={styles.progressHeader}>
               <Text style={styles.sectionTitle}>{t("stats.totalChapters")}</Text>
               <Text style={styles.progressPercent}>{progressPercent}%</Text>
             </View>
             <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: `${progressPercent}%` }]} />
+              <View style={[styles.progressBarFill, { width: `${progressPercent}%` as `${number}%` }]} />
             </View>
             <Text style={styles.progressMeta}>
               {chaptersRead} / {TOTAL_CHAPTERS}
             </Text>
+
+            <View style={styles.testamentRow}>
+              <View style={styles.testamentBlock}>
+                <View style={styles.progressHeader}>
+                  <Text style={styles.testamentLabel}>{t("stats.oldTestament")}</Text>
+                  <Text style={styles.testamentPct}>
+                    {Math.min(100, Math.round((otRead / OT_CHAPTERS) * 100))}%
+                  </Text>
+                </View>
+                <View style={[styles.progressBarBg, styles.testamentBar]}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      { width: `${Math.min(100, Math.round((otRead / OT_CHAPTERS) * 100))}%` as `${number}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressMeta}>{otRead} / {OT_CHAPTERS}</Text>
+              </View>
+
+              <View style={styles.testamentBlock}>
+                <View style={styles.progressHeader}>
+                  <Text style={styles.testamentLabel}>{t("stats.newTestament")}</Text>
+                  <Text style={styles.testamentPct}>
+                    {Math.min(100, Math.round((ntRead / NT_CHAPTERS) * 100))}%
+                  </Text>
+                </View>
+                <View style={[styles.progressBarBg, styles.testamentBar]}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      { width: `${Math.min(100, Math.round((ntRead / NT_CHAPTERS) * 100))}%` as `${number}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressMeta}>{ntRead} / {NT_CHAPTERS}</Text>
+              </View>
+            </View>
           </GlassCard>
 
           {/* Calendar */}
@@ -164,4 +208,16 @@ const styles = StyleSheet.create({
   },
   progressMeta: { ...typography.caption, color: colors.textMuted },
   emptyText: { ...typography.body, color: colors.textMuted },
+  testamentRow: {
+    flexDirection: "row",
+    gap: spacing.md,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.glassBorder,
+  },
+  testamentBlock: { flex: 1, gap: spacing.xs },
+  testamentLabel: { ...typography.caption, color: colors.textSecondary, fontWeight: "600" },
+  testamentPct: { ...typography.caption, color: colors.accent, fontWeight: "700" },
+  testamentBar: { marginTop: 0 },
 });

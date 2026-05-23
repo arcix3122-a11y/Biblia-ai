@@ -192,12 +192,19 @@ export function useSpiritualAssistant() {
   const { messages: chatMessages, addUserMessage, addAssistantMessage, consumeMessageQuota, canSend, remaining, messageCount, limit } =
     useAiChatStore();
   const [isThinking, setIsThinking] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [lastInput, setLastInput] = useState<string | null>(null);
+
+  const clearError = useCallback(() => {
+    setLastError(null);
+  }, []);
 
   const sendMessage = useCallback(
     async (text: string, verse: SelectedVerse | null = null): Promise<boolean> => {
       const trimmed = text.trim();
       if (!trimmed || !canSend()) return false;
 
+      setLastError(null);
       addUserMessage(trimmed);
       setIsThinking(true);
 
@@ -211,6 +218,7 @@ export function useSpiritualAssistant() {
         const reply = await callLiveAssistant(history, verse);
         addAssistantMessage(reply);
         consumeMessageQuota();
+        setLastInput(null);
         return true;
       } catch (error) {
         logError(error, "spiritual-assistant-live", {
@@ -219,10 +227,14 @@ export function useSpiritualAssistant() {
           hasVerseContext: Boolean(verse),
         });
 
-        const fallback = process.env.EXPO_PUBLIC_AI_API_KEY
-          ? t("ai.liveError")
-          : localFallback(trimmed);
-        addAssistantMessage(fallback);
+        if (process.env.EXPO_PUBLIC_AI_API_KEY) {
+          setLastError(t("ai.liveServiceError"));
+          setLastInput(trimmed);
+        } else {
+          const fallback = localFallback(trimmed);
+          addAssistantMessage(fallback);
+          setLastInput(null);
+        }
         return false;
       } finally {
         setIsThinking(false);
@@ -268,5 +280,8 @@ export function useSpiritualAssistant() {
     provider,
     model,
     endpoint,
+    lastError,
+    clearError,
+    lastInput,
   };
 }

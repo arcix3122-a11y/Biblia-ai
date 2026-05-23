@@ -329,6 +329,18 @@ export default function ReaderScreen() {
                   onClear={() => void clearHighlight(selectedVerseId)}
                 />
               ) : null}
+
+              {/* Premium Deep Scripture Study Button */}
+              <Pressable
+                onPress={() => router.push("/study")}
+                style={styles.selectionBtnPrimary}
+              >
+                <Ionicons name="school-outline" size={16} color={colors.canvas} style={{ marginRight: 6 }} />
+                <Text style={styles.selectionBtnTextPrimary}>
+                  {t("reader.deepStudy") || "Deep Scripture Study"}
+                </Text>
+              </Pressable>
+
               <View style={styles.selectionActions}>
                 <Pressable
                   onPress={() => void onShareSelectedVerse()}
@@ -346,6 +358,13 @@ export default function ReaderScreen() {
                 >
                   <Ionicons name="chatbubble-ellipses" size={16} color={colors.accent} />
                   <Text style={styles.selectionBtnText}>{t("reader.aiAssistant")}</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => router.push("/study")}
+                  style={styles.selectionBtn}
+                >
+                  <Ionicons name="school-outline" size={16} color={colors.accent} />
+                  <Text style={styles.selectionBtnText}>{t("study.studyAction")}</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => router.push("/workspace")}
@@ -537,6 +556,26 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textPrimary,
     fontWeight: "600",
+  },
+  selectionBtnPrimary: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.accent,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm + 2,
+    marginBottom: spacing.xs,
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  selectionBtnTextPrimary: {
+    ...typography.caption,
+    color: colors.canvas,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   translationNotice: {
     flexDirection: "row",

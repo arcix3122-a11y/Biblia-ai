@@ -28,6 +28,7 @@ import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHistoryStore } from "@/store/historyStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useSelectionStore } from "@/store/selectionStore";
+import { useYearPlanStore } from "@/store/yearPlanStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import type { Book, Testament, VerseWithReference } from "@/types/scripture";
 import { useLocaleStore } from "@/store/localeStore";
@@ -75,21 +76,26 @@ export default function HomeScreen() {
   const loadHistory = useHistoryStore((s) => s.loadHistory);
   const bookmarks = useBookmarksStore((s) => s.bookmarks);
   const loadBookmarks = useBookmarksStore((s) => s.loadBookmarks);
+  const yearPlanStartDate = useYearPlanStore((s) => s.startDate);
+  const yearPlanGetCurrentDay = useYearPlanStore((s) => s.getCurrentDay);
+  const yearPlanGetProgress = useYearPlanStore((s) => s.getProgress);
+  const yearPlanLoad = useYearPlanStore((s) => s.load);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([loadHistory(), loadBookmarks(), refreshBooks()]);
+      await Promise.all([loadHistory(), loadBookmarks(), refreshBooks(), yearPlanLoad()]);
     } finally {
       setRefreshing(false);
     }
-  }, [loadBookmarks, loadHistory, refreshBooks]);
+  }, [loadBookmarks, loadHistory, refreshBooks, yearPlanLoad]);
 
   useEffect(() => {
     void loadHistory();
     void loadBookmarks();
-  }, [loadHistory, loadBookmarks]);
+    void yearPlanLoad();
+  }, [loadHistory, loadBookmarks, yearPlanLoad]);
 
   useEffect(() => {
     const trimmed = debouncedQuery.trim();
@@ -313,18 +319,41 @@ export default function HomeScreen() {
           </View>
         ) : null}
 
-        <ReadingPlanCard style={styles.sectionCard} />
-
-        <Pressable onPress={() => router.push("/reading-plan")} style={styles.planTeaser}>
-          <View style={styles.planTeaserIcon}>
-            <Ionicons name="earth-outline" size={20} color={colors.accent} />
-          </View>
-          <View style={styles.planTeaserText}>
-            <Text style={styles.planTeaserTitle}>{t("plan.title")}</Text>
-            <Text style={styles.planTeaserSub}>{t("plan.subtitle")}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-        </Pressable>
+        <View style={styles.plansSection}>
+          <SectionHeader title={t("home.plansHeading")} />
+          <ReadingPlanCard style={styles.sectionCard} />
+          <Pressable onPress={() => router.push("/reading-plan")} style={styles.planTeaser}>
+            <View style={styles.planTeaserIcon}>
+              <Ionicons name="earth-outline" size={20} color={colors.accent} />
+            </View>
+            {yearPlanStartDate ? (
+              <View style={styles.planTeaserText}>
+                <Text style={styles.planTeaserTitle}>{t("home.planTeaserTitle")}</Text>
+                <Text style={styles.planTeaserSub}>
+                  {t("plan.dayLabel", { day: yearPlanGetCurrentDay() })}
+                </Text>
+                <View style={styles.progressBarTrack}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      { width: `${yearPlanGetProgress()}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressBarLabel}>
+                  {t("plan.progressLabel", { percent: yearPlanGetProgress() })}
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.planTeaserText}>
+                <Text style={styles.planTeaserTitle}>{t("home.planTeaserTitle")}</Text>
+                <Text style={styles.planTeaserSub}>{t("home.planTeaserSub")}</Text>
+                <Text style={styles.planTeaserStart}>{t("plan.startPlan")} →</Text>
+              </View>
+            )}
+            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+          </Pressable>
+        </View>
 
         <TopicGrid onTopicPress={openTopic} />
 
@@ -748,5 +777,30 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     marginTop: 2,
+  },
+  planTeaserStart: {
+    ...typography.caption,
+    color: colors.accent,
+    marginTop: spacing.xs,
+  },
+  plansSection: {
+    marginBottom: spacing.md,
+  },
+  progressBarTrack: {
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.glassBorder,
+    marginTop: spacing.sm,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.accent,
+  },
+  progressBarLabel: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
   },
 });
