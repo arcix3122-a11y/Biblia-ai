@@ -21,7 +21,7 @@ Add one short entry per completed task.
 
 **Built:** Production polish — bilingual onboarding tip, recent search history, KJV/English scripture notices (reader + settings), missing i18n keys, typecheck fix, README manual test rows.
 
-**Commits:** (see git log after commit)
+**Commits:** `e52affc` (docs), `8fd66e0` (feat: onboarding, search history, KJV notice, Settings AI)
 
 **Run:**
 ```bash
@@ -237,4 +237,18 @@ npx expo start
 - Task: DONE - aktualizacja zasad logowania + rozbudowa Settings o status AI.
 - Changes: AGENTS.md, AGENT_WORKLOG.md, src/screens/SettingsScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, src/screens/HomeScreen.tsx.
 - Validation: npm run typecheck (0 bledow).
+- Result: done
+
+## 2026-05-23 13:31
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - domkniecie AI status, UX polish i cleanup workloga.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 (local)
+- Agent: Claude subagent
+- Task: Notes export (Share) + search history
+- Changes: src/screens/WorkspaceScreen.tsx, src/screens/HomeScreen.tsx, src/hooks/useSearchHistory.ts, en.json, pl.json
+- Validation: npm run typecheck — pass
 - Result: done
