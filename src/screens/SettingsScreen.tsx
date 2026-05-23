@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Accordion } from "@/components/layout/Accordion";
 import { useReaderStore } from "@/store/readerStore";
 import { useAiChatStore } from "@/store/aiChatStore";
 import {
@@ -168,14 +169,14 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Language Section */}
+      <Text style={styles.groupHeading}>{t("settings.basic")}</Text>
+
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
         <Text style={styles.hint}>{t("settings.languageHint")}</Text>
         <LanguageSwitcher />
       </GlassCard>
 
-      {/* Reader Font Size Section */}
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.readerFontSize")}</Text>
         <Text style={styles.hint}>{t("settings.readerFontHint")}</Text>
@@ -190,7 +191,6 @@ export default function SettingsScreen() {
         <Text style={styles.meta}>{t("settings.currentSize", { size: fontSize })}</Text>
       </GlassCard>
 
-      {/* Daily reading goal */}
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.dailyReadingGoal")}</Text>
         <Text style={styles.hint}>{t("settings.dailyReadingGoalHint")}</Text>
@@ -215,70 +215,69 @@ export default function SettingsScreen() {
         </View>
       </GlassCard>
 
-      {/* Immersive Reading Section */}
       <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.immersiveReading")}</Text>
-        <Text style={styles.hint}>{t("settings.immersiveHint")}</Text>
-        <Pressable onPress={toggleImmersiveMode} style={styles.toggleRow}>
+        <Text style={styles.sectionTitle}>{t("settings.notifications")}</Text>
+        <Text style={styles.hint}>{t("settings.notificationsHint")}</Text>
+        <Pressable onPress={() => void handleToggleReminder()} style={styles.toggleRow}>
           <Text style={styles.toggleLabel}>
-            {t("settings.immersiveMode", {
-              state: immersiveMode ? t("common.on") : t("common.off"),
-            })}
+            {reminderEnabled ? t("settings.notificationsEnabled") : t("settings.notificationsDisabled")}
           </Text>
-          <View style={[styles.pill, immersiveMode && styles.pillOn]}>
-            <View style={[styles.knob, immersiveMode && styles.knobOn]} />
+          <View style={[styles.pill, reminderEnabled && styles.pillOn]}>
+            <View style={[styles.knob, reminderEnabled && styles.knobOn]} />
           </View>
         </Pressable>
+        {reminderEnabled ? (
+          <View style={styles.timeRow}>
+            <Pressable onPress={() => void handleHourChange(-1)} style={styles.timeBtn} hitSlop={10}>
+              <Ionicons name="chevron-back" size={20} color={colors.accent} />
+            </Pressable>
+            <Text style={styles.timeLabel}>
+              {String(hour).padStart(2, "0")}:{String(minute).padStart(2, "0")}
+            </Text>
+            <Pressable onPress={() => void handleHourChange(1)} style={styles.timeBtn} hitSlop={10}>
+              <Ionicons name="chevron-forward" size={20} color={colors.accent} />
+            </Pressable>
+          </View>
+        ) : null}
       </GlassCard>
 
-      {/* AI Companion Section */}
       <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.aiCompanionStatus")}</Text>
-        <Text style={styles.hint}>{t("settings.aiCompanionHint")}</Text>
-
-        <View style={styles.aiStatusContainer}>
-          <View style={styles.aiStatusRow}>
-            <View style={[styles.statusDot, hasApiKey ? styles.statusDotOn : styles.statusDotOff]} />
-            <Text style={[styles.aiStatusText, { color: hasApiKey ? colors.accent : colors.textMuted }]}>
-              {hasApiKey ? t("settings.aiStatusConfigured") : t("settings.aiStatusMissing")}
-            </Text>
-          </View>
-
-          {/* Quota Progress */}
-          <View style={styles.quotaSection}>
-            <View style={styles.quotaHeader}>
-              <Text style={styles.quotaTitle}>
-                {t("ai.responsesRemaining", { remaining: remainingCount, limit })}
+        <Accordion
+          title={t("settings.advanced")}
+          hint={t("settings.advancedHint")}
+          onExpandedChange={(open) => {
+            setAdvancedOpen(open);
+            if (open && hasApiKey) {
+              void runHealthCheck();
+            }
+          }}
+        >
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.immersiveReading")}</Text>
+            <Text style={styles.hint}>{t("settings.immersiveHint")}</Text>
+            <Pressable onPress={toggleImmersiveMode} style={styles.toggleRow}>
+              <Text style={styles.toggleLabel}>
+                {t("settings.immersiveMode", {
+                  state: immersiveMode ? t("common.on") : t("common.off"),
+                })}
               </Text>
-            </View>
-            <View style={styles.progressBarBg}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  { width: `${Math.min(100, (remainingCount / limit) * 100)}%` },
-                ]}
-              />
-            </View>
-          </View>
+              <View style={[styles.pill, immersiveMode && styles.pillOn]}>
+                <View style={[styles.knob, immersiveMode && styles.knobOn]} />
+              </View>
+            </Pressable>
+          </GlassCard>
 
-          {/* Reset Button */}
-          <Pressable onPress={handleResetQuota} style={styles.resetButton}>
-            <Ionicons name="refresh-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
-            <Text style={styles.resetButtonText}>{t("ai.clearChat")}</Text>
-          </Pressable>
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.aiCompanionStatus")}</Text>
+            <Text style={styles.hint}>{t("settings.aiServiceHint")}</Text>
 
-          <Pressable onPress={() => setAdvancedOpen((open) => !open)} style={styles.advancedToggle}>
-            <Text style={styles.advancedToggleText}>{t("settings.advanced")}</Text>
-            <Ionicons
-              name={advancedOpen ? "chevron-up" : "chevron-down"}
-              size={16}
-              color={colors.textMuted}
-            />
-          </Pressable>
-
-          {advancedOpen ? (
-            <View style={styles.advancedPanel}>
-              <Text style={styles.hint}>{t("settings.advancedHint")}</Text>
+            <View style={styles.aiStatusContainer}>
+              <View style={styles.aiStatusRow}>
+                <View style={[styles.statusDot, hasApiKey ? styles.statusDotOn : styles.statusDotOff]} />
+                <Text style={[styles.aiStatusText, { color: hasApiKey ? colors.accent : colors.textMuted }]}>
+                  {hasApiKey ? t("settings.aiStatusConfigured") : t("settings.aiStatusMissing")}
+                </Text>
+              </View>
 
               {hasApiKey ? (
                 <View style={styles.aiDetails}>
@@ -311,95 +310,80 @@ export default function SettingsScreen() {
                     </Pressable>
                   </View>
                 </View>
-              ) : (
-                <Text style={styles.note}>{t("settings.aiStatusMissing")}</Text>
-              )}
+              ) : null}
+
+              <View style={styles.quotaSection}>
+                <Text style={styles.quotaTitle}>
+                  {t("ai.responsesRemaining", { remaining: remainingCount, limit })}
+                </Text>
+                <View style={styles.progressBarBg}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      { width: `${Math.min(100, (remainingCount / limit) * 100)}%` },
+                    ]}
+                  />
+                </View>
+              </View>
+
+              <Pressable onPress={handleResetQuota} style={styles.resetButton}>
+                <Ionicons name="refresh-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+                <Text style={styles.resetButtonText}>{t("ai.clearChat")}</Text>
+              </Pressable>
             </View>
+          </GlassCard>
+
+          {supabaseConfigured ? (
+            <GlassCard style={styles.nestedCard}>
+              <Text style={styles.sectionTitle}>{t("settings.cloudSync")}</Text>
+              <Text style={styles.hint}>{t("settings.cloudSyncHint")}</Text>
+              <Text style={styles.meta}>
+                {lastSyncAt
+                  ? t("settings.lastSyncAt", { time: formatNoteDate(lastSyncAt, locale) })
+                  : t("settings.lastSyncNever")}
+              </Text>
+            </GlassCard>
           ) : null}
-        </View>
-      </GlassCard>
 
-      {/* Notifications Section */}
-      <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.notifications")}</Text>
-        <Text style={styles.hint}>{t("settings.notificationsHint")}</Text>
-        <Pressable onPress={() => void handleToggleReminder()} style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>
-            {reminderEnabled ? t("settings.notificationsEnabled") : t("settings.notificationsDisabled")}
-          </Text>
-          <View style={[styles.pill, reminderEnabled && styles.pillOn]}>
-            <View style={[styles.knob, reminderEnabled && styles.knobOn]} />
-          </View>
-        </Pressable>
-        {reminderEnabled ? (
-          <View style={styles.timeRow}>
-            <Pressable onPress={() => void handleHourChange(-1)} style={styles.timeBtn} hitSlop={10}>
-              <Ionicons name="chevron-back" size={20} color={colors.accent} />
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.scriptureTranslation")}</Text>
+            <Text style={styles.note}>{t("settings.scriptureTranslationHint")}</Text>
+          </GlassCard>
+
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.ecosystem")}</Text>
+            <Text style={styles.hint}>{t("settings.ecosystemHint")}</Text>
+            <Pressable
+              onPress={() => setEcosystemVisible(true)}
+              style={styles.ecosystemButton}
+            >
+              <Ionicons name="apps-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
+              <Text style={styles.ecosystemButtonText}>{t("settings.ecosystemView")}</Text>
             </Pressable>
-            <Text style={styles.timeLabel}>
-              {String(hour).padStart(2, "0")}:{String(minute).padStart(2, "0")}
-            </Text>
-            <Pressable onPress={() => void handleHourChange(1)} style={styles.timeBtn} hitSlop={10}>
-              <Ionicons name="chevron-forward" size={20} color={colors.accent} />
+          </GlassCard>
+
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.about")}</Text>
+            <Text style={styles.meta}>{t("settings.appVersion", { version: appVersion })}</Text>
+            {buildNumber ? (
+              <Text style={styles.meta}>{t("settings.buildNumber", { build: buildNumber })}</Text>
+            ) : null}
+          </GlassCard>
+
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.appearance")}</Text>
+            <Text style={styles.note}>{t("settings.appearanceNote")}</Text>
+          </GlassCard>
+
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.clearLibraryData")}</Text>
+            <Text style={styles.hint}>{t("settings.advancedHint")}</Text>
+            <Pressable onPress={handleClearLibrary} style={styles.dangerButton}>
+              <Ionicons name="trash-outline" size={16} color={colors.danger} style={{ marginRight: 6 }} />
+              <Text style={styles.dangerButtonText}>{t("settings.clearLibraryData")}</Text>
             </Pressable>
-          </View>
-        ) : null}
-      </GlassCard>
-
-      {supabaseConfigured ? (
-        <GlassCard style={styles.card}>
-          <Text style={styles.sectionTitle}>{t("settings.cloudSync")}</Text>
-          <Text style={styles.hint}>{t("settings.cloudSyncHint")}</Text>
-          <Text style={styles.meta}>
-            {lastSyncAt
-              ? t("settings.lastSyncAt", { time: formatNoteDate(lastSyncAt, locale) })
-              : t("settings.lastSyncNever")}
-          </Text>
-        </GlassCard>
-      ) : null}
-
-      {/* Scripture Translation Section */}
-      <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.scriptureTranslation")}</Text>
-        <Text style={styles.note}>{t("settings.scriptureTranslationHint")}</Text>
-      </GlassCard>
-
-      {/* Our Apps / Ecosystem Section */}
-      <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.ecosystem")}</Text>
-        <Text style={styles.hint}>{t("settings.ecosystemHint")}</Text>
-        <Pressable
-          onPress={() => setEcosystemVisible(true)}
-          style={styles.ecosystemButton}
-        >
-          <Ionicons name="apps-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
-          <Text style={styles.ecosystemButtonText}>{t("settings.ecosystemView")}</Text>
-        </Pressable>
-      </GlassCard>
-
-      {/* About / version */}
-      <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.about")}</Text>
-        <Text style={styles.meta}>{t("settings.appVersion", { version: appVersion })}</Text>
-        {buildNumber ? (
-          <Text style={styles.meta}>{t("settings.buildNumber", { build: buildNumber })}</Text>
-        ) : null}
-      </GlassCard>
-
-      {/* Appearance Section */}
-      <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.appearance")}</Text>
-        <Text style={styles.note}>{t("settings.appearanceNote")}</Text>
-      </GlassCard>
-
-      {/* Advanced / library reset */}
-      <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("settings.advanced")}</Text>
-        <Text style={styles.hint}>{t("settings.advancedHint")}</Text>
-        <Pressable onPress={handleClearLibrary} style={styles.dangerButton}>
-          <Ionicons name="trash-outline" size={16} color={colors.danger} style={{ marginRight: 6 }} />
-          <Text style={styles.dangerButtonText}>{t("settings.clearLibraryData")}</Text>
-        </Pressable>
+          </GlassCard>
+        </Accordion>
       </GlassCard>
 
       <EcosystemModal visible={ecosystemVisible} onClose={() => setEcosystemVisible(false)} />
@@ -417,8 +401,19 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     gap: spacing.md,
   },
+  groupHeading: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    marginBottom: -spacing.xs,
+  },
   card: {
     padding: spacing.md,
+  },
+  nestedCard: {
+    padding: spacing.md,
+    backgroundColor: colors.backgroundElevated,
   },
   sectionTitle: {
     ...typography.subtitle,

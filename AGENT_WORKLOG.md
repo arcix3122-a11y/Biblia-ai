@@ -897,3 +897,10 @@ npx expo start
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: DONE - Uproszczenie UX (Home, Ustawienia, zakładki, czytnik, AI) — mniej bałaganu, onboarding-friendly
+- Changes: HomeScreen (CTA Czytaj Pismo, mniej kart), SettingsScreen (Podstawowe/Zaawansowane Accordion), tabs (krótsze etykiety), ReaderScreen (KJV banner dismiss, prostszy footer), AiChatScreen (starter + composer), MomentumDashboard (kompakt), Accordion.tsx, onboardingStore (KJV dismiss), en.json/pl.json
+- Validation: npm run typecheck — 0 błędów; npm run check:locales — OK
+- Result: done

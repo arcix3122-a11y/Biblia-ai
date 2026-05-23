@@ -23,11 +23,12 @@
     "dismiss": "Dismiss"
   },
   "tabs": {
-    "scripture": "Scripture",
-    "companion": "Companion",
-    "workspace": "Workspace",
-    "headerScripture": "Biblia AI",
-    "headerCompanion": "Spiritual Companion"
+    "scripture": "Read",
+    "companion": "Chat",
+    "workspace": "Notes",
+    "headerScripture": "Scripture",
+    "headerCompanion": "Companion",
+    "headerWorkspace": "Workspace"
   },
   "navigation": {
     "chapters": "Chapters",
@@ -77,7 +78,8 @@
     "searchHint_few": "Type {{count}} more characters to search.",
     "searchHint_many": "Type {{count}} more characters to search.",
     "plansHeading": "Plans",
-    "verseTextLocaleNotice": "Verse text: English (KJV)"
+    "verseTextLocaleNotice": "Verse text: English (KJV)",
+    "readScripture": "Read Scripture"
   },
   "dashboard": {
     "dayStreak": "day streak",
@@ -199,7 +201,9 @@
       "green": "Green highlight",
       "rose": "Rose highlight"
     },
-    "scriptureTranslationNotice": "Scripture text is in English (KJV). The app interface follows your language setting.",
+    "scriptureTranslationNotice": "Scripture text is in English (KJV).",
+    "scriptureTranslationNoticeLong": "Scripture text is in English (KJV). The app interface follows your language setting.",
+    "dismissTranslationNotice": "Dismiss KJV notice",
     "crossReferences": "Related passages",
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "No related passages for this chapter.",
@@ -239,7 +243,9 @@
       "3": "The Spirit intercedes for us with groanings too deep for words. Bring your burdens honestly before God.",
       "4": "Wisdom begins with reverence for the Lord. As you read, ask: what is God inviting me to trust or obey?"
     },
-    "retry": "Retry"
+    "retry": "Retry",
+    "starterTitle": "Your spiritual companion",
+    "starterHint": "Ask about Scripture, prayer, or faith. Select a verse in the reader for contextual prompts."
   },
   "workspace": {
     "title": "Workspace",
@@ -299,7 +305,8 @@
     "aiCompanionHint": "Daily message quota and chat reset. Live responses use your configured API key.",
     "aiServiceHint": "Live diagnostics for the configured LLM provider.",
     "advanced": "Advanced",
-    "advancedHint": "Developer and troubleshooting options.",
+    "advancedHint": "AI status, cloud sync, and more.",
+    "basic": "Essentials",
     "aiStatusConfigured": "Status: API key configured",
     "aiStatusMissing": "Status: API key missing",
     "aiHealthChecking": "Connection check in progress…",

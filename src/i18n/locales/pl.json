@@ -23,11 +23,12 @@
     "dismiss": "Ukryj"
   },
   "tabs": {
-    "scripture": "Pismo",
-    "companion": "Asystent",
-    "workspace": "Przestrzeń",
-    "headerScripture": "Biblia AI",
-    "headerCompanion": "Duchowy towarzysz"
+    "scripture": "Czytaj",
+    "companion": "Czat",
+    "workspace": "Notatki",
+    "headerScripture": "Pismo Święte",
+    "headerCompanion": "Towarzysz",
+    "headerWorkspace": "Przestrzeń robocza"
   },
   "navigation": {
     "chapters": "Rozdziały",
@@ -77,7 +78,8 @@
     "offlineReady": "Tryb offline",
     "pullToRefresh": "Przeciągnij w dół, aby odświeżyć bibliotekę i dane czytania",
     "plansHeading": "Plany",
-    "verseTextLocaleNotice": "Tekst wersetów: angielski (KJV)"
+    "verseTextLocaleNotice": "Tekst wersetów: angielski (KJV)",
+    "readScripture": "Czytaj Pismo"
   },
   "dashboard": {
     "dayStreak": "dni z rzędu",
@@ -199,7 +201,9 @@
       "green": "Zielone podświetlenie",
       "rose": "Różowe podświetlenie"
     },
-    "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku.",
+    "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV).",
+    "scriptureTranslationNoticeLong": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku.",
+    "dismissTranslationNotice": "Ukryj informację o KJV",
     "crossReferences": "Powiązane fragmenty",
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "Brak powiązanych fragmentów dla tego rozdziału.",
@@ -239,7 +243,9 @@
       "3": "Duch wstawia się za nami w westchnieniach niewypowiedzianych. Przynieś swoje brzemię szczerze przed Boga.",
       "4": "Początkiem mądrości jest bojaźń Pańska. Czytając, zapytaj: do czego Bóg zaprasza mnie dziś — zaufania czy posłuszeństwa?"
     },
-    "retry": "Spróbuj ponownie"
+    "retry": "Spróbuj ponownie",
+    "starterTitle": "Twój duchowy towarzysz",
+    "starterHint": "Pytaj o Pismo, modlitwę lub wiarę. Wybierz werset w czytniku, aby włączyć kontekstowe podpowiedzi."
   },
   "workspace": {
     "title": "Przestrzeń robocza",
@@ -299,7 +305,8 @@
     "aiCompanionHint": "Dzienny limit wiadomości i reset czatu. Odpowiedzi na żywo korzystają ze skonfigurowanego klucza API.",
     "aiServiceHint": "Diagnostyka konfiguracji dostawcy LLM na żywo.",
     "advanced": "Zaawansowane",
-    "advancedHint": "Opcje deweloperskie i rozwiązywanie problemów.",
+    "advancedHint": "Status AI, synchronizacja w chmurze i więcej.",
+    "basic": "Podstawowe",
     "aiStatusConfigured": "Status: klucz API skonfigurowany",
     "aiStatusMissing": "Status: brak klucza API",
     "aiHealthChecking": "Trwa sprawdzanie połączenia…",
