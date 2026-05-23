@@ -24,7 +24,11 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-sqlite"],
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-asset"
+    ],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true

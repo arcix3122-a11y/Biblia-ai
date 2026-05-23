@@ -2,7 +2,7 @@
 
 ## Expo version
 
-Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before writing any code.
+Read the exact versioned docs at https://docs.expo.dev/versions/v52.0.0/ before writing any code.
 
 ## Internationalization (PL / EN)
 
@@ -79,7 +79,7 @@ node scripts/prepare-bible-seed.mjs <file.json>
 These rules apply to every coding agent and subagent working in this repository.
 
 ### 1) Mandatory Expo docs source
-- Always use Expo documentation for version `56.0.0`.
+- Always use Expo documentation for version `52.0.0`.
 - Do not rely on generic Expo blog posts or snippets for other versions.
 
 ### 2) Before making changes

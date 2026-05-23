@@ -1,6 +1,6 @@
 # Biblia AI
 
-**Biblia AI** by SolidCode Apps — local-first Bible reader with spiritual companion chat (Expo SDK 56).
+**Biblia AI** by SolidCode Apps — local-first Bible reader with spiritual companion chat (Expo SDK 52).
 
 ## Quick start
 

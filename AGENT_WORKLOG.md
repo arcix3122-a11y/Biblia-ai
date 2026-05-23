@@ -685,3 +685,33 @@ npx expo start
 - **README:** nadal opisuje sample seed (4 fragmenty) — seed faktycznie **66 ksiąg / 31100 wersetów**; brak dokumentacji stats/reminders/sync/study.
 - **Typecheck:** `npm run typecheck` — 0 błędów (stan working tree).
 
+
+## 2026-05-23 14:04
+- Agent: Antigravity
+- Task: DONE - Wdrożenie Ekranu Powitalnego Ekosystemu (Ecosystem Onboarding Modal) z listą aplikacji SolidCode oraz linkiem deweloperskim w Ustawieniach
+- Changes: src/components/EcosystemModal.tsx, src/screens/SettingsScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, tsconfig.json
+- Validation: Verified compilation with `npm run typecheck` (0 errors), corrected locales JSON validation and added common.close keys.
+- Result: done
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: START - Downgrade Expo SDK 56 → 52 dla kompatybilności z Expo Go (Play Store)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: DONE - Downgrade Expo SDK 56 → 52 dla Expo Go (Play Store)
+- Changes: `package.json`, `package-lock.json`, `tsconfig.json`, `app.json`, `reminderService.ts`, `EcosystemModal.tsx`, `AGENTS.md`, `README.md`
+- Validation: `npm run typecheck` (0 błędów), `npx expo start` (Metro OK :8081)
+- Result: done
+
+### DONE — Expo Go SDK 52 (≤5 punktów)
+
+- **Problem:** Expo SDK 56 wymaga nowszego Expo Go niż wersja z Play Store → błąd `Incompatible SDK version`.
+- **Fix:** Downgrade do **Expo SDK 52** (`expo ~52.0.49`, RN 0.76.9, React 18.3.1); usunięto `react-native-worklets`; dopasowano API powiadomień.
+- **Test na telefonie:** Ten sam WiFi co PC → `npx expo start` → zeskanuj QR w Expo Go; jeśli LAN nie działa: `npx expo start --tunnel`.
+- **Typecheck:** `npm run typecheck` — 0 błędów.
+- **Komenda start:** `npx expo start` (alternatywa: `npm start`).
+

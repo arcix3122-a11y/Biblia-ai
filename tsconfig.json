@@ -4,6 +4,8 @@
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./src/*"]
     }
