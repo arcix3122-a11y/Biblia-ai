@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNotesStore, Note } from "@/store/notesStore";
 import { useBookmarksStore } from "@/store/bookmarksStore";
@@ -21,8 +22,12 @@ import { useSelectionStore } from "@/store/selectionStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { colors, radii, spacing, typography } from "@/theme";
 import { GlassCard } from "@/components/GlassCard";
+import { useLocaleStore } from "@/store/localeStore";
+import { formatNoteDate, formatSavedDate } from "@/utils/formatDate";
 
 export default function WorkspaceScreen() {
+  const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   
@@ -64,12 +69,18 @@ export default function WorkspaceScreen() {
         romans: "Rz",
       };
       const abbr = abbrMap[selectedVerse.bookSlug] || selectedVerse.bookName;
-      setBody(`Rozważanie do wersetu [${abbr} ${selectedVerse.chapter}:${selectedVerse.verse}]:\n\n"${selectedVerse.text}"\n\n`);
+      const reference = `${abbr} ${selectedVerse.chapter}:${selectedVerse.verse}`;
+      setBody(
+        t("workspace.noteTemplate", {
+          reference,
+          text: selectedVerse.text,
+        })
+      );
     } else {
       setBody("");
     }
     setActiveSubTab("edit");
-  }, [selectedVerse]);
+  }, [selectedVerse, t]);
 
   const handleEditNote = useCallback((note: Note) => {
     setEditingNoteId(note.id);
@@ -85,22 +96,22 @@ export default function WorkspaceScreen() {
       return;
     }
 
-    const savedTitle = trimmedTitle || "Bez tytułu";
+    const savedTitle = trimmedTitle || t("common.untitled");
     const savedId = await saveNote(editingNoteId, savedTitle, body);
     setEditingNoteId(savedId);
-    Alert.alert("Sukces", "Notatka została pomyślnie zapisana.");
-  }, [body, editingNoteId, saveNote, title]);
+    Alert.alert(t("common.success"), t("workspace.noteSaved"));
+  }, [body, editingNoteId, saveNote, t, title]);
 
   const handleDelete = useCallback(() => {
     if (!editingNoteId) return;
 
     Alert.alert(
-      "Usuń notatkę",
-      "Czy na pewno chcesz usunąć tę notatkę?",
+      t("workspace.deleteNoteTitle"),
+      t("workspace.deleteNoteMessage"),
       [
-        { text: "Anuluj", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Usuń",
+          text: t("common.delete"),
           style: "destructive",
           onPress: async () => {
             await deleteNote(editingNoteId);
@@ -111,17 +122,17 @@ export default function WorkspaceScreen() {
         },
       ]
     );
-  }, [deleteNote, editingNoteId]);
+  }, [deleteNote, editingNoteId, t]);
 
   const handleBackToList = useCallback(async () => {
     if (title.trim() || body.trim()) {
-      const trimmedTitle = title.trim() || "Bez tytułu";
+      const trimmedTitle = title.trim() || t("common.untitled");
       await saveNote(editingNoteId, trimmedTitle, body);
     }
     setEditingNoteId(null);
     setTitle("");
     setBody("");
-  }, [body, editingNoteId, saveNote, title]);
+  }, [body, editingNoteId, saveNote, t, title]);
 
   // Navigating to verse
   const handleLinkPress = useCallback(
@@ -159,12 +170,12 @@ export default function WorkspaceScreen() {
 
   const handleDeleteBookmark = useCallback((item: any) => {
     Alert.alert(
-      "Usuń zakładkę",
-      "Czy na pewno chcesz usunąć ten werset z zakładek?",
+      t("workspace.deleteBookmarkTitle"),
+      t("workspace.deleteBookmarkMessage"),
       [
-        { text: "Anuluj", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Usuń",
+          text: t("common.delete"),
           style: "destructive",
           onPress: async () => {
             await toggleBookmark(item.verse_id, item.book_id, item.chapter, item.verse);
@@ -172,15 +183,13 @@ export default function WorkspaceScreen() {
         },
       ]
     );
-  }, [toggleBookmark]);
+  }, [toggleBookmark, t]);
 
   // Markdown Reference Parser for preview
   const renderPreviewContent = () => {
     if (!body.trim()) {
       return (
-        <Text style={styles.previewPlaceholder}>
-          Podgląd przemyśleń wygeneruje się w czasie rzeczywistym...
-        </Text>
+        <Text style={styles.previewPlaceholder}>{t("workspace.previewPlaceholder")}</Text>
       );
     }
 
@@ -265,10 +274,10 @@ export default function WorkspaceScreen() {
         <View style={[styles.header, { paddingTop: insets.top + spacing.xs }]}>
           <Pressable onPress={() => void handleBackToList()} style={styles.backButton} hitSlop={15}>
             <Ionicons name="arrow-back" size={24} color={colors.accent} />
-            <Text style={styles.backButtonText}>Notatki</Text>
+            <Text style={styles.backButtonText}>{t("workspace.notesBack")}</Text>
           </Pressable>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {editingNoteId ? "Edytuj notatkę" : "Nowa notatka"}
+            {editingNoteId ? t("workspace.editNote") : t("workspace.newNote")}
           </Text>
           <View style={styles.headerRight}>
             <Pressable onPress={() => void handleSave()} style={styles.saveIcon} hitSlop={15}>
@@ -296,7 +305,7 @@ export default function WorkspaceScreen() {
             <Text
               style={[styles.subTabLabel, activeSubTab === "edit" && styles.subTabLabelActive]}
             >
-              Edycja
+              {t("workspace.editTab")}
             </Text>
           </Pressable>
           <Pressable
@@ -311,7 +320,7 @@ export default function WorkspaceScreen() {
             <Text
               style={[styles.subTabLabel, activeSubTab === "preview" && styles.subTabLabelActive]}
             >
-              Podgląd (Auto-linki)
+              {t("workspace.previewTab")}
             </Text>
           </Pressable>
         </View>
@@ -321,7 +330,7 @@ export default function WorkspaceScreen() {
             <TextInput
               value={title}
               onChangeText={setTitle}
-              placeholder="Tytuł rozważania..."
+              placeholder={t("workspace.titlePlaceholder")}
               placeholderTextColor={colors.textMuted}
               style={styles.titleInput}
               maxLength={100}
@@ -329,7 +338,7 @@ export default function WorkspaceScreen() {
             <TextInput
               value={body}
               onChangeText={setBody}
-              placeholder="Zapisz swoje przemyślenia. Polskie sygnatury wersetów (np. Rdz 1:1, Ps 23:1, J 3,16, Rz 8:28) w trybie podglądu automatycznie zamienią się w interaktywne odnośniki do czytnika biblijnego..."
+              placeholder={t("workspace.bodyPlaceholder")}
               placeholderTextColor={colors.textMuted}
               style={styles.bodyInput}
               multiline
@@ -339,7 +348,7 @@ export default function WorkspaceScreen() {
           </ScrollView>
         ) : (
           <ScrollView contentContainerStyle={styles.previewContent}>
-            <Text style={styles.previewTitle}>{title || "Bez tytułu"}</Text>
+            <Text style={styles.previewTitle}>{title || t("common.untitled")}</Text>
             {renderPreviewContent()}
           </ScrollView>
         )}
@@ -352,7 +361,7 @@ export default function WorkspaceScreen() {
     <View style={styles.container}>
       {/* Top Header */}
       <View style={[styles.header, { paddingTop: insets.top + spacing.xs }]}>
-        <Text style={styles.headerTitleMain}>Workspace</Text>
+        <Text style={styles.headerTitleMain}>{t("workspace.title")}</Text>
         {workspaceTab === "notes" && (
           <Pressable onPress={handleCreateNewNote} style={styles.createNewButton} hitSlop={15}>
             <Ionicons name="add" size={24} color={colors.canvas} />
@@ -367,7 +376,7 @@ export default function WorkspaceScreen() {
           style={[styles.toggleBtn, workspaceTab === "notes" && styles.toggleBtnActive]}
         >
           <Text style={[styles.toggleBtnText, workspaceTab === "notes" && styles.toggleBtnTextActive]}>
-            Rozważania ({notes.length})
+            {t("workspace.notesCount", { count: notes.length })}
           </Text>
         </Pressable>
         <Pressable
@@ -375,7 +384,7 @@ export default function WorkspaceScreen() {
           style={[styles.toggleBtn, workspaceTab === "bookmarks" && styles.toggleBtnActive]}
         >
           <Text style={[styles.toggleBtnText, workspaceTab === "bookmarks" && styles.toggleBtnTextActive]}>
-            Zakładki ({bookmarks.length})
+            {t("workspace.bookmarksCount", { count: bookmarks.length })}
           </Text>
         </Pressable>
       </View>
@@ -388,7 +397,7 @@ export default function WorkspaceScreen() {
             <TextInput
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholder="Filtruj notatki..."
+              placeholder={t("workspace.filterNotes")}
               placeholderTextColor={colors.textMuted}
               style={styles.searchInput}
               autoCapitalize="none"
@@ -408,9 +417,9 @@ export default function WorkspaceScreen() {
           ) : filteredNotes.length === 0 ? (
             <View style={styles.centered}>
               <Ionicons name="journal-outline" size={48} color={colors.textMuted} />
-              <Text style={styles.emptyTitle}>Brak notatek</Text>
+              <Text style={styles.emptyTitle}>{t("workspace.noNotes")}</Text>
               <Text style={styles.emptySubtitle}>
-                {searchQuery ? "Brak wyników wyszukiwania." : "Kliknij '+', aby utworzyć pierwsze rozważanie."}
+                {searchQuery ? t("workspace.noNotesSearch") : t("workspace.noNotesEmpty")}
               </Text>
             </View>
           ) : (
@@ -426,16 +435,11 @@ export default function WorkspaceScreen() {
                         {item.title}
                       </Text>
                       <Text style={styles.noteCardDate}>
-                        {new Date(item.updatedAt).toLocaleDateString("pl-PL", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {formatNoteDate(item.updatedAt, locale)}
                       </Text>
                     </View>
                     <Text style={styles.noteCardBody} numberOfLines={3}>
-                      {item.body || "Brak treści."}
+                      {item.body || t("common.noContent")}
                     </Text>
                   </GlassCard>
                 </Pressable>
@@ -453,10 +457,8 @@ export default function WorkspaceScreen() {
           ) : bookmarks.length === 0 ? (
             <View style={styles.centered}>
               <Ionicons name="bookmark-outline" size={48} color={colors.textMuted} />
-              <Text style={styles.emptyTitle}>Brak zakładek</Text>
-              <Text style={styles.emptySubtitle}>
-                Oznaczaj wersety gwiazdką w czytniku, aby zapisać je w tym miejscu.
-              </Text>
+              <Text style={styles.emptyTitle}>{t("workspace.noBookmarks")}</Text>
+              <Text style={styles.emptySubtitle}>{t("workspace.noBookmarksEmpty")}</Text>
             </View>
           ) : (
             <FlatList
@@ -474,7 +476,7 @@ export default function WorkspaceScreen() {
                     >
                       <Ionicons name="book" size={16} color={colors.accent} style={{ marginRight: 6 }} />
                       <Text style={styles.bookmarkCardRef}>
-                        {item.book_name ?? "Księga"} {item.chapter}:{item.verse}
+                        {item.book_name ?? t("common.book")} {item.chapter}:{item.verse}
                       </Text>
                     </Pressable>
                     <Pressable
@@ -486,10 +488,10 @@ export default function WorkspaceScreen() {
                     </Pressable>
                   </View>
                   <Text style={styles.bookmarkCardText} numberOfLines={4}>
-                    {item.verse_text ?? "Tekst niedostępny."}
+                    {item.verse_text ?? t("common.textUnavailable")}
                   </Text>
                   <Text style={styles.bookmarkCardDate}>
-                    Zapisano: {new Date(item.created_at).toLocaleDateString("pl-PL")}
+                    {t("workspace.savedAt", { date: formatSavedDate(item.created_at, locale) })}
                   </Text>
                 </GlassCard>
               )}

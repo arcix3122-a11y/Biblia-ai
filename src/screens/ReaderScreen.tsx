@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GlassChrome } from "@/components/GlassChrome";
 import { ImmersiveModeToggle } from "@/components/reader/ImmersiveModeToggle";
@@ -28,6 +29,7 @@ import { useSelectionStore } from "@/store/selectionStore";
 import { animations, colors, radii, spacing, typography } from "@/theme";
 
 export default function ReaderScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { setTabBarHidden } = useChrome();
@@ -49,6 +51,8 @@ export default function ReaderScreen() {
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
 
+  const flatListRef = useRef<FlatList>(null);
+
   useEffect(() => {
     setTabBarHidden(immersiveMode);
     Animated.timing(chromeOpacity, {
@@ -59,6 +63,28 @@ export default function ReaderScreen() {
     }).start();
     return () => setTabBarHidden(false);
   }, [chromeOpacity, immersiveMode, setTabBarHidden]);
+
+  // Auto-scroll to selected verse
+  useEffect(() => {
+    if (selectedVerse && book && verses.length > 0) {
+      if (
+        selectedVerse.bookId === book.id &&
+        selectedVerse.chapter === chapterNumber
+      ) {
+        const index = verses.findIndex((v) => v.number === selectedVerse.verse);
+        if (index !== -1) {
+          const timer = setTimeout(() => {
+            flatListRef.current?.scrollToIndex({
+              index,
+              animated: true,
+              viewPosition: 0.3,
+            });
+          }, 350);
+          return () => clearTimeout(timer);
+        }
+      }
+    }
+  }, [book, chapterNumber, selectedVerse, verses]);
 
   useEffect(() => {
     if (book && verses.length > 0) {
@@ -125,7 +151,7 @@ export default function ReaderScreen() {
   if (dbError || !book) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.error}>{dbError ?? "Book not found."}</Text>
+        <Text style={styles.error}>{dbError ?? t("reader.bookNotFound")}</Text>
       </View>
     );
   }
@@ -138,7 +164,7 @@ export default function ReaderScreen() {
         <GlassChrome sticky style={{ paddingTop: insets.top }}>
           <Animated.View style={[styles.toolbar, { opacity: chromeOpacity }]}>
             <Pressable onPress={() => router.back()} hitSlop={12}>
-              <Text style={styles.back}>← Back</Text>
+              <Text style={styles.back}>← {t("common.back")}</Text>
             </Pressable>
             <Text style={styles.heading}>
               {book.name} {chapterNumber}
@@ -154,10 +180,20 @@ export default function ReaderScreen() {
 
       <ReadingCanvas fontSize={fontSize} style={styles.canvas}>
         <FlatList
+          ref={flatListRef}
           data={verses}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
+          onScrollToIndexFailed={(info) => {
+            setTimeout(() => {
+              flatListRef.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+                viewPosition: 0.3,
+              });
+            }, 100);
+          }}
           renderItem={({ item }) => (
             <VerseRow
               verse={item}
@@ -176,9 +212,7 @@ export default function ReaderScreen() {
             />
           )}
           ListEmptyComponent={
-            <Text style={styles.empty}>
-              This chapter is not available in the local library yet.
-            </Text>
+            <Text style={styles.empty}>{t("reader.chapterUnavailable")}</Text>
           }
         />
       </ReadingCanvas>
@@ -198,7 +232,9 @@ export default function ReaderScreen() {
               <View style={styles.selectionTextRow}>
                 <Ionicons name="sparkles" size={14} color={colors.accent} style={{ marginRight: 6 }} />
                 <Text style={styles.selectionRef} numberOfLines={1}>
-                  Zaznaczono: {selectedVerse.bookName} {selectedVerse.chapter}:{selectedVerse.verse}
+                  {t("reader.selected", {
+                    reference: `${selectedVerse.bookName} ${selectedVerse.chapter}:${selectedVerse.verse}`,
+                  })}
                 </Text>
               </View>
               <View style={styles.selectionActions}>
@@ -207,21 +243,23 @@ export default function ReaderScreen() {
                   style={styles.selectionBtn}
                 >
                   <Ionicons name="chatbubble-ellipses" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>Asystent AI</Text>
+                  <Text style={styles.selectionBtnText}>{t("reader.aiAssistant")}</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => router.push("/workspace")}
                   style={styles.selectionBtn}
                 >
                   <Ionicons name="journal" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>Notatnik</Text>
+                  <Text style={styles.selectionBtnText}>{t("reader.notebook")}</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setSelectedVerse(null)}
                   style={[styles.selectionBtn, { borderColor: "rgba(239, 68, 68, 0.2)" }]}
                 >
                   <Ionicons name="close-circle" size={16} color={colors.danger} />
-                  <Text style={[styles.selectionBtnText, { color: colors.danger }]}>Anuluj</Text>
+                  <Text style={[styles.selectionBtnText, { color: colors.danger }]}>
+                    {t("common.cancel")}
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -234,15 +272,15 @@ export default function ReaderScreen() {
                   chromeOpacity={chromeOpacity}
                 />
                 <Pressable onPress={() => void loadAudioPreview()} style={styles.audioStub}>
-                  <Text style={styles.audioStubText}>Listen</Text>
+                  <Text style={styles.audioStubText}>{t("reader.listen")}</Text>
                 </Pressable>
               </View>
               <View style={styles.nav}>
                 <Pressable onPress={() => void navigateChapter("prev")} style={styles.navButton}>
-                  <Text style={styles.navText}>Previous</Text>
+                  <Text style={styles.navText}>{t("reader.previous")}</Text>
                 </Pressable>
                 <Pressable onPress={() => void navigateChapter("next")} style={styles.navButton}>
-                  <Text style={styles.navText}>Next</Text>
+                  <Text style={styles.navText}>{t("reader.next")}</Text>
                 </Pressable>
               </View>
             </>
@@ -253,7 +291,7 @@ export default function ReaderScreen() {
           style={[styles.immersiveExit, { bottom: insets.bottom + spacing.md }]}
           onPress={toggleImmersiveMode}
         >
-          <Text style={styles.immersiveExitText}>Exit immersive</Text>
+          <Text style={styles.immersiveExitText}>{t("reader.exitImmersive")}</Text>
         </Pressable>
       )}
     </View>

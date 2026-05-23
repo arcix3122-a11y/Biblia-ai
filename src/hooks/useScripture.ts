@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import i18n from "@/i18n";
 import type { Book, Chapter, Testament, Verse, VerseWithReference } from "@/types/scripture";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { getDatabase } from "@/services/db/database";
@@ -17,7 +18,7 @@ export function useDatabaseReady(): { ready: boolean; error: string | null } {
       })
       .catch((err: unknown) => {
         if (mounted) {
-          setError(err instanceof Error ? err.message : "Database failed to open");
+          setError(err instanceof Error ? err.message : i18n.t("errors.databaseOpenFailed"));
         }
       });
     return () => {

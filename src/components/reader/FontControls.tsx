@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors, getReadingTypography, radii, spacing, typography } from "@/theme";
 import type { FontControlsProps } from "@/types/ui";
 
@@ -7,9 +8,11 @@ export function FontControls({
   fontSize,
   onIncrease,
   onDecrease,
-  previewText = "The Lord is my shepherd",
+  previewText,
 }: FontControlsProps) {
+  const { t } = useTranslation();
   const previewAnim = useRef(new Animated.Value(1)).current;
+  const resolvedPreview = previewText ?? t("reader.fontPreview");
 
   useEffect(() => {
     previewAnim.setValue(0.92);
@@ -28,7 +31,7 @@ export function FontControls({
       <Pressable
         onPress={onDecrease}
         style={styles.button}
-        accessibilityLabel="Decrease font size"
+        accessibilityLabel={t("reader.decreaseFont")}
       >
         <Text style={styles.buttonText}>A−</Text>
       </Pressable>
@@ -44,12 +47,12 @@ export function FontControls({
         ]}
         numberOfLines={1}
       >
-        {previewText}
+        {resolvedPreview}
       </Animated.Text>
       <Pressable
         onPress={onIncrease}
         style={styles.button}
-        accessibilityLabel="Increase font size"
+        accessibilityLabel={t("reader.increaseFont")}
       >
         <Text style={styles.buttonText}>A+</Text>
       </Pressable>

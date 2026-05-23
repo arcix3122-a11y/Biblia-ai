@@ -1,45 +1,52 @@
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useReaderStore } from "@/store/readerStore";
 import { FontControls } from "@/components/reader/FontControls";
 import { GlassCard } from "@/components/GlassCard";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function SettingsScreen() {
+  const { t } = useTranslation();
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
     useReaderStore();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>Appearance</Text>
-        <Text style={styles.note}>
-          Biblia AI uses a fixed Cyber-Monastery dark theme (black canvas, gold accent). Light
-          mode is not available in Phase 1.
-        </Text>
+        <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
+        <Text style={styles.hint}>{t("settings.languageHint")}</Text>
+        <LanguageSwitcher />
       </GlassCard>
 
       <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>Reader font size</Text>
-        <Text style={styles.hint}>Adjusts verse text in the Scripture reader.</Text>
+        <Text style={styles.sectionTitle}>{t("settings.appearance")}</Text>
+        <Text style={styles.note}>{t("settings.appearanceNote")}</Text>
+      </GlassCard>
+
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.readerFontSize")}</Text>
+        <Text style={styles.hint}>{t("settings.readerFontHint")}</Text>
         <View style={styles.fontRow}>
           <FontControls
             fontSize={fontSize}
             onIncrease={increaseFont}
             onDecrease={decreaseFont}
+            previewText={t("reader.fontPreview")}
           />
         </View>
-        <Text style={styles.meta}>Current size: {fontSize}px</Text>
+        <Text style={styles.meta}>{t("settings.currentSize", { size: fontSize })}</Text>
       </GlassCard>
 
       <GlassCard style={styles.card}>
-        <Text style={styles.sectionTitle}>Immersive reading</Text>
-        <Text style={styles.hint}>
-          Hide chrome while reading. Toggle from the reader toolbar or below.
-        </Text>
+        <Text style={styles.sectionTitle}>{t("settings.immersiveReading")}</Text>
+        <Text style={styles.hint}>{t("settings.immersiveHint")}</Text>
         <Pressable onPress={toggleImmersiveMode} style={styles.toggleRow}>
           <Text style={styles.toggleLabel}>
-            {immersiveMode ? "Immersive mode: on" : "Immersive mode: off"}
+            {t("settings.immersiveMode", {
+              state: immersiveMode ? t("common.on") : t("common.off"),
+            })}
           </Text>
           <View style={[styles.pill, immersiveMode && styles.pillOn]}>
             <View style={[styles.knob, immersiveMode && styles.knobOn]} />

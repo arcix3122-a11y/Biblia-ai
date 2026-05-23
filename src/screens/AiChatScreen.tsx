@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { ContextPills } from "@/components/ai/ContextPills";
 import { ChatBubble } from "@/components/ChatBubble";
 import { GlassChrome } from "@/components/GlassChrome";
@@ -20,12 +21,12 @@ import { colors, radii, spacing, typography } from "@/theme";
 import type { ContextPillTemplateId } from "@/types/ui";
 
 export default function AiChatScreen() {
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
   const listRef = useRef<FlatList>(null);
   const messages = useAiChatStore((s) => s.messages);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const resetChat = useAiChatStore((s) => s.resetChat);
-  const messageCount = useAiChatStore((s) => s.messageCount);
   const limit = useAiChatStore((s) => s.limit);
   const { sendMessage, sendWithContext, isThinking, canSend, remaining } = useSpiritualAssistant();
 
@@ -61,21 +62,21 @@ export default function AiChatScreen() {
       <View style={styles.badgeRow}>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>
-            {messageCount} / {limit} messages used · {remaining()} left
+            {t("ai.responsesRemaining", { remaining: remaining(), limit })}
           </Text>
         </View>
         <Pressable
           onPress={resetChat}
           style={styles.clearButton}
-          accessibilityLabel="Clear chat history"
+          accessibilityLabel={t("ai.clearChat")}
         >
-          <Text style={styles.clearButtonText}>Clear</Text>
+          <Text style={styles.clearButtonText}>{t("common.clear")}</Text>
         </Pressable>
       </View>
 
       {selectedVerse ? (
         <View style={styles.contextBanner}>
-          <Text style={styles.contextLabel}>Selected verse</Text>
+          <Text style={styles.contextLabel}>{t("ai.selectedVerse")}</Text>
           <Text style={styles.contextRef}>
             {selectedVerse.bookName} {selectedVerse.chapter}:{selectedVerse.verse}
           </Text>
@@ -84,9 +85,7 @@ export default function AiChatScreen() {
           </Text>
         </View>
       ) : (
-        <Text style={styles.contextHint}>
-          Tap or long-press a verse in the reader to enable contextual prompts.
-        </Text>
+        <Text style={styles.contextHint}>{t("ai.contextHint")}</Text>
       )}
 
       <FlatList
@@ -100,11 +99,17 @@ export default function AiChatScreen() {
           isThinking ? (
             <View style={styles.thinking}>
               <ActivityIndicator color={colors.accent} size="small" />
-              <Text style={styles.thinkingText}>Reflecting…</Text>
+              <Text style={styles.thinkingText}>{t("ai.reflecting")}</Text>
             </View>
           ) : null
         }
       />
+
+      {!canSend() ? (
+        <View style={styles.limitBanner}>
+          <Text style={styles.limitBannerText}>{t("ai.limitReached")}</Text>
+        </View>
+      ) : null}
 
       <GlassChrome>
         <ContextPills
@@ -115,9 +120,7 @@ export default function AiChatScreen() {
           <TextInput
             value={input}
             onChangeText={setInput}
-            placeholder={
-              canSend() ? "Ask about Scripture, prayer, or faith…" : "Message limit reached"
-            }
+            placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
             placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={canSend() && !isThinking}
@@ -129,7 +132,7 @@ export default function AiChatScreen() {
             disabled={disabled}
             style={[styles.send, disabled && styles.sendDisabled]}
           >
-            <Text style={styles.sendText}>Send</Text>
+            <Text style={styles.sendText}>{t("common.send")}</Text>
           </Pressable>
         </View>
       </GlassChrome>
@@ -248,5 +251,19 @@ const styles = StyleSheet.create({
   sendText: {
     ...typography.subtitle,
     color: colors.canvas,
+  },
+  limitBanner: {
+    margin: spacing.md,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: colors.accentGlow,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    alignItems: "center",
+  },
+  limitBannerText: {
+    ...typography.caption,
+    color: colors.accent,
+    textAlign: "center",
   },
 });

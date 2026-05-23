@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChapterTile } from "@/components/ChapterTile";
 import { GlassChrome } from "@/components/GlassChrome";
@@ -14,6 +15,7 @@ import { useBook, useChapters, useDatabaseReady } from "@/hooks/useScripture";
 import { colors, spacing, typography } from "@/theme";
 
 export default function BookScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -42,7 +44,7 @@ export default function BookScreen() {
   if (error || !book) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.error}>{error ?? "Book not found."}</Text>
+        <Text style={styles.error}>{error ?? t("book.notFound")}</Text>
       </View>
     );
   }
@@ -52,7 +54,7 @@ export default function BookScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <GlassChrome style={styles.header}>
         <Text style={styles.title}>{book.name}</Text>
-        <Text style={styles.meta}>{chapters.length} chapters available locally</Text>
+        <Text style={styles.meta}>{t("book.chaptersAvailable", { count: chapters.length })}</Text>
       </GlassChrome>
 
       <FlatList
@@ -63,9 +65,7 @@ export default function BookScreen() {
         renderItem={({ item }) => (
           <ChapterTile number={item.number} onPress={() => openChapter(item.number)} />
         )}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No chapters seeded for this book yet.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.empty}>{t("book.noChapters")}</Text>}
       />
     </View>
   );

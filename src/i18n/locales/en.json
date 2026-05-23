@@ -1,0 +1,250 @@
+{
+  "common": {
+    "appName": "Biblia AI",
+    "back": "Back",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "clear": "Clear",
+    "send": "Send",
+    "tryAgain": "Try again",
+    "seeAll": "See all",
+    "scripture": "Scripture",
+    "book": "Book",
+    "loading": "Loading…",
+    "preparing": "Preparing…",
+    "success": "Success",
+    "untitled": "Untitled",
+    "noContent": "No content.",
+    "textUnavailable": "Text unavailable.",
+    "on": "on",
+    "off": "off"
+  },
+  "tabs": {
+    "scripture": "Scripture",
+    "companion": "Companion",
+    "workspace": "Workspace",
+    "headerScripture": "Biblia AI",
+    "headerCompanion": "Spiritual Companion"
+  },
+  "navigation": {
+    "chapters": "Chapters",
+    "reader": "Reader",
+    "topic": "Topic",
+    "settings": "Settings",
+    "spiritualCompanion": "Spiritual Companion"
+  },
+  "stack": {
+    "chapters": "Chapters",
+    "reader": "Reader",
+    "topic": "Topic",
+    "settings": "Settings"
+  },
+  "topic": {
+    "notFound": "Topic not found.",
+    "empty": "No local verses matched this topic yet."
+  },
+  "home": {
+    "preparingLibrary": "Preparing Scripture library…",
+    "loadingLibrary": "Preparing Scripture library…",
+    "openSettings": "Open settings",
+    "continueReading": "Continue reading",
+    "recentlyRead": "Recently read",
+    "bookmarks": "Bookmarks",
+    "seeAll": "See all",
+    "searchPlaceholder": "Search verses (local)",
+    "searchHint": "Type {{count}} more character(s) to search.",
+    "searchHint_one": "Type {{count}} more character to search.",
+    "noResults": "No verses matched “{{query}}”.",
+    "noVersesMatched": "No verses matched “{{query}}”.",
+    "noResultsHint": "Try different keywords or a shorter phrase.",
+    "searchEmptySub": "Try different keywords or a shorter phrase.",
+    "oldTestament": "Old Testament",
+    "newTestament": "New Testament",
+    "exploreByTopic": "Explore by topic"
+  },
+  "dashboard": {
+    "dayStreak": "day streak",
+    "dayStreak_one": "day streak",
+    "verseOfTheDay": "Verse of the day",
+    "readTodayUnlock": "Read today to unlock your verse.",
+    "readToday": "Read today to unlock your verse.",
+    "shareStoryImage": "Share story image",
+    "shareStory": "Share story image",
+    "preparingShare": "Preparing…",
+    "preparing": "Preparing…"
+  },
+  "topics": {
+    "heading": "Explore by topic",
+    "notFound": "Topic not found.",
+    "noLocalMatches": "No local verses matched this topic yet.",
+    "anxiety": {
+      "title": "Anxiety",
+      "description": "Peace, courage, and trust in uncertainty"
+    },
+    "gratitude": {
+      "title": "Gratitude",
+      "description": "Thanksgiving and praise"
+    },
+    "leadership": {
+      "title": "Leadership",
+      "description": "Servant leadership and wisdom"
+    },
+    "focus": {
+      "title": "Focus",
+      "description": "Single-minded purpose and discipline"
+    },
+    "hope": {
+      "title": "Hope",
+      "description": "Future anchored in God's promises"
+    },
+    "forgiveness": {
+      "title": "Forgiveness",
+      "description": "Mercy, reconciliation, and grace"
+    },
+    "strength": {
+      "title": "Strength",
+      "description": "Power made perfect in weakness"
+    }
+  },
+  "book": {
+    "notFound": "Book not found.",
+    "chaptersAvailable": "{{count}} chapters available locally",
+    "chaptersAvailable_one": "{{count}} chapter available locally",
+    "noChaptersSeeded": "No chapters seeded for this book yet.",
+    "noChapters": "No chapters seeded for this book yet.",
+    "noChaptersImported": "No chapters imported yet for this book. Add text via a full Bible JSON import.",
+    "openBook": "Open {{name}}",
+    "chapterCount": "{{count}} chapters",
+    "chapterCount_one": "{{count}} chapter",
+    "chapterA11y": "Chapter {{number}}",
+    "noChaptersImported": "No chapters imported for this book yet.",
+    "openBook": "Open {{name}}",
+    "chapterCount": "{{count}} chapters",
+    "chapterCount_one": "{{count}} chapter",
+    "chapterA11y": "Chapter {{number}}"
+  },
+  "reader": {
+    "bookNotFound": "Book not found.",
+    "chapterUnavailable": "This chapter is not available in the local library yet.",
+    "selected": "Selected: {{reference}}",
+    "aiAssistant": "AI Assistant",
+    "notebook": "Notebook",
+    "listen": "Listen",
+    "previous": "Previous",
+    "next": "Next",
+    "exitImmersive": "Exit immersive",
+    "immersive": "Immersive",
+    "showChrome": "Show chrome",
+    "enterImmersive": "Enter immersive reading",
+    "exitImmersiveA11y": "Exit immersive reading",
+    "decreaseFont": "Decrease font size",
+    "increaseFont": "Increase font size",
+    "fontPreview": "The Lord is my shepherd",
+    "addBookmark": "Add bookmark",
+    "removeBookmark": "Remove bookmark",
+    "addBookmark": "Add bookmark",
+    "removeBookmark": "Remove bookmark"
+  },
+  "ai": {
+    "responsesRemaining": "{{remaining}} / {{limit}} responses",
+    "clearChat": "Clear chat history",
+    "clear": "Clear",
+    "selectedVerse": "Selected verse",
+    "contextHint": "Tap or long-press a verse in the reader to enable contextual prompts.",
+    "reflecting": "Reflecting…",
+    "limitReached": "Daily limit reached. Come back tomorrow to continue your reflection.",
+    "dailyLimitReached": "Daily limit reached. Come back tomorrow to continue your reflection.",
+    "inputPlaceholder": "Ask about Scripture, prayer, or faith…",
+    "inputLimitReached": "Message limit reached",
+    "pillHistorical": "Explain historical context",
+    "pillApplication": "Give a daily life application",
+    "pillOriginalLanguage": "Break down original Greek/Hebrew",
+    "welcomeMessage": "Peace be with you. I am your spiritual companion — ask about Scripture, prayer, or faith. Set EXPO_PUBLIC_AI_API_KEY for live responses; otherwise local previews are used.",
+    "chatCleared": "Chat cleared. How may I walk with you in Scripture today?",
+    "liveServiceError": "I could not reach the live AI service right now. Please try again in a moment.",
+    "liveError": "I could not reach the live AI service right now. Please try again in a moment.",
+    "templateHistorical": "Explain the historical context of {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
+    "templateApplication": "Give a practical daily-life application for {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
+    "templateOriginalLanguage": "Break down the original Greek or Hebrew meaning of key terms in {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
+    "fallback1": "Scripture reminds us that God's mercies are new every morning. What passage is on your heart today?",
+    "fallback2": "In prayer, we draw near to the One who hears. Consider pausing for a moment of stillness before you continue reading.",
+    "fallback3": "Faith is strengthened in community and in the Word. Would you like a verse to meditate on from what you've read?",
+    "fallback4": "The Spirit intercedes for us with groanings too deep for words. Bring your burdens honestly before God.",
+    "fallback5": "Wisdom begins with reverence for the Lord. As you read, ask: what is God inviting me to trust or obey?",
+    "fallbackResponses": {
+      "0": "Scripture reminds us that God's mercies are new every morning. What passage is on your heart today?",
+      "1": "In prayer, we draw near to the One who hears. Consider pausing for a moment of stillness before you continue reading.",
+      "2": "Faith is strengthened in community and in the Word. Would you like a verse to meditate on from what you've read?",
+      "3": "The Spirit intercedes for us with groanings too deep for words. Bring your burdens honestly before God.",
+      "4": "Wisdom begins with reverence for the Lord. As you read, ask: what is God inviting me to trust or obey?"
+    }
+  },
+  "workspace": {
+    "title": "Workspace",
+    "notes": "Reflections",
+    "notesWithCount": "Reflections ({{count}})",
+    "notesCount": "Reflections ({{count}})",
+    "bookmarks": "Bookmarks",
+    "bookmarksWithCount": "Bookmarks ({{count}})",
+    "bookmarksCount": "Bookmarks ({{count}})",
+    "notesBack": "Notes",
+    "editNote": "Edit note",
+    "newNote": "New note",
+    "editTab": "Edit",
+    "previewTab": "Preview (auto-links)",
+    "titlePlaceholder": "Reflection title…",
+    "bodyPlaceholder": "Write your thoughts. Polish verse references (e.g. Rdz 1:1, Ps 23:1, J 3:16, Rz 8:28) become interactive links in preview mode…",
+    "previewPlaceholder": "Your reflection preview will appear here in real time…",
+    "filterNotes": "Filter notes…",
+    "emptyNotes": "No notes yet",
+    "noNotes": "No notes yet",
+    "emptyNotesSearch": "No search results.",
+    "noNotesSearch": "No search results.",
+    "emptyNotesHint": "Tap '+' to create your first reflection.",
+    "noNotesEmpty": "Tap '+' to create your first reflection.",
+    "emptyBookmarks": "No bookmarks yet",
+    "noBookmarks": "No bookmarks yet",
+    "emptyBookmarksHint": "Star verses in the reader to save them here.",
+    "noBookmarksEmpty": "Star verses in the reader to save them here.",
+    "savedAt": "Saved: {{date}}",
+    "noteSaved": "Note saved successfully.",
+    "deleteNoteTitle": "Delete note",
+    "deleteNoteMessage": "Are you sure you want to delete this note?",
+    "deleteBookmarkTitle": "Remove bookmark",
+    "deleteBookmarkMessage": "Are you sure you want to remove this verse from bookmarks?",
+    "noteTemplate": "Reflection on [{{reference}}]:\n\n\"{{text}}\"\n\n"
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "appearanceNote": "Biblia AI uses a fixed Cyber-Monastery dark theme (black canvas, gold accent). Light mode is not available in Phase 1.",
+    "readerFontSize": "Reader font size",
+    "readerFontHint": "Adjusts verse text in the Scripture reader.",
+    "currentFontSize": "Current size: {{size}}px",
+    "currentSize": "Current size: {{size}}px",
+    "immersiveMode": "Immersive mode: {{state}}",
+    "immersiveReading": "Immersive reading",
+    "immersiveHint": "Hide chrome while reading. Toggle from the reader toolbar or below.",
+    "immersiveOn": "Immersive mode: on",
+    "immersiveOff": "Immersive mode: off",
+    "language": "Language",
+    "languageHint": "Choose the app interface language.",
+    "languagePl": "Polish",
+    "languageEn": "English"
+  },
+  "languageSwitcher": {
+    "pl": "PL",
+    "en": "EN",
+    "accessibilityLabel": "Switch language"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred.",
+    "unexpected": "An unexpected error occurred.",
+    "somethingWrong": "Something went wrong",
+    "databaseOpenFailed": "Database failed to open"
+  },
+  "share": {
+    "brand": "SolidCode · Biblia AI",
+    "dialogTitle": "Share verse"
+  }
+}

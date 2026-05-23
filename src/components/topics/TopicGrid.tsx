@@ -1,13 +1,16 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SEMANTIC_TOPICS } from "@/data/semanticTopics";
 import { colors, radii, spacing, typography } from "@/theme";
 import type { TopicGridProps } from "@/types/ui";
 
 export function TopicGrid({ onTopicPress }: TopicGridProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.section}>
-      <Text style={styles.heading}>Explore by topic</Text>
+      <Text style={styles.heading}>{t("home.exploreByTopic")}</Text>
       <View style={styles.grid}>
         {SEMANTIC_TOPICS.map((topic) => (
           <Pressable
@@ -15,9 +18,11 @@ export function TopicGrid({ onTopicPress }: TopicGridProps) {
             onPress={() => onTopicPress(topic.slug)}
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
           >
-            <Text style={styles.title}>{topic.title}</Text>
+            <Text style={styles.title}>
+              {t(`topics.${topic.slug}.title`, { defaultValue: topic.title })}
+            </Text>
             <Text style={styles.description} numberOfLines={2}>
-              {topic.description}
+              {t(`topics.${topic.slug}.description`, { defaultValue: topic.description })}
             </Text>
           </Pressable>
         ))}

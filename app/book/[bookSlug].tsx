@@ -7,11 +7,13 @@ import {
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { ChapterTile } from "@/components/ChapterTile";
 import { useBook, useChapters, useDatabaseReady } from "@/hooks/useScripture";
 import { colors, spacing, typography } from "@/theme";
 
 export default function BookChaptersRoute() {
+  const { t } = useTranslation();
   const { bookSlug } = useLocalSearchParams<{ bookSlug: string }>();
   const slug = typeof bookSlug === "string" ? bookSlug : "";
   const router = useRouter();
@@ -30,7 +32,7 @@ export default function BookChaptersRoute() {
   if (error || !book) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.error}>{error ?? "Book not found."}</Text>
+        <Text style={styles.error}>{error ?? t("book.notFound")}</Text>
       </View>
     );
   }
@@ -40,7 +42,7 @@ export default function BookChaptersRoute() {
       <Stack.Screen options={{ title: book.name }} />
       <View style={styles.container}>
         <Text style={styles.subtitle}>
-          {chapters.length} chapter{chapters.length === 1 ? "" : "s"} available locally
+          {t("book.chaptersAvailable", { count: chapters.length })}
         </Text>
         <FlatList
           data={chapters}
@@ -55,11 +57,7 @@ export default function BookChaptersRoute() {
               }
             />
           )}
-          ListEmptyComponent={
-            <Text style={styles.empty}>
-              No chapters imported yet for this book. Add text via a full Bible JSON import.
-            </Text>
-          }
+          ListEmptyComponent={<Text style={styles.empty}>{t("book.noChaptersImported")}</Text>}
         />
       </View>
     </>

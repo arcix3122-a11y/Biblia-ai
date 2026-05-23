@@ -2,6 +2,7 @@ import * as Sharing from "expo-sharing";
 import { captureRef } from "react-native-view-shot";
 import type { RefObject } from "react";
 import type { View } from "react-native";
+import i18n from "@/i18n";
 
 export const STORY_WIDTH = 1080;
 export const STORY_HEIGHT = 1920;
@@ -32,7 +33,7 @@ export async function shareVerseImage(uri: string): Promise<boolean> {
 
   await Sharing.shareAsync(uri, {
     mimeType: "image/png",
-    dialogTitle: "Share verse",
+    dialogTitle: i18n.t("share.dialogTitle"),
     UTI: "public.png",
   });
 

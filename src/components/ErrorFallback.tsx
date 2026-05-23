@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors, radii, spacing, typography } from "@/theme";
 
 interface ErrorFallbackProps {
@@ -8,14 +9,16 @@ interface ErrorFallbackProps {
 }
 
 export function ErrorFallback({ message, onRetry }: ErrorFallbackProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Something went wrong</Text>
+      <Text style={styles.title}>{t("errors.somethingWrong")}</Text>
       <Text style={styles.message} numberOfLines={4}>
-        {message || "An unexpected error occurred."}
+        {message || t("errors.unexpected")}
       </Text>
       <Pressable onPress={onRetry} style={styles.button}>
-        <Text style={styles.buttonText}>Try again</Text>
+        <Text style={styles.buttonText}>{t("common.tryAgain")}</Text>
       </Pressable>
     </View>
   );

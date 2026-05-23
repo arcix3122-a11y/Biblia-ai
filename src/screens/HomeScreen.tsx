@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { BookTile } from "@/components/BookTile";
 import { GlassCard } from "@/components/GlassCard";
 import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
@@ -18,8 +19,13 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useBooks, useDatabaseReady, useVerseSearch } from "@/hooks/useScripture";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHistoryStore } from "@/store/historyStore";
+import { useSelectionStore } from "@/store/selectionStore";
+import * as scriptureRepo from "@/services/db/scriptureRepository";
 import type { Book, Testament, VerseWithReference } from "@/types/scripture";
+import { useLocaleStore } from "@/store/localeStore";
+import { getDeviceLocale } from "@/i18n";
 import { HighlightedText } from "@/utils/highlightText";
+import { formatShortDate } from "@/utils/formatDate";
 import { colors, radii, spacing, typography } from "@/theme";
 
 const TESTAMENTS: readonly Testament[] = ["OT", "NT"];
@@ -43,6 +49,8 @@ function dedupeRecent<T extends { book_slug?: string; chapter: number }>(entries
 }
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale) ?? getDeviceLocale();
   const router = useRouter();
   const [testament, setTestament] = useState<Testament>("OT");
   const [query, setQuery] = useState("");
@@ -73,6 +81,8 @@ export default function HomeScreen() {
   const recentUnique = useMemo(() => dedupeRecent(recent, 5), [recent]);
   const bookmarkPreview = useMemo(() => bookmarks.slice(0, 3), [bookmarks]);
 
+  const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
+
   const openBook = useCallback(
     (book: Book) => {
       router.push(`/book/${book.slug}`);
@@ -81,22 +91,36 @@ export default function HomeScreen() {
   );
 
   const openReader = useCallback(
-    (bookSlug: string, chapter: number) => {
+    async (bookSlug: string, chapter: number, verseNumber?: number, verseText?: string) => {
+      if (verseNumber) {
+        const book = books.find((b) => b.slug === bookSlug) ||
+                     await scriptureRepo.getBookBySlug(bookSlug);
+        if (book) {
+          setSelectedVerse({
+            bookId: book.id,
+            bookName: book.name,
+            bookSlug: book.slug,
+            chapter,
+            verse: verseNumber,
+            text: verseText ?? "",
+          });
+        }
+      }
       router.push(`/reader/${bookSlug}/${chapter}`);
     },
-    [router]
+    [books, router, setSelectedVerse]
   );
 
   const openSearchHit = useCallback(
     (hit: VerseWithReference) => {
-      openReader(hit.book_slug, hit.chapter_number);
+      void openReader(hit.book_slug, hit.chapter_number, hit.number, hit.text);
     },
     [openReader]
   );
 
   const resumeReading = useCallback(() => {
     if (lastRead?.book_slug) {
-      openReader(lastRead.book_slug, lastRead.chapter);
+      void openReader(lastRead.book_slug, lastRead.chapter, lastRead.verse);
     }
   }, [lastRead, openReader]);
 
@@ -111,7 +135,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={styles.loadingLabel}>Preparing Scripture library…</Text>
+        <Text style={styles.loadingLabel}>{t("home.preparingLibrary")}</Text>
       </View>
     );
   }
@@ -128,18 +152,18 @@ export default function HomeScreen() {
   const showSearch = trimmedQuery.length >= MIN_SEARCH_LEN;
   const searchHint =
     trimmedQuery.length > 0 && trimmedQuery.length < MIN_SEARCH_LEN
-      ? `Type ${MIN_SEARCH_LEN - trimmedQuery.length} more character(s) to search.`
+      ? t("home.searchHint", { count: MIN_SEARCH_LEN - trimmedQuery.length })
       : null;
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <View style={styles.brandRow}>
-          <Text style={styles.brand}>SolidCode · Biblia AI</Text>
+          <Text style={styles.brand}>{t("common.appName")}</Text>
           <Pressable
             onPress={() => router.push("/settings")}
             hitSlop={12}
-            accessibilityLabel="Open settings"
+            accessibilityLabel={t("home.openSettings")}
           >
             <Ionicons name="settings-outline" size={22} color={colors.accent} />
           </Pressable>
@@ -150,9 +174,9 @@ export default function HomeScreen() {
         {lastRead?.book_slug ? (
           <Pressable onPress={resumeReading}>
             <GlassCard style={styles.sectionCard}>
-              <Text style={styles.sectionLabel}>Continue reading</Text>
+              <Text style={styles.sectionLabel}>{t("home.continueReading")}</Text>
               <Text style={styles.sectionTitle}>
-                {lastRead.book_name ?? "Scripture"} {lastRead.chapter}:{lastRead.verse}
+                {lastRead.book_name ?? t("common.scripture")} {lastRead.chapter}:{lastRead.verse}
               </Text>
             </GlassCard>
           </Pressable>
@@ -160,25 +184,22 @@ export default function HomeScreen() {
 
         {recentUnique.length > 0 ? (
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>Recently read</Text>
+            <Text style={styles.sectionHeading}>{t("home.recentlyRead")}</Text>
             {recentUnique.map((entry) => (
               <Pressable
                 key={`${entry.id}-${entry.viewed_at}`}
                 onPress={() => {
                   if (entry.book_slug) {
-                    openReader(entry.book_slug, entry.chapter);
+                    void openReader(entry.book_slug, entry.chapter, entry.verse);
                   }
                 }}
               >
                 <GlassCard style={styles.listRow}>
                   <Text style={styles.listRowTitle}>
-                    {entry.book_name ?? "Scripture"} {entry.chapter}:{entry.verse}
+                    {entry.book_name ?? t("common.scripture")} {entry.chapter}:{entry.verse}
                   </Text>
                   <Text style={styles.listRowMeta}>
-                    {new Date(entry.viewed_at).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    {formatShortDate(entry.viewed_at, locale)}
                   </Text>
                 </GlassCard>
               </Pressable>
@@ -189,9 +210,9 @@ export default function HomeScreen() {
         {bookmarkPreview.length > 0 ? (
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionHeading}>Bookmarks</Text>
+              <Text style={styles.sectionHeading}>{t("home.bookmarks")}</Text>
               <Pressable onPress={() => router.push("/(tabs)/workspace")} hitSlop={8}>
-                <Text style={styles.sectionLink}>See all</Text>
+                <Text style={styles.sectionLink}>{t("common.seeAll")}</Text>
               </Pressable>
             </View>
             {bookmarkPreview.map((item) => (
@@ -199,13 +220,13 @@ export default function HomeScreen() {
                 key={item.id}
                 onPress={() => {
                   if (item.book_slug) {
-                    openReader(item.book_slug, item.chapter);
+                    void openReader(item.book_slug, item.chapter, item.verse, item.verse_text ?? "");
                   }
                 }}
               >
                 <GlassCard style={styles.listRow}>
                   <Text style={styles.listRowTitle}>
-                    {item.book_name ?? "Scripture"} {item.chapter}:{item.verse}
+                    {item.book_name ?? t("common.scripture")} {item.chapter}:{item.verse}
                   </Text>
                   <Text style={styles.listRowSnippet} numberOfLines={2}>
                     {item.verse_text ?? ""}
@@ -221,7 +242,7 @@ export default function HomeScreen() {
         <TextInput
           value={query}
           onChangeText={setQuery}
-          placeholder="Search verses (local)"
+          placeholder={t("home.searchPlaceholder")}
           placeholderTextColor={colors.textMuted}
           style={styles.search}
           autoCapitalize="none"
@@ -238,8 +259,10 @@ export default function HomeScreen() {
             {!searching && results.length === 0 ? (
               <View style={styles.emptySearch}>
                 <Ionicons name="search-outline" size={32} color={colors.textMuted} />
-                <Text style={styles.empty}>No verses matched “{debouncedQuery.trim()}”.</Text>
-                <Text style={styles.emptySub}>Try different keywords or a shorter phrase.</Text>
+                <Text style={styles.empty}>
+                  {t("home.noResults", { query: debouncedQuery.trim() })}
+                </Text>
+                <Text style={styles.emptySub}>{t("home.noResultsHint")}</Text>
               </View>
             ) : null}
             {results.map((item) => (
@@ -259,14 +282,14 @@ export default function HomeScreen() {
         ) : (
           <>
             <View style={styles.tabs}>
-              {TESTAMENTS.map((t) => (
+              {TESTAMENTS.map((testamentKey) => (
                 <Pressable
-                  key={t}
-                  onPress={() => setTestament(t)}
-                  style={[styles.tab, testament === t && styles.tabActive]}
+                  key={testamentKey}
+                  onPress={() => setTestament(testamentKey)}
+                  style={[styles.tab, testament === testamentKey && styles.tabActive]}
                 >
-                  <Text style={[styles.tabText, testament === t && styles.tabTextActive]}>
-                    {t === "OT" ? "Old Testament" : "New Testament"}
+                  <Text style={[styles.tabText, testament === testamentKey && styles.tabTextActive]}>
+                    {testamentKey === "OT" ? t("home.oldTestament") : t("home.newTestament")}
                   </Text>
                 </Pressable>
               ))}

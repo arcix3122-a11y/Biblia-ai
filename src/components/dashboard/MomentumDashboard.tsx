@@ -6,6 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { GlassCard } from "@/components/GlassCard";
 import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
 import { getVerseOfTheDay } from "@/services/db/scriptureRepository";
@@ -16,6 +17,7 @@ import type { MomentumDashboardProps } from "@/types/ui";
 import type { VerseWithReference } from "@/types/scripture";
 
 export function MomentumDashboard({ style }: MomentumDashboardProps) {
+  const { t } = useTranslation();
   const [streakDays, setStreakDays] = useState(0);
   const [verse, setVerse] = useState<VerseWithReference | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,18 +62,18 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
 
   const reference = verse
     ? `${verse.book_name} ${verse.chapter_number}:${verse.number}`
-    : "Scripture";
+    : t("common.scripture");
 
   return (
     <GlassCard style={style}>
       <View style={styles.row}>
         <View style={styles.streakBlock}>
           <Text style={styles.streakValue}>{streakDays}</Text>
-          <Text style={styles.streakLabel}>day streak</Text>
+          <Text style={styles.streakLabel}>{t("dashboard.dayStreak")}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.verseBlock}>
-          <Text style={styles.sectionLabel}>Verse of the day</Text>
+          <Text style={styles.sectionLabel}>{t("dashboard.verseOfTheDay")}</Text>
           {verse ? (
             <>
               <Text style={styles.reference}>{reference}</Text>
@@ -80,7 +82,7 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
               </Text>
             </>
           ) : (
-            <Text style={styles.verseText}>Read today to unlock your verse.</Text>
+            <Text style={styles.verseText}>{t("dashboard.readToday")}</Text>
           )}
         </View>
       </View>
@@ -91,7 +93,9 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
           disabled={sharing}
           style={[styles.shareButton, sharing && styles.shareDisabled]}
         >
-          <Text style={styles.shareLabel}>{sharing ? "Preparing…" : "Share story image"}</Text>
+          <Text style={styles.shareLabel}>
+            {sharing ? t("dashboard.preparing") : t("dashboard.shareStory")}
+          </Text>
         </Pressable>
       ) : null}
 

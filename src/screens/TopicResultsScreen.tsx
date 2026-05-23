@@ -8,30 +8,34 @@ import {
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { getTopicBySlug } from "@/data/semanticTopics";
+import { useLocalizedTopic } from "@/hooks/useLocalizedTopic";
 import { searchTopicVerses } from "@/services/db/semanticSearch";
 import { colors, spacing, typography } from "@/theme";
 import type { VerseWithReference } from "@/types/scripture";
 
 export default function TopicResultsScreen() {
+  const { t } = useTranslation();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const topicSlug = typeof slug === "string" ? slug : "";
-  const topic = getTopicBySlug(topicSlug);
+  const topic = useLocalizedTopic(getTopicBySlug(topicSlug));
   const router = useRouter();
   const [results, setResults] = useState<VerseWithReference[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    if (!topic) {
+    const rawTopic = getTopicBySlug(topicSlug);
+    if (!rawTopic) {
       setResults([]);
       setLoading(false);
       return;
     }
     setLoading(true);
-    const hits = await searchTopicVerses(topic);
+    const hits = await searchTopicVerses(rawTopic);
     setResults(hits);
     setLoading(false);
-  }, [topic]);
+  }, [topicSlug]);
 
   useEffect(() => {
     void load();
@@ -39,12 +43,12 @@ export default function TopicResultsScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: topic?.title ?? "Topic" }} />
+      <Stack.Screen options={{ title: topic?.title ?? t("stack.topic") }} />
 
       {topic ? (
         <Text style={styles.description}>{topic.description}</Text>
       ) : (
-        <Text style={styles.description}>Topic not found.</Text>
+        <Text style={styles.description}>{t("topic.notFound")}</Text>
       )}
 
       {loading ? (
@@ -54,9 +58,7 @@ export default function TopicResultsScreen() {
           data={results}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.list}
-          ListEmptyComponent={
-            <Text style={styles.empty}>No local verses matched this topic yet.</Text>
-          }
+          ListEmptyComponent={<Text style={styles.empty}>{t("topic.empty")}</Text>}
           renderItem={({ item }) => (
             <Pressable
               onPress={() => router.push(`/reader/${item.book_slug}/${item.chapter_number}`)}

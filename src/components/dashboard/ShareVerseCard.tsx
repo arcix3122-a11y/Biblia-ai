@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { STORY_HEIGHT, STORY_WIDTH } from "@/services/share/verseImageExporter";
 import { colors, spacing, typography } from "@/theme";
 import type { ShareVerseCardProps } from "@/types/ui";
@@ -8,6 +9,8 @@ export const ShareVerseCard = forwardRef<View, ShareVerseCardProps>(function Sha
   { reference, text, width = STORY_WIDTH, height = STORY_HEIGHT },
   ref
 ) {
+  const { t } = useTranslation();
+
   return (
     <View
       ref={ref}
@@ -16,7 +19,7 @@ export const ShareVerseCard = forwardRef<View, ShareVerseCardProps>(function Sha
     >
       <Text style={styles.text}>"{text}"</Text>
       <Text style={styles.reference}>— {reference}</Text>
-      <Text style={styles.brand}>SolidCode · Biblia AI</Text>
+      <Text style={styles.brand}>SolidCode · {t("common.appName")}</Text>
     </View>
   );
 });

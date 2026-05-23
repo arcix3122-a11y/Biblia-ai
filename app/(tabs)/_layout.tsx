@@ -3,7 +3,9 @@ import { Platform, StyleSheet } from "react-native";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { useChrome } from "@/context/ChromeContext";
+import { useLocaleStore } from "@/store/localeStore";
 import { colors, glass } from "@/theme";
 
 function TabBarBackground() {
@@ -21,9 +23,12 @@ function TabBarBackground() {
 
 export default function TabsLayout() {
   const { tabBarHidden } = useChrome();
+  const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
 
   return (
     <Tabs
+      key={locale}
       screenOptions={{
         headerStyle: { backgroundColor: colors.backgroundElevated },
         headerTintColor: colors.accent,
@@ -43,8 +48,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Scripture",
-          headerTitle: "Biblia AI",
+          title: t("tabs.scripture"),
+          headerTitle: t("tabs.headerScripture"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="book-outline" size={size} color={color} />
           ),
@@ -53,8 +58,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="ai"
         options={{
-          title: "Companion",
-          headerTitle: "Spiritual Companion",
+          title: t("tabs.companion"),
+          headerTitle: t("tabs.headerCompanion"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubble-ellipses-outline" size={size} color={color} />
           ),
@@ -63,7 +68,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="workspace"
         options={{
-          title: "Workspace",
+          title: t("tabs.workspace"),
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="journal-outline" size={size} color={color} />

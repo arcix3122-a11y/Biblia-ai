@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { getReadingTypography } from "@/theme/typography";
 import { colors, spacing, typography } from "@/theme";
 import type { Verse } from "@/types/scripture";
@@ -23,6 +24,7 @@ export function VerseRow({
   onLongPress,
   onToggleBookmark,
 }: VerseRowProps) {
+  const { t } = useTranslation();
   const reading = getReadingTypography(fontSize);
 
   return (
@@ -37,7 +39,7 @@ export function VerseRow({
           onPress={onToggleBookmark}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+          accessibilityLabel={isBookmarked ? t("reader.removeBookmark") : t("reader.addBookmark")}
         >
           <Text style={[styles.bookmark, isBookmarked && styles.bookmarkActive]}>
             {isBookmarked ? "★" : "☆"}

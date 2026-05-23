@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import i18n from "@/i18n";
 import type { ChatMessage } from "@/types/chat";
 
 const FREE_MESSAGE_LIMIT = 20;
@@ -26,15 +27,14 @@ function createMessage(role: ChatMessage["role"], content: string): ChatMessage 
   };
 }
 
-const WELCOME_MESSAGE = createMessage(
-  "assistant",
-  "Peace be with you. I am your spiritual companion — ask about Scripture, prayer, or faith. Set EXPO_PUBLIC_AI_API_KEY for live responses; otherwise local previews are used."
-);
+function welcomeMessage(): ChatMessage {
+  return createMessage("assistant", i18n.t("ai.welcomeMessage"));
+}
 
 export const useAiChatStore = create<AiChatState>()(
   persist(
     (set, get) => ({
-      messages: [WELCOME_MESSAGE],
+      messages: [welcomeMessage()],
       messageCount: 0,
       limit: FREE_MESSAGE_LIMIT,
 
@@ -61,12 +61,7 @@ export const useAiChatStore = create<AiChatState>()(
 
       resetChat: () =>
         set({
-          messages: [
-            createMessage(
-              "assistant",
-              "Chat cleared. How may I walk with you in Scripture today?"
-            ),
-          ],
+          messages: [createMessage("assistant", i18n.t("ai.chatCleared"))],
           messageCount: 0,
         }),
     }),

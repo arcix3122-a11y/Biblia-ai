@@ -21,23 +21,23 @@ Add one short entry per completed task.
 
 ## 2026-05-23 13:10
 - Agent: Antigravity
-- Task: Wdrożenie modułu Biblia AI Workspace (Notebook / Notatnik) w aplikacji Expo
+- Task: Wdro?enie modu?u Biblia AI Workspace (Notebook / Notatnik) w aplikacji Expo
 - Changes: src/store/notesStore.ts, src/screens/WorkspaceScreen.tsx, app/(tabs)/workspace.tsx, app/(tabs)/_layout.tsx
-- Validation: npm run typecheck (zakończony sukcesem bez błędów)
+- Validation: npm run typecheck (zako?czony sukcesem bez b??d?w)
 - Result: done
 
 ## 2026-05-23 13:15
 - Agent: Antigravity
-- Task: Wyszukanie i naprawa błędów (skip chapter bug) oraz wdrożenie podglądu zakładek (Saved Bookmarks) w module Workspace
+- Task: Wyszukanie i naprawa b??d?w (skip chapter bug) oraz wdro?enie podgl?du zak?adek (Saved Bookmarks) w module Workspace
 - Changes: src/types/scripture.ts, src/services/db/bookmarksRepository.ts, src/screens/WorkspaceScreen.tsx, src/services/audio/audioEngine.ts, src/components/audio/GlobalAudioBar.tsx
-- Validation: npm run typecheck (zakończony sukcesem bez błędów)
+- Validation: npm run typecheck (zako?czony sukcesem bez b??d?w)
 - Result: done
 
 ## 2026-05-23 13:20
 - Agent: Cursor (Auto)
-- Task: Phase 1+ E2E expansion — Home history/bookmarks, debounced search highlight, Settings, AI chat persist/mock, app init stores, docs, import script
+- Task: Phase 1+ E2E expansion ? Home history/bookmarks, debounced search highlight, Settings, AI chat persist/mock, app init stores, docs, import script
 - Changes: src/screens/HomeScreen.tsx, SettingsScreen.tsx, AiChatScreen.tsx, src/hooks/useDebouncedValue.ts, src/utils/highlightText.tsx, src/hooks/useSpiritualAssistant.ts, src/store/aiChatStore.ts, app/_layout.tsx, app/settings.tsx, scripts/import-full-bible.mjs, README.md, AGENTS.md, AGENT_WORKLOG.md
-- Validation: npm run typecheck — pass
+- Validation: npm run typecheck ? pass
 - Result: done
 
 ## 2026-05-23 13:16
@@ -49,9 +49,9 @@ Add one short entry per completed task.
 
 ## 2026-05-23 13:18
 - Agent: Antigravity
-- Task: Wdrożenie dynamicznego paska wyboru (SelectionToolbar) w czytniku, auto-importu wersetów do notatnika oraz naprawa błędów kompilacji (expo-speech i anthropic stubs)
+- Task: Wdro?enie dynamicznego paska wyboru (SelectionToolbar) w czytniku, auto-importu werset?w do notatnika oraz naprawa b??d?w kompilacji (expo-speech i anthropic stubs)
 - Changes: src/screens/ReaderScreen.tsx, src/screens/WorkspaceScreen.tsx, src/types/expo-speech.d.ts, src/services/ai/anthropicClient.ts
-- Validation: npm run typecheck (zakończony pełnym sukcesem z 0 błędami)
+- Validation: npm run typecheck (zako?czony pe?nym sukcesem z 0 b??dami)
 - Result: done
 
 ## 2026-05-23 13:20
@@ -70,7 +70,7 @@ Add one short entry per completed task.
 
 ---
 
-## 2026-05-23 — Bilingual app (PL + EN) / i18n
+## 2026-05-23 ? Bilingual app (PL + EN) / i18n
 
 **Decision:** Biblia AI ships in **Polish and English from day one**. All user-facing UI, navigation, settings, and companion copy are localized. Scripture seed content stays **KJV English** in SQLite (`assets/bible-seed.json`); only app chrome is bilingual.
 
@@ -82,16 +82,16 @@ Add one short entry per completed task.
 | Locale files | `src/i18n/locales/en.json`, `src/i18n/locales/pl.json` |
 | Persisted language | `src/store/localeStore.ts` (Zustand + AsyncStorage) |
 | Typed hook | `src/hooks/useAppTranslation.ts` |
-| Settings switcher | `src/components/LanguageSwitcher.tsx` → `SettingsScreen` |
+| Settings switcher | `src/components/LanguageSwitcher.tsx` ? `SettingsScreen` |
 | Root wiring | `app/_layout.tsx` (init i18n + hydrate store) |
 
 **Parallel agent workstreams:**
 
-1. **Foundation** — `src/i18n/index.ts`, locale JSON skeleton, `localeStore`, device locale detection via `expo-localization`, root layout integration.
-2. **UI wiring** — replace hardcoded strings in screens/components with `useAppTranslation`; add `LanguageSwitcher` to Settings.
-3. **Docs / QA** — `AGENTS.md` i18n rules (this section), manual pass on both locales, `npm run typecheck`.
+1. **Foundation** ? `src/i18n/index.ts`, locale JSON skeleton, `localeStore`, device locale detection via `expo-localization`, root layout integration.
+2. **UI wiring** ? replace hardcoded strings in screens/components with `useAppTranslation`; add `LanguageSwitcher` to Settings.
+3. **Docs / QA** ? `AGENTS.md` i18n rules (this section), manual pass on both locales, `npm run typecheck`.
 
-**Language switching:** Settings (gear on Home) → **Language** section → `LanguageSwitcher` (PL / EN). Preference persists across launches. First launch with no saved preference: device locale `pl*` → Polish, otherwise English.
+**Language switching:** Settings (gear on Home) ? **Language** section ? `LanguageSwitcher` (PL / EN). Preference persists across launches. First launch with no saved preference: device locale `pl*` ? Polish, otherwise English.
 
 **Validation commands:**
 
@@ -108,5 +108,54 @@ npx expo start
 - Agent: Cursor (Auto)
 - Task: Document PL/EN i18n decision and agent rules in AGENTS.md and AGENT_WORKLOG.md
 - Changes: AGENTS.md, AGENT_WORKLOG.md
-- Validation: Repo scan — `src/i18n/` (en.json, pl.json, index.ts), `localeStore`, `useAppTranslation`, `LanguageSwitcher`, Settings wiring confirmed (status: implemented)
+- Validation: Repo scan ? `src/i18n/` (en.json, pl.json, index.ts), `localeStore`, `useAppTranslation`, `LanguageSwitcher`, Settings wiring confirmed (status: implemented)
+- Result: done
+
+## 2026-05-23 (local)
+- Agent: Cursor (Agent 3 ? i18n DOCS + QA)
+- Task: README Languages section, AGENTS i18n QA conventions, pl vs en key audit
+- Changes: README.md, AGENTS.md, AGENT_WORKLOG.md
+- Validation: Node key-path diff en.json vs pl.json (0 missing in pl); no TS edits
+- Result: done (pl.json gaps: none; Agent 2 i18n UI still uncommitted ? no separate docs commit)
+
+## 2026-05-23 13:24
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: Usuniecie nieuzywanego modu?u Anthropica i zaleznosci z projektu.
+- Changes: src/services/ai/anthropicClient.ts, expo-env.d.ts, package.json, package-lock.json, AGENT_WORKLOG.md.
+- Validation: npm run typecheck.
+- Result: done
+
+## 2026-05-23 13:25
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: Naprawa bledow TypeScript po audycie (klucze i18n i locale).
+- Changes: src/components/ai/ContextPills.tsx, src/screens/AiChatScreen.tsx, src/screens/HomeScreen.tsx, AGENT_WORKLOG.md.
+- Validation: npm run typecheck (0 bledow).
+- Result: done
+
+## 2026-05-23 13:30
+- Agent: Cursor Agent (Agent 2 ? i18n UI integration)
+- Task: Wire all user-facing UI to PL/EN i18n; LanguageSwitcher in Settings; locale-aware dates; mock AI replies
+- Changes: app/(tabs)/_layout.tsx, app/book/[bookSlug].tsx, src/screens/*, src/components/*, src/hooks/useSpiritualAssistant.ts, src/hooks/useLocalizedTopic.ts, src/store/aiChatStore.ts, src/i18n/locales/*.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass)
+- Result: done
+
+## 2026-05-23 13:26
+- Agent: Cursor Agent (Agent 1 ? i18n foundation)
+- Task: Bilingual PL/EN i18n infrastructure (expo-localization, i18next, locale store, LanguageSwitcher)
+- Changes: package.json, package-lock.json, src/i18n/**, src/store/localeStore.ts, src/hooks/useAppTranslation.ts, src/components/LanguageSwitcher.tsx, src/utils/formatDate.ts, app/_layout.tsx, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass)
+- Result: done
+
+## 2026-05-23 13:26
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: Domkniecie audytu technicznego i usuniecie bledow i18n wykrytych przez typecheck.
+- Changes: src/screens/AiChatScreen.tsx, src/screens/HomeScreen.tsx, src/components/ai/ContextPills.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md.
+- Validation: npm run typecheck (0 bledow).
+- Result: done
+
+## 2026-05-23 13:30
+- Agent: Cursor Agent (Agent 2 ? i18n UI integration)
+- Task: Wire all user-facing UI to PL/EN i18n; LanguageSwitcher in Settings; locale-aware dates; mock AI replies
+- Changes: app/(tabs)/_layout.tsx, app/book/[bookSlug].tsx, src/screens/*, src/components/*, src/hooks/useSpiritualAssistant.ts, src/hooks/useLocalizedTopic.ts, src/store/aiChatStore.ts, src/i18n/locales/*.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass)
 - Result: done
