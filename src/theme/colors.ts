@@ -1,0 +1,22 @@
+/** Cyber-Monastery — canvas black, deep navy tiles, gold accent for active states only */
+export const colors = {
+  canvas: "#000000",
+  background: "#000000",
+  backgroundElevated: "#0A101D",
+  card: "#0A101D",
+  tile: "#0A101D",
+  cardHover: "#121A2E",
+  glassBorder: "rgba(255,255,255,0.06)",
+  glassOverlay: "rgba(255,255,255,0.04)",
+  textPrimary: "#F2F4F8",
+  textSecondary: "#9CA8BC",
+  textMuted: "#6B7A94",
+  accent: "#E5A93C",
+  accentMuted: "rgba(229,169,60,0.22)",
+  accentGlow: "rgba(229,169,60,0.1)",
+  danger: "#EF4444",
+  success: "#34D399",
+  bubbleUser: "#1A2236",
+  bubbleAssistant: "#0A101D",
+  inputBackground: "#0A101D",
+} as const;

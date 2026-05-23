@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Biblia AI",
+    "slug": "biblia-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "biblia-ai",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.solidcodeapps.bibliaai"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0A",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.solidcodeapps.bibliaai"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router", "expo-sqlite", "react-native-reanimated"],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    }
+  }
+}
