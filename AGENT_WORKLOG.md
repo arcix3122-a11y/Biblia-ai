@@ -541,3 +541,24 @@ npx expo start
 - `expo-haptics` installed; `VerseRow`/`BookTile`/`ChapterTile` memoized.
 - i18n: `settings.about/appVersion/buildNumber`, `home.pullToRefresh` (PL+EN).
 
+### DONE — 2026-05-23 horizontal polish pass (Cursor subagent)
+
+**Goal vs result:** Shipped concrete UI/UX polish — shared layout primitives, loading skeletons, pull-to-refresh, verse deep-link scroll, reduce-motion, haptics, memoized tiles/rows, error retry, Settings version. Typecheck clean.
+
+**Commit:** `233ef37` — `refactor: UI structure polish and performance pass`
+
+**Validation:** `npm run typecheck` — 0 errors
+
+**How to test:**
+```bash
+npm run typecheck
+npx expo start
+```
+1. Home → pull down → history/bookmarks refresh; book grid shows skeleton while loading.
+2. Search or Recently read → tap verse → reader scrolls to verse (`?verse=` param).
+3. Settings → About → version label (PL+EN).
+4. Reader → prev/next chapter → light haptic; enable Reduce Motion → instant scroll/fade.
+5. DB error screen → Try again retries open.
+
+**Notes:** `expo-haptics` added via `--legacy-peer-deps`. Untracked parallel-agent files (notifications, stats route, reading-plan) remain uncommitted.
+
