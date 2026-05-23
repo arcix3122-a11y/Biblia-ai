@@ -178,16 +178,16 @@ export default function HomeScreen() {
     [router]
   );
 
+  if (error) {
+    return <ErrorFallback message={error} onRetry={retry} />;
+  }
+
   if (!ready) {
     return (
       <View style={styles.centered}>
         <LoadingState message={t("home.preparingLibrary")} />
       </View>
     );
-  }
-
-  if (error) {
-    return <ErrorFallback message={error} onRetry={retry} />;
   }
 
   const trimmedQuery = query.trim();

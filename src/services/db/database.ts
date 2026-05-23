@@ -9,10 +9,23 @@ const SEED_FLAG_KEY = "@biblia-ai/db-seeded";
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 let initPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
+/** Clears a failed init so callers can retry `getDatabase()`. */
+export function resetDatabaseInit(): void {
+  if (dbInstance) {
+    return;
+  }
+  initPromise = null;
+}
+
 async function applyMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
-  const row = await db.getFirstAsync<{ version: number }>(
-    "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1"
-  );
+  let row: { version: number } | null = null;
+  try {
+    row = await db.getFirstAsync<{ version: number }>(
+      "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1"
+    );
+  } catch {
+    // If the schema_migrations table does not exist, row remains null.
+  }
 
   if (!row) {
     await db.execAsync(CREATE_TABLES_SQL);
@@ -42,23 +55,28 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
 
   if (!initPromise) {
     initPromise = (async () => {
-      const db = await SQLite.openDatabaseAsync(DB_NAME);
       try {
-        await db.execAsync("PRAGMA journal_mode = WAL;");
-      } catch {
-        // WAL may be unsupported on some platforms; continue without it.
-      }
-      await db.execAsync("PRAGMA foreign_keys = ON;");
-      await applyMigrations(db);
+        const db = await SQLite.openDatabaseAsync(DB_NAME);
+        try {
+          await db.execAsync("PRAGMA journal_mode = WAL;");
+        } catch {
+          // WAL may be unsupported on some platforms; continue without it.
+        }
+        await db.execAsync("PRAGMA foreign_keys = ON;");
+        await applyMigrations(db);
 
-      const seeded = await AsyncStorage.getItem(SEED_FLAG_KEY);
-      if (seeded !== "true") {
-        await runSeedIfNeeded(db);
-        await AsyncStorage.setItem(SEED_FLAG_KEY, "true");
-      }
+        const seeded = await AsyncStorage.getItem(SEED_FLAG_KEY);
+        if (seeded !== "true") {
+          await runSeedIfNeeded(db);
+          await AsyncStorage.setItem(SEED_FLAG_KEY, "true");
+        }
 
-      dbInstance = db;
-      return db;
+        dbInstance = db;
+        return db;
+      } catch (error) {
+        initPromise = null;
+        throw error;
+      }
     })();
   }
 

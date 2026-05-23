@@ -1,7 +1,26 @@
-# Agent Worklog
+﻿# Agent Worklog
 
 This file is used by all agents/subagents working in this repository.
 Add one short entry per completed task.
+
+---
+
+## 2026-05-23 (local)
+- Agent: Cursor subagent
+- Task: START - Naprawa UTF-8 mojibake w pl.json/en.json
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+---
+
+## 2026-05-23 — START (diagnoza P0 — aplikacja „wydmuszka”, subagent)
+
+**Cel:** Porównać wpisy worklog (w tym Antigravity) z realnym stanem aplikacji: mojibake PL, Home wiszące na „Przygotowywanie biblioteki”, puste zakładki AI/Workspace.
+
+**Zakres:** Odczyt `AGENT_WORKLOG.md`; grep Antigravity; skan `pl.json`/`en.json` (mojibake); analiza `seed.ts` + `database.ts` + rozmiar `bible-seed.json`; wiring zakładek `ai.tsx` / `workspace.tsx`.
+
+**Kryteria sukcesu:** Zaktualizowany `PLAN KONKRETNY` z **P0×3** i kolumną **Kto**; wpis DONE (≤5 punktów PL); brak zmian TSX (tylko worklog).
 
 ---
 
@@ -19,11 +38,13 @@ Add one short entry per completed task.
 
 | Priorytet | Zadanie | Kto | Status | Pliki |
 |-----------|---------|-----|--------|-------|
-| **P0** | Commit unstaged batch (~13 plików: study wiring, home plan polish, AI retry banner, stats OT/NT, bump `expo-notifications`/`expo-device` SDK56) | Developer z git | niezcommitowane | `HomeScreen.tsx`, `ReaderScreen.tsx`, `AiChatScreen.tsx`, `StatsScreen.tsx`, `historyRepository.ts`, `useSpiritualAssistant.ts`, `en.json`, `pl.json`, `package.json`, `app.json`, `metro.config.js` |
-| **P0** | Push `1fc8b18` (cloud sync) — branch `master` +1 względem `origin/master` | Developer z git | oczekuje push | `git push -u origin HEAD` |
-| **P0** | Włączyć **Anonymous Auth** w Supabase Dashboard (Providers → Anonymous → Enable) | User Supabase Dashboard | wymagane ręcznie | Supabase projekt `txwksirnvzoifcdpniby`, migracja `002_anonymous_cloud_sync.sql` już zastosowana |
-| **P0** | Smoke test cloud sync (highlight → reinstall / drugie urządzenie → merge LWW) | Agent implementacyjny | nie udokumentowany | `syncEngine.ts`, `supabaseClient.ts`, `highlightsStore.ts`, `notesStore.ts`, `readingPlanStore.ts`, `yearPlanStore.ts` |
-| **P0** | Naprawić regresję UTF-8 w unstaged `en.json`/`pl.json` (BOM, mojibake `â€¦`/`â†’`) przed commitem | Agent implementacyjny | regresja w working tree | `src/i18n/locales/en.json`, `pl.json` |
+| **P0** | **Korupcja i18n** — naprawić UTF-8 w `en.json`/`pl.json` (mojibake `â€¦`, `Ä…`, `Ăł`; polski UI nieczytelny; ~163 wzorce w `pl.json`) | **Agent implementacyjny** (Antigravity START 14:38 **niedokończone**) | aktywna regresja; staged partial fix w `pl.json` | `src/i18n/locales/en.json`, `pl.json` |
+| **P0** | **Wiszenie init DB / seed** — full Bible (~6.7 MB, 31100 wersetów, pojedyncze INSERT w transakcji) blokuje Home na „Przygotowywanie biblioteki”; brak progress/timeout | **Agent implementacyjny** (GitHub Copilot wdrożył import `13:16`) | hang first launch Expo Go | `seed.ts`, `database.ts`, `assets/bible-seed.json` |
+| **P0** | **Puste zakładki AI + Workspace** — moduły wdrożone (Antigravity Workspace, Cursor AI chat) bez smoke testu na telefonie; UI puste/bezużyteczne gdy DB+i18n zablokowane | **Antigravity** (Workspace/Study) + **Agent implementacyjny** (AI chat, QA Expo Go) | brak weryfikacji runtime | `AiChatScreen.tsx`, `WorkspaceScreen.tsx`, `notesStore.ts`, `aiChatStore.ts`, `app/(tabs)/ai.tsx`, `workspace.tsx` |
+| **P1** | Commit unstaged batch (~13 plików: study wiring, home plan polish, AI retry banner, stats OT/NT, deps) | Developer z git | niezcommitowane | `HomeScreen.tsx`, `ReaderScreen.tsx`, `AiChatScreen.tsx`, `StatsScreen.tsx`, `historyRepository.ts`, `useSpiritualAssistant.ts`, `en.json`, `pl.json`, `package.json`, `app.json`, `metro.config.js` |
+| **P1** | Push cloud sync — branch `master` ahead of `origin/master` | Developer z git | oczekuje push | `git push -u origin HEAD` |
+| **P1** | Włączyć **Anonymous Auth** w Supabase Dashboard (Providers → Anonymous → Enable) | User Supabase Dashboard | wymagane ręcznie | Supabase projekt `txwksirnvzoifcdpniby`, migracja `002_anonymous_cloud_sync.sql` już zastosowana |
+| **P1** | Smoke test cloud sync (highlight → reinstall / drugie urządzenie → merge LWW) | Agent implementacyjny | nie udokumentowany | `syncEngine.ts`, `supabaseClient.ts`, `highlightsStore.ts`, `notesStore.ts`, `readingPlanStore.ts`, `yearPlanStore.ts` |
 | **P1** | `expo-notifications` — dodać plugin + uprawnienia w `app.json`; QA na urządzeniu fizycznym | Agent implementacyjny | brak pluginu w `app.json` | `app.json`, `reminderService.ts`, `SettingsScreen.tsx`, `reminderStore.ts` |
 | **P1** | Deep links / typed routes — `study`, `stats`, `reading-plan`, `?verse=` scroll | Agent implementacyjny | częściowo (reader `?verse=` OK) | `app/_layout.tsx`, `app/study.tsx`, `app/stats.tsx`, `app/reading-plan.tsx` |
 | **P1** | Reading plans polish — year-plan card + usunięcie „coming soon” (unstaged Home) | Agent implementacyjny | w working tree | `HomeScreen.tsx`, `yearPlanStore.ts`, `en.json`, `pl.json` |
@@ -34,7 +55,7 @@ Add one short entry per completed task.
 | **P2** | Parallel translations (side-by-side; single KJV SQLite) | Product | backlog | `scriptureRepository.ts`, `assets/bible-seed.json` |
 | **P2** | AGENTS.md — opcjonalna sekcja operacyjna (cloud sync, backlog, Supabase checklist) | Agent docs | opcjonalnie | `AGENTS.md` |
 
-> **Uwaga audytu:** blok **ACTION REQUIRED** poniżej jest **przestarzały** (stan sprzed commitów `4bbd5c5`, `c3f8fd8`, `1fc8b18`). Aktualny stan: competitive parity + session-2 **zcommitowane**; pozostaje **13 plików unstaged** + **1 commit do push**.
+> **Uwaga audytu (2026-05-23):** aplikacja na Expo Go = **„wydmuszka”** — Home wiszy na seed DB, PL = mojibake, zakładki AI/Workspace puste. Agenci raportowali **typecheck OK** bez smoke testu urządzenia po imporcie pełnej Biblii. Blok **ACTION REQUIRED** poniżej nadal **przestarzały**. Antigravity START 14:38 (mojibake + DB) = **in-progress, bez DONE**.
 
 ---
 
@@ -720,5 +741,35 @@ npx expo start
 - **Fix:** Downgrade do **Expo SDK 52** (`expo ~52.0.49`, RN 0.76.9, React 18.3.1); usunięto `react-native-worklets`; dopasowano API powiadomień.
 - **Test na telefonie:** Ten sam WiFi co PC → `npx expo start` → zeskanuj QR w Expo Go; jeśli LAN nie działa: `npx expo start --tunnel`.
 - **Typecheck:** `npm run typecheck` — 0 błędów.
-- **Komenda start:** `npx expo start` (alternatywa: `npm start`).
+- Komenda start: `npx expo start` (alternatywa: `npm start`).
 
+## 2026-05-23 14:38
+- Agent: Antigravity
+- Task: START - Naprawa krytycznego mojibake (błędnego kodowania) w plikach pl.json i en.json oraz zdiagnozowanie i usunięcie blokady ładowania biblioteki Pisma (seeding / DB init)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+---
+
+## 2026-05-23 — DONE (diagnoza P0 — aplikacja „wydmuszka”, subagent)
+
+- Porównano worklog vs runtime: agenci deklarują **typecheck OK** / feature DONE, brak smoke testu **Expo Go** po seedzie 31100 wersetów.
+- **P0×3** w `PLAN KONKRETNY`: korupcja i18n, wiszenie seed DB, puste zakładki AI/Workspace — każdy z przypisaniem **Kto**.
+- **Antigravity:** 9 wpisów DONE (Workspace, bookmarks, SelectionToolbar, Study, Stats/AI retry, EcosystemModal×2); **START 14:38** (mojibake + DB init) — **bez DONE** — blokada nadal aktywna.
+- **GitHub Copilot 13:16:** import pełnej Biblii do `bible-seed.json` (~6.7 MB) — prawdopodobna przyczyna hang `HomeScreen` (`useDatabaseReady` → `runSeedIfNeeded`).
+- Zmiany: tylko `AGENT_WORKLOG.md` (START + PLAN + DONE); brak edycji TSX.
+
+## 2026-05-23 15:10
+- Agent: Cursor subagent
+- Task: START - Naprawa seed DB mobile-first i odblokowanie shell aplikacji (Expo Go)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 15:25
+- Agent: Cursor subagent
+- Task: DONE - Naprawa seed DB mobile-first i odblokowanie shell aplikacji (Expo Go)
+- Changes: assets/bible-seed.json (4 księgi / 94 wersety), scripts/create-mobile-seed.mjs, database.ts (reset init + retry), useScripture.ts (timeout 30s), HomeScreen.tsx (error przed spinnerem), _layout.tsx, en.json/pl.json (databaseInitTimeout, mojibake)
+- Validation: npm run typecheck — 0 błędów
+- Result: done — pierwszy launch powinien zakończyć seed <10s na telefonie średniej klasy

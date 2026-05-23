@@ -2,7 +2,27 @@ import { useCallback, useEffect, useState } from "react";
 import i18n from "@/i18n";
 import type { Book, Chapter, Testament, Verse, VerseWithReference } from "@/types/scripture";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
-import { getDatabase } from "@/services/db/database";
+import { getDatabase, resetDatabaseInit } from "@/services/db/database";
+
+const DB_INIT_TIMEOUT_MS = 30_000;
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(message));
+    }, timeoutMs);
+
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error: unknown) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
 
 export function useDatabaseReady(): {
   ready: boolean;
@@ -14,6 +34,7 @@ export function useDatabaseReady(): {
   const [attempt, setAttempt] = useState(0);
 
   const retry = useCallback(() => {
+    resetDatabaseInit();
     setReady(false);
     setError(null);
     setAttempt((value) => value + 1);
@@ -24,13 +45,18 @@ export function useDatabaseReady(): {
     setReady(false);
     setError(null);
 
-    getDatabase()
+    void withTimeout(
+      getDatabase(),
+      DB_INIT_TIMEOUT_MS,
+      i18n.t("errors.databaseInitTimeout")
+    )
       .then(() => {
         if (mounted) {
           setReady(true);
         }
       })
       .catch((err: unknown) => {
+        resetDatabaseInit();
         if (mounted) {
           setError(err instanceof Error ? err.message : i18n.t("errors.databaseOpenFailed"));
         }
