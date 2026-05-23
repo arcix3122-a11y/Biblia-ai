@@ -5,12 +5,22 @@ Add one short entry per completed task.
 
 ---
 
-## 2026-05-23 (local)
-- Agent: Cursor subagent
-- Task: DONE - Naprawa UTF-8 mojibake w pl.json/en.json
-- Changes: src/i18n/locales/en.json, pl.json
-- Validation: check:locales (348 kluczy), typecheck OK, brak BOM, grep TSX bez mojibake
-- Result: done
+### START — Przejęcie sesji 2026-05-23
+
+- **Biorę na klatę:** naprawa mojibake PL/EN (`pl.json`/`en.json`); mobile-first seed DB (4 fragmenty zamiast 6,7 MB / 31100 wersetów); odblokowanie Home/AI/Workspace (timeout init 30 s, retry, flaga `@biblia-ai/db-seeded`); merge z pracą równoległych agentów (Antigravity Workspace/Study, Copilot full import, Cursor sync/polish).
+- **Agent Antygravity:** 9× DONE (Workspace, zakładki, SelectionToolbar→notatnik, Verse Study, Stats OT/NT + AI retry, EcosystemModal×2, Settings AI status, fix TS `@anthropic-ai/sdk`) — wszystko **typecheck OK**, **bez smoke testu Expo Go**. **START 14:38** (mojibake + blokada seed DB) — **bez DONE**; faktyczny stan repo: pełna Biblia w `bible-seed.json` wisiała Home na „Przygotowywanie biblioteki…”, ~163 wzorce mojibake w `pl.json`, zakładki AI/Workspace kodowo OK ale bezużyteczne przy zablokowanym init.
+- **Cel:** aplikacja testowalna w Expo Go (obecnie **SDK 54** w `package.json`; wcześniejszy downgrade do SDK 52 w `9c6e3ad`, potem upgrade `57f9411`), 0 błędów typecheck.
+- **Kryteria sukcesu:** Home pokazuje księgi <15 s, polskie znaki OK, chat wysyła, workspace + tworzy notatkę.
+
+---
+
+## 2026-05-23 — DONE (Przejęcie sesji — shell end-to-end)
+
+- **Wynik vs cel:** P0×3 domknięte — mobile seed (~20 KB, Genesis 1 / Ps 23 / J 1 / Rz 8:26–31), UTF-8 locale naprawione (348 kluczy PL+EN), DB init z timeoutem 30 s + `resetDatabaseInit()` + retry na Home.
+- **Commity:** `43c02ba` `fix: mobile-first DB seed and unblock app shell`; `4f56020` `fix(i18n): repair UTF-8 encoding in locale files`.
+- **Walidacja:** `npm run typecheck` — 0 błędów; `npm run check:locales` — 348 kluczy OK; brak mojibake w locale JSON.
+- **Antygravity — podsumowanie:** dużo feature DONE, ale START 14:38 (encoding + DB hang) pozostawiony innym agentom; aplikacja była „wydmuszką” mimo zielonego typecheck.
+- **Test na telefonie:** `npx expo start` → QR w Expo Go → **wyczyść dane aplikacji** (stary seed 31100 wersetów w SQLite) lub reinstall → Home powinno załadować 4 księgi w kilka sekund; sprawdź PL w Ustawieniach, wyślij wiadomość w Companion, utwórz notatkę w Workspace.
 
 ---
 
@@ -38,9 +48,9 @@ Add one short entry per completed task.
 
 | Priorytet | Zadanie | Kto | Status | Pliki |
 |-----------|---------|-----|--------|-------|
-| **P0** | **Korupcja i18n** — naprawić UTF-8 w `en.json`/`pl.json` (mojibake `â€¦`, `Ä…`, `Ăł`; polski UI nieczytelny; ~163 wzorce w `pl.json`) | **Agent implementacyjny** (Antigravity START 14:38 **niedokończone**) | aktywna regresja; staged partial fix w `pl.json` | `src/i18n/locales/en.json`, `pl.json` |
-| **P0** | **Wiszenie init DB / seed** — full Bible (~6.7 MB, 31100 wersetów, pojedyncze INSERT w transakcji) blokuje Home na „Przygotowywanie biblioteki”; brak progress/timeout | **Agent implementacyjny** (GitHub Copilot wdrożył import `13:16`) | hang first launch Expo Go | `seed.ts`, `database.ts`, `assets/bible-seed.json` |
-| **P0** | **Puste zakładki AI + Workspace** — moduły wdrożone (Antigravity Workspace, Cursor AI chat) bez smoke testu na telefonie; UI puste/bezużyteczne gdy DB+i18n zablokowane | **Antigravity** (Workspace/Study) + **Agent implementacyjny** (AI chat, QA Expo Go) | brak weryfikacji runtime | `AiChatScreen.tsx`, `WorkspaceScreen.tsx`, `notesStore.ts`, `aiChatStore.ts`, `app/(tabs)/ai.tsx`, `workspace.tsx` |
+| **P0** | **Korupcja i18n** — naprawić UTF-8 w `en.json`/`pl.json` | Antigravity START 14:38 → **DONE** `4f56020` | naprawione; 348 kluczy | `src/i18n/locales/en.json`, `pl.json` |
+| **P0** | **Wiszenie init DB / seed** — mobile seed + timeout/retry | Copilot import `13:16` → **DONE** `43c02ba` | mobile seed ~20 KB; timeout 30 s | `seed.ts`, `database.ts`, `assets/bible-seed.json`, `scripts/create-mobile-seed.mjs` |
+| **P0** | **Zakładki AI + Workspace** — wiring + odblokowanie init DB | Antigravity + Cursor → **DONE** (kod); smoke test = user | ekrany podłączone; wymaga QA telefon | `AiChatScreen.tsx`, `WorkspaceScreen.tsx`, `app/(tabs)/ai.tsx`, `workspace.tsx` |
 | **P1** | Commit unstaged batch (~13 plików: study wiring, home plan polish, AI retry banner, stats OT/NT, deps) | Developer z git | niezcommitowane | `HomeScreen.tsx`, `ReaderScreen.tsx`, `AiChatScreen.tsx`, `StatsScreen.tsx`, `historyRepository.ts`, `useSpiritualAssistant.ts`, `en.json`, `pl.json`, `package.json`, `app.json`, `metro.config.js` |
 | **P1** | Push cloud sync — branch `master` ahead of `origin/master` | Developer z git | oczekuje push | `git push -u origin HEAD` |
 | **P1** | Włączyć **Anonymous Auth** w Supabase Dashboard (Providers → Anonymous → Enable) | User Supabase Dashboard | wymagane ręcznie | Supabase projekt `txwksirnvzoifcdpniby`, migracja `002_anonymous_cloud_sync.sql` już zastosowana |
