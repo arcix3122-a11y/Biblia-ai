@@ -7,10 +7,10 @@ Add one short entry per completed task.
 
 ## 2026-05-23 (local)
 - Agent: Cursor subagent
-- Task: START - Naprawa UTF-8 mojibake w pl.json/en.json
-- Changes: pending
-- Validation: pending
-- Result: in-progress
+- Task: DONE - Naprawa UTF-8 mojibake w pl.json/en.json
+- Changes: src/i18n/locales/en.json, pl.json
+- Validation: check:locales (348 kluczy), typecheck OK, brak BOM, grep TSX bez mojibake
+- Result: done
 
 ---
 
