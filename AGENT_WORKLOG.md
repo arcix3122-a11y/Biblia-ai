@@ -5,6 +5,16 @@ Add one short entry per completed task.
 
 ---
 
+## 2026-05-23 — START (Claude Code orchestrator — polish & structure pass)
+
+**Goal:** Audit project, identify structural/UX gaps, ship improvements end-to-end:
+1. **Study Screen wiring** — `app/study.tsx` + `useVerseStudy` hook exist but unreachable; wire via VerseRow long-press / selection toolbar; add `study.*` i18n namespace
+2. **HomeScreen reading plan polish** — remove stale "coming soon" copy; differentiate Foundation Week (7-day) vs Bible in a Year (365-day) teaser cards; show real year-plan progress
+3. **AiChatScreen error UX** — visible retry button + error banner when API fails; currently only logs silently
+4. **Study namespace i18n** — screen uses `t("study.x") || "hardcoded"` fallbacks; add proper keys to en.json + pl.json
+
+**Expected result:** Study screen reachable from reader; HomeScreen accurate; AI chat shows errors; `npm run typecheck` 0 errors.
+
 ## 2026-05-23 — START (Claude Code orchestrator, 4-agent parallel session)
 
 **Goal:** Ship 4 competitive-parity features end-to-end with full PL+EN i18n, matching YouVersion / Blue Letter Bible / Bible Gateway:

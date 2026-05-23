@@ -13,6 +13,8 @@ import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHighlightsStore } from "@/store/highlightsStore";
 import { useHistoryStore } from "@/store/historyStore";
 import { useLocaleStore } from "@/store/localeStore";
+import { useReminderStore } from "@/store/reminderStore";
+import { useYearPlanStore } from "@/store/yearPlanStore";
 import { colors } from "@/theme";
 
 LogBox.ignoreLogs(["Non-serializable values were found in the navigation state"]);
@@ -65,6 +67,14 @@ function RootStack() {
       />
       <Stack.Screen name="topic/[slug]" options={{ title: t("navigation.topic") }} />
       <Stack.Screen name="settings" options={{ title: t("navigation.settings") }} />
+      <Stack.Screen name="reading-plan" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="study"
+        options={{
+          presentation: "modal",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }
@@ -105,6 +115,8 @@ export default function RootLayout() {
         void useBookmarksStore.getState().loadBookmarks();
         void useHighlightsStore.getState().loadHighlights();
         void useHistoryStore.getState().loadHistory();
+        void useReminderStore.getState().load();
+        void useYearPlanStore.getState().load();
       })
       .catch((err: unknown) => {
         logError(err, "DatabaseInit");

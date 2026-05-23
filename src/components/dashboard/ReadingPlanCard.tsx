@@ -55,8 +55,8 @@ export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
           <Ionicons name="calendar-outline" size={18} color={colors.accent} />
         </View>
         <View style={styles.headerText}>
-          <Text style={styles.title}>{t(FOUNDATION_WEEK_PLAN.titleKey as any)}</Text>
-          <Text style={styles.subtitle}>{t(FOUNDATION_WEEK_PLAN.subtitleKey as any)}</Text>
+          <Text style={styles.title}>{t("readingPlan.foundationTitle")}</Text>
+          <Text style={styles.subtitle}>{t("readingPlan.foundationSubtitle")}</Text>
         </View>
       </View>
 
