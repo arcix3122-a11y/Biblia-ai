@@ -4,6 +4,49 @@
 
 Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before writing any code.
 
+## Internationalization (PL / EN)
+
+**Status: implemented** — stack wired (`expo-localization`, `i18next`, `react-i18next`; `src/i18n/`, `localeStore`, `LanguageSwitcher` on Settings, root init in `app/_layout.tsx`). Remaining screens may still be migrated off hardcoded strings in parallel PRs. The product ships **Polish + English end-to-end** from day one. Scripture text in SQLite remains **KJV English**; all app chrome, labels, and AI companion UI are bilingual.
+
+### Stack and file layout
+
+| Piece | Path / package |
+|-------|----------------|
+| Device locale | `expo-localization` (`getLocales()`) — initial language when no saved preference |
+| i18n core | `i18next` + `react-i18next`, initialized in `src/i18n/index.ts` |
+| Locale JSON | `src/i18n/locales/en.json`, `src/i18n/locales/pl.json` |
+| Persisted preference | `src/store/localeStore.ts` (Zustand + AsyncStorage) |
+| App hook | `src/hooks/useAppTranslation.ts` — thin wrapper over `useTranslation` with typed namespaces |
+| Language switcher | `src/components/LanguageSwitcher.tsx` — rendered on **Settings** (`src/screens/SettingsScreen.tsx`) |
+
+Wire i18n in `app/_layout.tsx` before screens mount (import `@/i18n`, hydrate `localeStore`).
+
+### Rules for all agents
+
+1. **Never hardcode user-visible strings in TSX/TS** — no Polish or English literals in components, hooks, or alerts. Use translation keys.
+2. **Always add keys to BOTH locales** — every new key goes in `en.json` **and** `pl.json` in the same commit. Missing keys fall back to English and look broken in QA.
+3. **Use the hooks** — prefer `useAppTranslation('namespace')` in screens/components; use `useTranslation` from `react-i18next` only in non-React modules if needed.
+4. **Namespace / key naming**
+   - One namespace per feature area: `common`, `home`, `reader`, `settings`, `ai`, `workspace`, `errors`.
+   - Keys are **camelCase**, grouped by screen section: `settings.appearance.title`, `reader.immersiveMode.on`.
+   - Reuse `common.*` for shared actions (`save`, `cancel`, `back`, `loading`).
+   - Do not embed dynamic values in key names; use i18next interpolation: `"currentSize": "Current size: {{size}}px"`.
+5. **Language switching** — user picks PL or EN in Settings via `LanguageSwitcher`; choice persists in `localeStore`. On first launch, default follows device locale (`pl` → Polish, otherwise English).
+6. **Scripture vs UI** — book/chapter/verse **content** comes from `assets/bible-seed.json` (KJV). UI labels for books (e.g. Polish abbreviations in notes) stay in locale files or existing slug maps; do not duplicate verse text in JSON locales.
+
+### How to test both locales
+
+```bash
+npm run typecheck
+npx expo start
+```
+
+1. Open **Settings** (gear on Home) → switch **Polish / English** → confirm labels update without restart.
+2. Kill and relaunch the app → confirm persisted language.
+3. Change device language (or simulate via `expo-localization` in dev) with no saved preference → confirm correct default.
+4. Spot-check each tab (Scripture, Companion, Workspace) and stack screens (book, reader, topics).
+5. Grep for regressions: search `src/` for quoted UI strings in `.tsx` files you touched.
+
 ## Architecture (SolidCode Apps)
 
 - **Router:** `expo-router` — `app/(tabs)/` for Home, AI, Workspace; stack screens for book, reader, topic, settings.
@@ -13,6 +56,7 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before 
 - **AI:** `useSpiritualAssistant` — live OpenAI-compatible API when `EXPO_PUBLIC_AI_API_KEY` is set; otherwise mock replies. Quota: 20 user turns in `aiChatStore`.
 - **Theme:** `@/theme` — gold-on-black Cyber-Monastery; do not add light theme without product approval.
 - **Imports:** use `@/` path alias (see `tsconfig.json`).
+- **i18n:** Polish + English UI via `i18next` / `react-i18next` (`src/i18n/`). User preference in `localeStore`; device locale via `expo-localization`. See **Internationalization (i18n)** below.
 
 ### Commands
 
@@ -87,3 +131,24 @@ Notes:
 - Focus on correctness first, then readability.
 - Mention regressions or edge cases explicitly.
 - If no issues found in review, say so clearly.
+
+### 7) Internationalization (i18n)
+
+Biblia AI is bilingual (**PL** + **EN**). All user-visible UI copy must go through i18n — not hardcoded literals in TSX (except proper nouns, API env hints, or scripture text from SQLite).
+
+**When adding or changing UI text:**
+
+1. Add the key to **both** `src/i18n/locales/en.json` and `src/i18n/locales/pl.json` under the same nested path (e.g. `workspace.emptyNotes`).
+2. Use `useTranslation()` or `useAppTranslation()` from `@/hooks/useAppTranslation` — prefer feature namespaces in key names (`home.*`, `reader.*`, `settings.*`, `ai.*`, `common.*`).
+3. Polish copy should read naturally; use i18next plural suffixes in `pl.json` where needed (`_one`, `_few`, `_many`) — see existing keys like `home.searchHint_*` and `book.chaptersAvailable_*`.
+4. Do **not** add English-only keys without a Polish counterpart (and vice versa). Run a quick key-path diff between the two JSON files before finishing.
+5. Stack/tab titles and `expo-router` options: use `t("navigation.*")` or `t("tabs.*")` inside components that re-render on locale change (see `app/_layout.tsx`, `app/(tabs)/_layout.tsx`).
+6. Changing language: call `setLocale` from `useAppTranslation` / `localeStore` (Settings `LanguageSwitcher`); do not call `i18n.changeLanguage` directly except inside `localeStore` / `initI18n`.
+7. Dates shown to the user: format with `Intl` using the active locale (`pl-PL` / `en-US`), not hardcoded locale strings.
+
+**Do not** wire new screens without replacing every user-facing string. Mock AI replies and error fallbacks belong in locale JSON (`ai.fallbackResponses.*`, `errors.*`).
+
+### 8) Multi-Agent Integrations & TypeScript typings
+- **TypeScript compile safety is mandatory**: Always verify with `npm run typecheck` before finalizing your work.
+- **External type declarations**: If you implement new Expo native APIs (e.g., `expo-speech` or other sensors/modules) that lack type resolutions in the local lockfile environment, declare a stub module declaration file under `src/types/` (e.g., `src/types/expo-speech.d.ts`) to avoid breaking the global build.
+- **Notes & Selection Store integration**: When adding features that rely on highlighting or active scriptures, check `useSelectionStore` in `src/store/selectionStore.ts`. In `WorkspaceScreen.tsx`, starting a new note dynamically parses and pre-populates the editor with the active verse text and maps slugs to Polish abbreviations (`Rdz`, `Ps`, `J`, `Rz`). Maintain this contextual link when expanding features.

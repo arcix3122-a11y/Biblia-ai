@@ -53,3 +53,60 @@ Add one short entry per completed task.
 - Changes: src/screens/ReaderScreen.tsx, src/screens/WorkspaceScreen.tsx, src/types/expo-speech.d.ts, src/services/ai/anthropicClient.ts
 - Validation: npm run typecheck (zakończony pełnym sukcesem z 0 błędami)
 - Result: done
+
+## 2026-05-23 13:20
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Zadanie: Przelaczenie AI na bezpieczny routing Groq/OpenAI i poprawa limitu 20 wiadomosci.
+- Zmiany: src/hooks/useSpiritualAssistant.ts, expo-env.d.ts, .env.example.
+- Walidacja: npm run typecheck (0 bledow).
+- Wynik: zakonczono.
+
+## 2026-05-23 13:21
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: Domkniecie konfiguracji AI end-to-end po stronie lokalnej .env.
+- Changes: .env, AGENT_WORKLOG.md.
+- Validation: npm run typecheck.
+- Result: done
+
+---
+
+## 2026-05-23 — Bilingual app (PL + EN) / i18n
+
+**Decision:** Biblia AI ships in **Polish and English from day one**. All user-facing UI, navigation, settings, and companion copy are localized. Scripture seed content stays **KJV English** in SQLite (`assets/bible-seed.json`); only app chrome is bilingual.
+
+**Status:** **implemented** (as of 2026-05-23). Packages: `expo-localization`, `i18next`, `react-i18next`. Foundation files present in repo:
+
+| Component | Path |
+|-----------|------|
+| i18n bootstrap | `src/i18n/index.ts` |
+| Locale files | `src/i18n/locales/en.json`, `src/i18n/locales/pl.json` |
+| Persisted language | `src/store/localeStore.ts` (Zustand + AsyncStorage) |
+| Typed hook | `src/hooks/useAppTranslation.ts` |
+| Settings switcher | `src/components/LanguageSwitcher.tsx` → `SettingsScreen` |
+| Root wiring | `app/_layout.tsx` (init i18n + hydrate store) |
+
+**Parallel agent workstreams:**
+
+1. **Foundation** — `src/i18n/index.ts`, locale JSON skeleton, `localeStore`, device locale detection via `expo-localization`, root layout integration.
+2. **UI wiring** — replace hardcoded strings in screens/components with `useAppTranslation`; add `LanguageSwitcher` to Settings.
+3. **Docs / QA** — `AGENTS.md` i18n rules (this section), manual pass on both locales, `npm run typecheck`.
+
+**Language switching:** Settings (gear on Home) → **Language** section → `LanguageSwitcher` (PL / EN). Preference persists across launches. First launch with no saved preference: device locale `pl*` → Polish, otherwise English.
+
+**Validation commands:**
+
+```bash
+npm run typecheck
+npx expo start
+```
+
+**Note:** Do not localize KJV verse text in locale JSON; localize labels, buttons, errors, and AI UI only.
+
+---
+
+## 2026-05-23 (local)
+- Agent: Cursor (Auto)
+- Task: Document PL/EN i18n decision and agent rules in AGENTS.md and AGENT_WORKLOG.md
+- Changes: AGENTS.md, AGENT_WORKLOG.md
+- Validation: Repo scan — `src/i18n/` (en.json, pl.json, index.ts), `localeStore`, `useAppTranslation`, `LanguageSwitcher`, Settings wiring confirmed (status: implemented)
+- Result: done
