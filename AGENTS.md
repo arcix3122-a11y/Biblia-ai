@@ -49,6 +49,19 @@ npx expo start
 4. Spot-check each tab (Scripture, Companion, Workspace) and stack screens (book, reader, topics).
 5. Grep for regressions: search `src/` for quoted UI strings in `.tsx` files you touched.
 
+## UX principles
+
+These rules apply to all UI work — especially first-run and Polish-primary users.
+
+1. **Three taps to Scripture** — a new user must reach a readable chapter in ≤3 taps from cold launch (Home → book → chapter). Defer secondary features (stats, plans, ecosystem, language tips) until after first successful read.
+2. **Audio onboarding (first launch)** — full-screen immersive carousel (`AudioOnboarding`, 100-slide scaffold) gates main tabs once; completion persists in `@biblia-ai/audio-onboarding-complete`. Returning users skip automatically.
+3. **Language coherence** — UI chrome follows active locale (PL/EN). Book **labels** in grids, headers, and history use localized display names; verse **text** stays KJV English until a second translation ships. Never show English book names on a Polish UI without a visible KJV/scripture notice.
+4. **Progressive Settings** — default view shows Language, Reader (font + immersive), short AI status, About. Advanced items (notifications, cloud sync, daily goal, ecosystem, provider/model/endpoint) live under a collapsed **Advanced** section.
+5. **AI must never feel broken** — if live API fails or key is missing, fall back to localized mock replies with a clear banner (`retry` + optional “using offline companion”). Do not disable the chat input permanently on `lastError`.
+6. **No dev chrome in production UX** — gate `OfflineBadge`, debug overlays, and provider/endpoint fields behind `__DEV__` or Advanced Settings. First launch must not auto-show marketing modals (`EcosystemModal`).
+7. **Honest offline scope** — if seed is mobile/demo (4 books), say so in UI and README; if full 66-book KJV is bundled, show seed progress on first launch instead of an infinite spinner.
+8. **Smoke test > typecheck** — `npm run typecheck` is necessary but not sufficient. Every UX-affecting PR needs Expo Go verification on a physical device in **both** PL and EN before DONE in worklog.
+
 ## Architecture (SolidCode Apps)
 
 - **Router:** `expo-router` — `app/(tabs)/` for Home, AI, Workspace; stack screens for book, reader, topic, settings.

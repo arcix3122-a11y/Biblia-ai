@@ -500,5 +500,54 @@
     "3-john": "3 Jana",
     "jude": "Judy",
     "revelation": "Apokalipsy"
+  },
+  "audioIntro": {
+    "heroLabel": "Immersyjne audio",
+    "premiumLabel": "Premium {{number}}",
+    "slide1": {
+      "title": "Ziemia Święta",
+      "body": "Poczuj bliskość Ducha Świętego. Usłysz Pismo w miejscach, w których żyli prorocy i apostołowie."
+    },
+    "slide2": {
+      "title": "Biblijny dramat",
+      "body": "Usłysz miłość, wiarę i dobro w żywej, dramatyzowanej narracji, która ożywia każdy werset."
+    },
+    "slide3": {
+      "title": "Zawsze offline",
+      "body": "Odkrywaj mądrość Pisma Świętego bez względu na połączenie — Biblia jest zawsze przy tobie."
+    },
+    "premium": {
+      "title": "Doświadczenie premium {{number}}",
+      "body": "Odblokuj głębsze warstwy audio i medytacji — więcej głosów, scen i modlitw w drodze."
+    },
+    "play": "Odtwórz próbkę",
+    "pause": "Wstrzymaj próbkę",
+    "rewind": "Cofnij 15 sekund",
+    "forward": "Przewiń 15 sekund",
+    "progress": "{{current}} / {{total}}",
+    "ctaNext": "Dalej",
+    "ctaStart": "Zaczynamy"
+  },
+  "guidedPrayer": {
+    "title": "Modlitwa z przewodnikiem",
+    "exitAlertTitle": "Przerwać modlitwę?",
+    "exitAlertMessage": "Twój postęp w tej sesji modlitewnej zostanie utracony.",
+    "exitAlertConfirm": "Przerwij",
+    "welcome": "Witaj",
+    "welcomeSubtitle": "Zatrzymaj się i weź głęboki oddech.",
+    "welcomeText": "Bóg słyszy twoje modlitwy. Wycisz umysł, uświadom sobie Jego świętą obecność i wejdź w ten wyjątkowy moment.",
+    "adoration": "Uwielbienie",
+    "adorationSubtitle": "Uhonoruj Boga.",
+    "adorationLoading": "Czerpanie z duchowych archiwów w celu przygotowania uwielbienia...",
+    "reflection": "Refleksja",
+    "reflectionSubtitle": "Oddaj Bogu swoje troski.",
+    "addPrayer": "Dodaj modlitwę",
+    "prayerInputPlaceholder": "Co dzisiaj leży Ci na sercu? Powierz to Bogu...",
+    "habit": "Nawyk",
+    "habitSubtitle": "Módl się regularnie.",
+    "habitMessage": "Niech modlitwa stanie się codziennym nawykiem. Regularna rozmowa z Bogiem przynosi pokój serca.",
+    "scheduleReminder": "Ustaw codzienne przypomnienie",
+    "continueButton": "Dalej",
+    "finishButton": "Amen"
   }
 }

@@ -500,5 +500,54 @@
     "3-john": "3 John",
     "jude": "Jude",
     "revelation": "Revelation"
+  },
+  "audioIntro": {
+    "heroLabel": "Immersive audio",
+    "premiumLabel": "Premium {{number}}",
+    "slide1": {
+      "title": "The Holy Land",
+      "body": "Feel the closeness of the Holy Spirit. Hear Scripture in the places where prophets and apostles walked."
+    },
+    "slide2": {
+      "title": "Dramatized Bible",
+      "body": "Hear love, faith, and goodness in vivid dramatized narration that brings every verse to life."
+    },
+    "slide3": {
+      "title": "Always offline",
+      "body": "Discover the wisdom of Scripture without a connection — the Bible is always with you."
+    },
+    "premium": {
+      "title": "Premium experience {{number}}",
+      "body": "Unlock deeper layers of audio and meditation — more voices, scenes, and prayers on the way."
+    },
+    "play": "Play sample",
+    "pause": "Pause sample",
+    "rewind": "Rewind 15 seconds",
+    "forward": "Forward 15 seconds",
+    "progress": "{{current}} / {{total}}",
+    "ctaNext": "Next",
+    "ctaStart": "Let's begin"
+  },
+  "guidedPrayer": {
+    "title": "Guided Prayer",
+    "exitAlertTitle": "Exit Prayer?",
+    "exitAlertMessage": "Your progress in this prayer session will be lost.",
+    "exitAlertConfirm": "Exit",
+    "welcome": "Welcome",
+    "welcomeSubtitle": "Breathe in, quiet your mind.",
+    "welcomeText": "God hears your prayers. Let us pause, reflect on His presence, and enter into this holy moment.",
+    "adoration": "Adoration",
+    "adorationSubtitle": "Honor God's holiness.",
+    "adorationLoading": "Consulting spiritual archives to prepare your adoration...",
+    "reflection": "Reflection",
+    "reflectionSubtitle": "Surrender your worries.",
+    "addPrayer": "Add Prayer Request",
+    "prayerInputPlaceholder": "What is on your heart today? Surrender it to God...",
+    "habit": "Habit",
+    "habitSubtitle": "Stay consistent in prayer.",
+    "habitMessage": "Let prayer become a daily habit. Consistent communion with God builds a peaceful soul.",
+    "scheduleReminder": "Schedule Daily Reminder",
+    "continueButton": "Continue",
+    "finishButton": "Amen"
   }
 }

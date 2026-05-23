@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 import { GlobalAudioBar } from "@/components/audio/GlobalAudioBar";
+import { AudioOnboarding } from "@/components/AudioOnboarding";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 import { ChromeProvider } from "@/context/ChromeContext";
 import { initI18n } from "@/i18n";
@@ -15,6 +16,7 @@ import { initSyncEngine, scheduleSync } from "@/services/sync/syncEngine";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHighlightsStore } from "@/store/highlightsStore";
 import { useHistoryStore } from "@/store/historyStore";
+import { useAudioOnboardingStore } from "@/store/audioOnboardingStore";
 import { useLocaleStore } from "@/store/localeStore";
 import { useReminderStore } from "@/store/reminderStore";
 import { useYearPlanStore } from "@/store/yearPlanStore";
@@ -80,23 +82,35 @@ function RootStack() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="guided-prayer"
+        options={{
+          presentation: "modal",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }
 
 export default function RootLayout() {
   const [i18nReady, setI18nReady] = useState(false);
+  const [storesReady, setStoresReady] = useState(false);
   const locale = useLocaleStore((s) => s.locale);
+  const hasCompletedAudioOnboarding = useAudioOnboardingStore((s) => s.hasCompleted);
+  const completeAudioOnboarding = useAudioOnboardingStore((s) => s.complete);
 
   useEffect(() => {
     let mounted = true;
 
     const bootstrapI18n = async () => {
       await useLocaleStore.persist.rehydrate();
+      await useAudioOnboardingStore.persist.rehydrate();
       const initialLocale = useLocaleStore.getState().resolveInitialLocale();
       await initI18n(initialLocale);
       if (mounted) {
         setI18nReady(true);
+        setStoresReady(true);
       }
     };
 
@@ -161,7 +175,7 @@ export default function RootLayout() {
     return () => subscription.remove();
   }, [i18nReady]);
 
-  if (!i18nReady) {
+  if (!i18nReady || !storesReady) {
     return (
       <View
         style={{
@@ -173,6 +187,19 @@ export default function RootLayout() {
       >
         <ActivityIndicator size="large" color={colors.accent} />
       </View>
+    );
+  }
+
+  if (!hasCompletedAudioOnboarding) {
+    return (
+      <GlobalErrorBoundary>
+        <ChromeProvider>
+          <StatusBar style="light" />
+          <View style={{ flex: 1, backgroundColor: colors.canvas }} key={locale ?? "en"}>
+            <AudioOnboarding onComplete={completeAudioOnboarding} />
+          </View>
+        </ChromeProvider>
+      </GlobalErrorBoundary>
     );
   }
 

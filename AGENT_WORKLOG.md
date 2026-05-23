@@ -3,6 +3,10 @@
 This file is used by all agents/subagents working in this repository.
 Add one short entry per completed task.
 
+## 2026-05-23 — START (Claude Code — viral feed overhaul)
+
+**Cel:** Przeprojektowanie głównego ekranu aplikacji na wzór angażującego feeda (YouVersion). Nowe elementy: premium karta VOTD z social barem (like/share/komentarz), powitanie zależne od pory dnia, dwie karty "Przewodnika duchowego" otwierające streaming AI. Pełna i18n PL+EN pod przestrzenią `viralFeed.*`.
+
 ---
 
 ## 2026-05-23 — START (fix AI Companion end-to-end)
@@ -903,4 +907,29 @@ npx expo start
 - Task: DONE - Uproszczenie UX (Home, Ustawienia, zakładki, czytnik, AI) — mniej bałaganu, onboarding-friendly
 - Changes: HomeScreen (CTA Czytaj Pismo, mniej kart), SettingsScreen (Podstawowe/Zaawansowane Accordion), tabs (krótsze etykiety), ReaderScreen (KJV banner dismiss, prostszy footer), AiChatScreen (starter + composer), MomentumDashboard (kompakt), Accordion.tsx, onboardingStore (KJV dismiss), en.json/pl.json
 - Validation: npm run typecheck — 0 błędów; npm run check:locales — OK
+- Result: done
+
+## 2026-05-23 19:16
+- Agent: Antigravity
+- Task: START - Interaktywne kinowe doświadczenie modlitewne AI z dźwiękiem ambientowym w tle (Guided Prayer Flow)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 20:30 (local)
+- Agent: Cursor subagent
+- Task: START - Immersive Audio Onboarding Carousel
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 20:45 (local)
+- Agent: Cursor subagent
+- Task: DONE - Immersive Audio Onboarding Carousel
+- **Wynik:** Pełnoekranowy karuzelowy onboarding audio (100 slajdów) przed zakładkami przy pierwszym uruchomieniu; flaga `@biblia-ai/audio-onboarding-complete`.
+- **UI:** `AudioOnboarding.tsx` — paging FlatList, timeline, ±15 s, play/pause, kropki, CTA Dalej/Zaczynamy, haptics, złoto `#E5A93C`.
+- **Dane:** `audioOnboardingSlides.ts` (3 hero + 97 premium), generator `scripts/generate-onboarding-slides.mjs`, 100 PNG w `assets/onboarding/`.
+- **Audio:** `expo-av` (tryb) + `expo-speech` próbki mowy; pauza przy zmianie slajdu.
+- **i18n:** namespace `audioIntro.*` PL/EN; system 100 slajdów — slajdy 4–100 używają `audioIntro.premium.*` z interpolacją `{{number}}`.
+- Validation: `npm run check:locales` OK; nowe pliki bez błędów TS (repo ma istniejące błędy poza zakresem).
 - Result: done
