@@ -240,6 +240,22 @@ export function useSpiritualAssistant() {
     [canSend, sendMessage]
   );
 
+  const hasApiKey = Boolean(process.env.EXPO_PUBLIC_AI_API_KEY?.trim());
+  let provider = "";
+  let model = "";
+  let endpoint = "";
+
+  if (hasApiKey) {
+    try {
+      const config = buildApiConfig();
+      provider = config.provider;
+      model = config.model;
+      endpoint = config.endpoint;
+    } catch {
+      // Ignored
+    }
+  }
+
   return {
     sendMessage,
     sendWithContext,
@@ -248,5 +264,9 @@ export function useSpiritualAssistant() {
     remaining,
     messageCount,
     limit,
+    hasApiKey,
+    provider,
+    model,
+    endpoint,
   };
 }

@@ -63,7 +63,15 @@
     "searchEmptySub": "Spróbuj innych słów kluczowych lub krótszej frazy.",
     "oldTestament": "Stary Testament",
     "newTestament": "Nowy Testament",
-    "exploreByTopic": "Przeglądaj według tematu"
+    "exploreByTopic": "Przeglądaj według tematu",
+    "recentSearches": "Ostatnie wyszukiwania",
+    "clearSearchHistory": "Wyczyść",
+    "planTeaserTitle": "Plany czytania",
+    "planTeaserSub": "Codzienne czytanie z przewodnikiem — wkrótce.",
+    "languageTipTitle": "Wskazówka: zmiana języka",
+    "languageTipBody": "Stuknij ikonę koła zębatego → Język, aby w każdym momencie wybrać polski lub angielski.",
+    "languageTipDismiss": "Rozumiem",
+    "languageTipOpenSettings": "Otwórz ustawienia"
   },
   "dashboard": {
     "dayStreak": "dni z rzędu",
@@ -109,6 +117,22 @@
     "strength": {
       "title": "Siła",
       "description": "Moc doskonała w słabości"
+    },
+    "prayer": {
+      "title": "Modlitwa",
+      "description": "Obcowanie z Bogiem przez modlitwę"
+    },
+    "wisdom": {
+      "title": "Mądrość",
+      "description": "Mądrość Boża i rozeznanie"
+    },
+    "love": {
+      "title": "Miłość",
+      "description": "Miłość Boga i miłość bliźniego"
+    },
+    "peace": {
+      "title": "Pokój",
+      "description": "Pokój, który przewyższa wszelkie pojęcie"
     }
   },
   "book": {
@@ -154,7 +178,8 @@
     "addBookmark": "Dodaj zakładkę",
     "removeBookmark": "Usuń zakładkę",
     "addBookmark": "Dodaj zakładkę",
-    "removeBookmark": "Usuń zakładkę"
+    "removeBookmark": "Usuń zakładkę",
+    "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku."
   },
   "ai": {
     "responsesRemaining": "{{remaining}} / {{limit}} odpowiedzi",
@@ -223,7 +248,9 @@
     "deleteNoteMessage": "Czy na pewno chcesz usunąć tę notatkę?",
     "deleteBookmarkTitle": "Usuń zakładkę",
     "deleteBookmarkMessage": "Czy na pewno chcesz usunąć ten werset z zakładek?",
-    "noteTemplate": "Rozważanie do wersetu [{{reference}}]:\n\n\"{{text}}\"\n\n"
+    "noteTemplate": "Rozważanie do wersetu [{{reference}}]:\n\n\"{{text}}\"\n\n",
+    "shareNote": "Udostępnij",
+    "shareNoteTitle": "Udostępnij notatkę"
   },
   "settings": {
     "appearance": "Wygląd",
@@ -240,7 +267,19 @@
     "language": "Język",
     "languageHint": "Wybierz język interfejsu aplikacji.",
     "languagePl": "Polski",
-    "languageEn": "Angielski"
+    "languageEn": "Angielski",
+    "aiService": "Usługa AI",
+    "aiServiceHint": "Diagnostyka konfiguracji dostawcy LLM na żywo.",
+    "aiStatusConfigured": "Status: klucz API skonfigurowany",
+    "aiStatusMissing": "Status: brak klucza API",
+    "aiProviderValue": "Dostawca: {{value}}",
+    "aiModelValue": "Model: {{value}}",
+    "aiEndpointValue": "Endpoint: {{value}}",
+    "scriptureTranslation": "Tłumaczenie Pisma",
+    "scriptureTranslationHint": "Tekst wersetów w lokalnej bazie jest po angielsku (KJV). Lokalizowany jest tylko interfejs aplikacji.",
+    "resetQuotaTitle": "Zresetować limit i wyczyścić czat?",
+    "resetQuotaMessage": "To wyczyści historię czatu w Towarzyszu i przywróci dzienny limit wiadomości.",
+    "resetQuotaSuccess": "Czat wyczyszczony, dzienny limit przywrócony."
   },
   "languageSwitcher": {
     "pl": "PL",
@@ -254,7 +293,7 @@
     "databaseOpenFailed": "Nie udało się otworzyć bazy danych"
   },
   "share": {
-    "brand": "SolidCode · Biblia AI",
+    "brand": "Biblia AI",
     "dialogTitle": "Udostępnij werset"
   }
 }

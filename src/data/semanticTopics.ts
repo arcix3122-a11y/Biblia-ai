@@ -61,6 +61,34 @@ export const SEMANTIC_TOPICS: readonly SemanticTopic[] = [
     keywords: ["strength", "weak", "power", "mighty", "endure", "overcome"],
     verseRefs: [{ bookSlug: "romans", chapter: 8 }],
   },
+  {
+    slug: "prayer",
+    title: "Prayer",
+    description: "Communion with God through prayer",
+    keywords: ["prayer", "pray", "supplication", "intercede", "petition", "ask", "seek", "knock"],
+    verseRefs: [{ bookSlug: "matthew", chapter: 6 }, { bookSlug: "philippians", chapter: 4 }, { bookSlug: "james", chapter: 5 }],
+  },
+  {
+    slug: "wisdom",
+    title: "Wisdom",
+    description: "Godly wisdom and discernment",
+    keywords: ["wisdom", "wise", "knowledge", "understanding", "discern", "insight", "prudent"],
+    verseRefs: [{ bookSlug: "proverbs", chapter: 3 }, { bookSlug: "james", chapter: 1 }, { bookSlug: "psalms", chapter: 111 }],
+  },
+  {
+    slug: "love",
+    title: "Love",
+    description: "God's love and loving one another",
+    keywords: ["love", "beloved", "charity", "compassion", "kindness", "agape"],
+    verseRefs: [{ bookSlug: "john", chapter: 3 }, { bookSlug: "romans", chapter: 8 }, { bookSlug: "1-corinthians", chapter: 13 }],
+  },
+  {
+    slug: "peace",
+    title: "Peace",
+    description: "Peace that surpasses all understanding",
+    keywords: ["peace", "rest", "still", "calm", "quiet", "shalom", "comfort"],
+    verseRefs: [{ bookSlug: "john", chapter: 14 }, { bookSlug: "philippians", chapter: 4 }, { bookSlug: "isaiah", chapter: 26 }],
+  },
 ] as const;
 
 export function getTopicBySlug(slug: string): SemanticTopic | undefined {

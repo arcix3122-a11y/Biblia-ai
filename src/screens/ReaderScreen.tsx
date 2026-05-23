@@ -185,6 +185,16 @@ export default function ReaderScreen() {
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
+          ListHeaderComponent={
+            !immersiveMode ? (
+              <View style={styles.translationNotice}>
+                <Ionicons name="information-circle-outline" size={14} color={colors.textMuted} />
+                <Text style={styles.translationNoticeText}>
+                  {t("reader.scriptureTranslationNotice")}
+                </Text>
+              </View>
+            ) : null
+          }
           onScrollToIndexFailed={(info) => {
             setTimeout(() => {
               flatListRef.current?.scrollToIndex({
@@ -426,5 +436,18 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textPrimary,
     fontWeight: "600",
+  },
+  translationNotice: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.xs,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xs,
+  },
+  translationNoticeText: {
+    ...typography.caption,
+    color: colors.textMuted,
+    flex: 1,
+    lineHeight: 18,
   },
 });

@@ -61,7 +61,15 @@
     "searchEmptySub": "Try different keywords or a shorter phrase.",
     "oldTestament": "Old Testament",
     "newTestament": "New Testament",
-    "exploreByTopic": "Explore by topic"
+    "exploreByTopic": "Explore by topic",
+    "recentSearches": "Recent searches",
+    "clearSearchHistory": "Clear",
+    "planTeaserTitle": "Reading plans",
+    "planTeaserSub": "Guided daily readings — coming soon.",
+    "languageTipTitle": "Tip: switch language",
+    "languageTipBody": "Tap the gear icon → Language to choose Polish or English anytime.",
+    "languageTipDismiss": "Got it",
+    "languageTipOpenSettings": "Open settings"
   },
   "dashboard": {
     "dayStreak": "day streak",
@@ -105,6 +113,22 @@
     "strength": {
       "title": "Strength",
       "description": "Power made perfect in weakness"
+    },
+    "prayer": {
+      "title": "Prayer",
+      "description": "Communion with God through prayer"
+    },
+    "wisdom": {
+      "title": "Wisdom",
+      "description": "Godly wisdom and discernment"
+    },
+    "love": {
+      "title": "Love",
+      "description": "God's love and loving one another"
+    },
+    "peace": {
+      "title": "Peace",
+      "description": "Peace that surpasses all understanding"
     }
   },
   "book": {
@@ -143,8 +167,7 @@
     "fontPreview": "The Lord is my shepherd",
     "addBookmark": "Add bookmark",
     "removeBookmark": "Remove bookmark",
-    "addBookmark": "Add bookmark",
-    "removeBookmark": "Remove bookmark"
+    "scriptureTranslationNotice": "Scripture text is in English (KJV). The app interface follows your language setting."
   },
   "ai": {
     "responsesRemaining": "{{remaining}} / {{limit}} responses",
@@ -213,7 +236,9 @@
     "deleteNoteMessage": "Are you sure you want to delete this note?",
     "deleteBookmarkTitle": "Remove bookmark",
     "deleteBookmarkMessage": "Are you sure you want to remove this verse from bookmarks?",
-    "noteTemplate": "Reflection on [{{reference}}]:\n\n\"{{text}}\"\n\n"
+    "noteTemplate": "Reflection on [{{reference}}]:\n\n\"{{text}}\"\n\n",
+    "shareNote": "Share",
+    "shareNoteTitle": "Share note"
   },
   "settings": {
     "appearance": "Appearance",
@@ -230,7 +255,19 @@
     "language": "Language",
     "languageHint": "Choose the app interface language.",
     "languagePl": "Polish",
-    "languageEn": "English"
+    "languageEn": "English",
+    "aiService": "AI service",
+    "aiServiceHint": "Live diagnostics for the configured LLM provider.",
+    "aiStatusConfigured": "Status: API key configured",
+    "aiStatusMissing": "Status: API key missing",
+    "aiProviderValue": "Provider: {{value}}",
+    "aiModelValue": "Model: {{value}}",
+    "aiEndpointValue": "Endpoint: {{value}}",
+    "scriptureTranslation": "Scripture translation",
+    "scriptureTranslationHint": "Verse text in the local database is English (KJV). Only app labels and navigation are localized.",
+    "resetQuotaTitle": "Reset quota and clear chat?",
+    "resetQuotaMessage": "This clears your Companion chat history and restores the daily message limit.",
+    "resetQuotaSuccess": "Chat cleared and daily limit restored."
   },
   "languageSwitcher": {
     "pl": "PL",
@@ -244,7 +281,7 @@
     "databaseOpenFailed": "Database failed to open"
   },
   "share": {
-    "brand": "SolidCode · Biblia AI",
+    "brand": "Biblia AI",
     "dialogTitle": "Share verse"
   }
 }

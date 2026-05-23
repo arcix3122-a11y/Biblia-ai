@@ -1,14 +1,8 @@
-import Anthropic from "@anthropic-ai/sdk";
+// Anthropic SDK has been removed from dependencies. Stubbed out to avoid compilation errors.
+let client: any = null;
 
-let client: Anthropic | null = null;
-
-export function getAnthropicClient(): Anthropic | null {
-  const apiKey = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
-  if (!client) {
-    client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-  }
-  return client;
+export function getAnthropicClient(): any {
+  return null;
 }
 
 export const SPIRITUAL_SYSTEM_PROMPT = `You are a warm, scholarly spiritual companion helping users engage with Scripture. You offer:

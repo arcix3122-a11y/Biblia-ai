@@ -16,9 +16,11 @@ import { GlassCard } from "@/components/GlassCard";
 import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
 import { TopicGrid } from "@/components/topics/TopicGrid";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useBooks, useDatabaseReady, useVerseSearch } from "@/hooks/useScripture";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHistoryStore } from "@/store/historyStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { useSelectionStore } from "@/store/selectionStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import type { Book, Testament, VerseWithReference } from "@/types/scripture";
@@ -58,6 +60,9 @@ export default function HomeScreen() {
   const { ready, error } = useDatabaseReady();
   const { books, loading } = useBooks(testament);
   const { results, searching, search, clear } = useVerseSearch();
+  const { history, addToHistory, clearHistory } = useSearchHistory();
+  const hasSeenLanguageTip = useOnboardingStore((s) => s.hasSeenLanguageTip);
+  const dismissLanguageTip = useOnboardingStore((s) => s.dismissLanguageTip);
   const lastRead = useHistoryStore((s) => s.lastRead);
   const recent = useHistoryStore((s) => s.recent);
   const loadHistory = useHistoryStore((s) => s.loadHistory);
@@ -113,9 +118,10 @@ export default function HomeScreen() {
 
   const openSearchHit = useCallback(
     (hit: VerseWithReference) => {
+      void addToHistory(debouncedQuery.trim());
       void openReader(hit.book_slug, hit.chapter_number, hit.number, hit.text);
     },
-    [openReader]
+    [addToHistory, debouncedQuery, openReader]
   );
 
   const resumeReading = useCallback(() => {
@@ -170,6 +176,36 @@ export default function HomeScreen() {
         </View>
 
         <MomentumDashboard style={styles.dashboard} />
+
+        {!hasSeenLanguageTip ? (
+          <GlassCard style={styles.languageTip}>
+            <View style={styles.languageTipContent}>
+              <Ionicons name="language-outline" size={20} color={colors.accent} />
+              <View style={styles.languageTipText}>
+                <Text style={styles.languageTipTitle}>{t("home.languageTipTitle")}</Text>
+                <Text style={styles.languageTipBody}>{t("home.languageTipBody")}</Text>
+              </View>
+            </View>
+            <View style={styles.languageTipActions}>
+              <Pressable
+                onPress={() => router.push("/settings")}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("home.languageTipOpenSettings")}
+              >
+                <Text style={styles.languageTipLink}>{t("home.languageTipOpenSettings")}</Text>
+              </Pressable>
+              <Pressable
+                onPress={dismissLanguageTip}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("home.languageTipDismiss")}
+              >
+                <Text style={styles.languageTipDismiss}>{t("home.languageTipDismiss")}</Text>
+              </Pressable>
+            </View>
+          </GlassCard>
+        ) : null}
 
         {lastRead?.book_slug ? (
           <Pressable onPress={resumeReading}>
@@ -237,6 +273,17 @@ export default function HomeScreen() {
           </View>
         ) : null}
 
+        <View style={styles.planTeaser}>
+          <View style={styles.planTeaserIcon}>
+            <Ionicons name="calendar-outline" size={20} color={colors.accent} />
+          </View>
+          <View style={styles.planTeaserText}>
+            <Text style={styles.planTeaserTitle}>{t("home.planTeaserTitle")}</Text>
+            <Text style={styles.planTeaserSub}>{t("home.planTeaserSub")}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+        </View>
+
         <TopicGrid onTopicPress={openTopic} />
 
         <TextInput
@@ -248,8 +295,44 @@ export default function HomeScreen() {
           autoCapitalize="none"
           autoCorrect={false}
           returnKeyType="search"
+          accessibilityLabel={t("home.searchPlaceholder")}
+          onSubmitEditing={() => {
+            const trimmed = query.trim();
+            if (trimmed.length >= MIN_SEARCH_LEN) {
+              void addToHistory(trimmed);
+            }
+          }}
         />
         {searchHint ? <Text style={styles.searchHint}>{searchHint}</Text> : null}
+
+        {!showSearch && history.length > 0 ? (
+          <View style={styles.searchHistory}>
+            <View style={styles.searchHistoryHeader}>
+              <Text style={styles.searchHistoryTitle}>{t("home.recentSearches")}</Text>
+              <Pressable
+                onPress={() => void clearHistory()}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("home.clearSearchHistory")}
+              >
+                <Text style={styles.searchHistoryClear}>{t("home.clearSearchHistory")}</Text>
+              </Pressable>
+            </View>
+            <View style={styles.searchHistoryChips}>
+              {history.map((item) => (
+                <Pressable
+                  key={item}
+                  onPress={() => setQuery(item)}
+                  style={styles.searchHistoryChip}
+                  accessibilityRole="button"
+                  accessibilityLabel={item}
+                >
+                  <Text style={styles.searchHistoryChipText}>{item}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : null}
 
         {showSearch ? (
           <View>
@@ -486,5 +569,108 @@ const styles = StyleSheet.create({
   },
   searchSpinner: {
     marginVertical: spacing.md,
+  },
+  languageTip: {
+    marginBottom: spacing.md,
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  languageTipContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+  },
+  languageTipText: {
+    flex: 1,
+  },
+  languageTipTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  languageTipBody: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  languageTipActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  languageTipLink: {
+    ...typography.caption,
+    color: colors.accent,
+  },
+  languageTipDismiss: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  searchHistory: {
+    marginBottom: spacing.md,
+  },
+  searchHistoryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.sm,
+  },
+  searchHistoryTitle: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  searchHistoryClear: {
+    ...typography.caption,
+    color: colors.accent,
+  },
+  searchHistoryChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+  },
+  searchHistoryChip: {
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    borderRadius: radii.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    backgroundColor: colors.inputBackground,
+  },
+  searchHistoryChipText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+  },
+  planTeaser: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
+    marginBottom: spacing.md,
+  },
+  planTeaserIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(229, 169, 60, 0.12)",
+  },
+  planTeaserText: {
+    flex: 1,
+  },
+  planTeaserTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+    fontWeight: "700",
+  },
+  planTeaserSub: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: 2,
   },
 });

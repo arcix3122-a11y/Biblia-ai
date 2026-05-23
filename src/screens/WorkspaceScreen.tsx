@@ -7,6 +7,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
@@ -16,6 +17,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Sharing from "expo-sharing";
 import { useNotesStore, Note } from "@/store/notesStore";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useSelectionStore } from "@/store/selectionStore";
@@ -133,6 +135,18 @@ export default function WorkspaceScreen() {
     setTitle("");
     setBody("");
   }, [body, editingNoteId, saveNote, t, title]);
+
+  const handleShareNote = useCallback(async () => {
+    const safeTitle = title.trim() || t("common.untitled");
+    const safeBody = body.trim() || t("common.noContent");
+    const shareText = `${safeTitle}\n\n${safeBody}\n\n— Biblia AI`;
+
+    const isAvailable = await Sharing.isAvailableAsync();
+    if (!isAvailable) {
+      return;
+    }
+    await Share.share({ message: shareText, title: safeTitle });
+  }, [body, t, title]);
 
   // Navigating to verse
   const handleLinkPress = useCallback(
@@ -282,6 +296,14 @@ export default function WorkspaceScreen() {
           <View style={styles.headerRight}>
             <Pressable onPress={() => void handleSave()} style={styles.saveIcon} hitSlop={15}>
               <Ionicons name="save-outline" size={22} color={colors.accent} />
+            </Pressable>
+            <Pressable
+              onPress={() => void handleShareNote()}
+              style={styles.shareIcon}
+              hitSlop={15}
+              accessibilityLabel={t("workspace.shareNoteTitle")}
+            >
+              <Ionicons name="share-outline" size={22} color={colors.accent} />
             </Pressable>
             {editingNoteId && (
               <Pressable onPress={handleDelete} style={styles.deleteIcon} hitSlop={15}>
@@ -562,6 +584,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   saveIcon: {
+    padding: spacing.xs,
+  },
+  shareIcon: {
     padding: spacing.xs,
   },
   deleteIcon: {
