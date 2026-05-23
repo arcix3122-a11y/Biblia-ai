@@ -28,11 +28,13 @@ Wire i18n in `app/_layout.tsx` before screens mount (import `@/i18n`, hydrate `l
 3. **Use the hooks** — prefer `useAppTranslation('namespace')` in screens/components; use `useTranslation` from `react-i18next` only in non-React modules if needed.
 4. **Namespace / key naming**
    - One namespace per feature area: `common`, `home`, `reader`, `settings`, `ai`, `workspace`, `errors`.
-   - Keys are **camelCase**, grouped by screen section: `settings.appearance.title`, `reader.immersiveMode.on`.
+   - Keys are **camelCase**, grouped by screen section: `settings.appearance`, `reader.immersiveOn`.
    - Reuse `common.*` for shared actions (`save`, `cancel`, `back`, `loading`).
-   - Do not embed dynamic values in key names; use i18next interpolation: `"currentSize": "Current size: {{size}}px"`.
-5. **Language switching** — user picks PL or EN in Settings via `LanguageSwitcher`; choice persists in `localeStore`. On first launch, default follows device locale (`pl` → Polish, otherwise English).
+   - Do not embed dynamic values in key names; use i18next interpolation: `"currentFontSize": "Current size: {{size}}px"`.
+   - Polish plural forms: add `_one`, `_few`, `_many` in `pl.json` where needed (see `home.searchHint_*`, `book.chaptersAvailable_*`).
+5. **Language switching** — user picks PL or EN in Settings via `LanguageSwitcher`; call `setLocale` from `useAppTranslation` / `localeStore` (not raw `i18n.changeLanguage` outside `localeStore` / `initI18n`). Choice persists in AsyncStorage; on first launch, default follows device locale (`pl` → Polish, otherwise English).
 6. **Scripture vs UI** — book/chapter/verse **content** comes from `assets/bible-seed.json` (KJV). UI labels for books (e.g. Polish abbreviations in notes) stay in locale files or existing slug maps; do not duplicate verse text in JSON locales.
+7. **QA before merge** — diff key paths between `en.json` and `pl.json`; format user-visible dates with `Intl` and active locale (`pl-PL` / `en-US`). Mock AI replies and error fallbacks live in locale JSON (`ai.fallbackResponses.*`, `errors.*`).
 
 ### How to test both locales
 
@@ -56,7 +58,7 @@ npx expo start
 - **AI:** `useSpiritualAssistant` — live OpenAI-compatible API when `EXPO_PUBLIC_AI_API_KEY` is set; otherwise mock replies. Quota: 20 user turns in `aiChatStore`.
 - **Theme:** `@/theme` — gold-on-black Cyber-Monastery; do not add light theme without product approval.
 - **Imports:** use `@/` path alias (see `tsconfig.json`).
-- **i18n:** Polish + English UI via `i18next` / `react-i18next` (`src/i18n/`). User preference in `localeStore`; device locale via `expo-localization`. See **Internationalization (i18n)** below.
+- **i18n:** Polish + English UI via `i18next` / `react-i18next` (`src/i18n/`). User preference in `localeStore`; device locale via `expo-localization`. See **Internationalization (PL / EN)** above.
 
 ### Commands
 
@@ -115,13 +117,21 @@ Notes:
 ```
 
 ### 5) Repository work log
-- Every agent should append a short entry to `AGENT_WORKLOG.md` after finishing a task.
+- Every agent should append a short START entry to `AGENT_WORKLOG.md` before beginning a task.
+- Every agent should append a short DONE entry to `AGENT_WORKLOG.md` after finishing a task.
 - Entry format:
 
 ```text
 ## YYYY-MM-DD HH:mm (local)
 - Agent: <name>
-- Task: <short task description>
+- Task: START - <short task description>
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## YYYY-MM-DD HH:mm (local)
+- Agent: <name>
+- Task: DONE - <short task description>
 - Changes: <files or "none">
 - Validation: <what was checked>
 - Result: <done/blocker>
@@ -132,23 +142,7 @@ Notes:
 - Mention regressions or edge cases explicitly.
 - If no issues found in review, say so clearly.
 
-### 7) Internationalization (i18n)
-
-Biblia AI is bilingual (**PL** + **EN**). All user-visible UI copy must go through i18n — not hardcoded literals in TSX (except proper nouns, API env hints, or scripture text from SQLite).
-
-**When adding or changing UI text:**
-
-1. Add the key to **both** `src/i18n/locales/en.json` and `src/i18n/locales/pl.json` under the same nested path (e.g. `workspace.emptyNotes`).
-2. Use `useTranslation()` or `useAppTranslation()` from `@/hooks/useAppTranslation` — prefer feature namespaces in key names (`home.*`, `reader.*`, `settings.*`, `ai.*`, `common.*`).
-3. Polish copy should read naturally; use i18next plural suffixes in `pl.json` where needed (`_one`, `_few`, `_many`) — see existing keys like `home.searchHint_*` and `book.chaptersAvailable_*`.
-4. Do **not** add English-only keys without a Polish counterpart (and vice versa). Run a quick key-path diff between the two JSON files before finishing.
-5. Stack/tab titles and `expo-router` options: use `t("navigation.*")` or `t("tabs.*")` inside components that re-render on locale change (see `app/_layout.tsx`, `app/(tabs)/_layout.tsx`).
-6. Changing language: call `setLocale` from `useAppTranslation` / `localeStore` (Settings `LanguageSwitcher`); do not call `i18n.changeLanguage` directly except inside `localeStore` / `initI18n`.
-7. Dates shown to the user: format with `Intl` using the active locale (`pl-PL` / `en-US`), not hardcoded locale strings.
-
-**Do not** wire new screens without replacing every user-facing string. Mock AI replies and error fallbacks belong in locale JSON (`ai.fallbackResponses.*`, `errors.*`).
-
-### 8) Multi-Agent Integrations & TypeScript typings
+### 7) Multi-Agent Integrations & TypeScript typings
 - **TypeScript compile safety is mandatory**: Always verify with `npm run typecheck` before finalizing your work.
 - **External type declarations**: If you implement new Expo native APIs (e.g., `expo-speech` or other sensors/modules) that lack type resolutions in the local lockfile environment, declare a stub module declaration file under `src/types/` (e.g., `src/types/expo-speech.d.ts`) to avoid breaking the global build.
 - **Notes & Selection Store integration**: When adding features that rely on highlighting or active scriptures, check `useSelectionStore` in `src/store/selectionStore.ts`. In `WorkspaceScreen.tsx`, starting a new note dynamically parses and pre-populates the editor with the active verse text and maps slugs to Polish abbreviations (`Rdz`, `Ps`, `J`, `Rz`). Maintain this contextual link when expanding features.

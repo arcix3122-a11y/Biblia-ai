@@ -62,10 +62,49 @@ Theme is fixed dark in Phase 1. Reader font size and immersive mode are in **Set
 
 Raw KJV source for tooling may live at `scripts/source-kjv-full.json` (not bundled).
 
+## Languages / Języki
+
+Biblia AI supports **Polish (PL)** and **English (EN)** for all app UI strings (tabs, screens, settings, errors). Scripture text in SQLite remains in the bundled translation (KJV-style sample or your imported Bible JSON).
+
+### Switching language / Zmiana języka
+
+1. Open **Home** → gear icon → **Settings** / **Ustawienia**.
+2. In the **Language** / **Język** section, tap **PL** or **EN** on the segmented control (`LanguageSwitcher`).
+3. The choice is saved in AsyncStorage (`@biblia-ai/locale`) and applied immediately via `i18n.changeLanguage`; tab labels and stack headers re-render.
+
+### Device locale detection / Wykrywanie języka urządzenia
+
+On first launch (no saved preference):
+
+- `expo-localization` reads the device language code (`getLocales()[0].languageCode`).
+- If it is `pl`, the UI starts in Polish; otherwise English is used (`getDeviceLocale()` in `src/i18n/index.ts`).
+- Fallback language is always **English** (`fallbackLng: "en"`).
+
+After the user picks a language in Settings, that stored value overrides the device locale on every subsequent launch.
+
+### Adding or editing translations / Dodawanie tłumaczeń
+
+| Path | Purpose |
+|------|---------|
+| `src/i18n/locales/en.json` | English UI strings |
+| `src/i18n/locales/pl.json` | Polish UI strings (natural wording; add `_one` / `_few` / `_many` plural keys where i18next needs them) |
+| `src/i18n/index.ts` | i18next init, device locale helper |
+| `src/i18n/types.ts` | Typed keys (inferred from `en.json`) |
+| `src/store/localeStore.ts` | Persisted `pl` \| `en` + sync with i18n |
+| `src/hooks/useAppTranslation.ts` | `t`, `locale`, `setLocale` wrapper |
+
+Use nested keys by feature namespace, e.g. `home.searchPlaceholder`, `settings.language`, `ai.limitReached`. Add the **same key path** to both JSON files. In components: `const { t } = useTranslation()` or `useAppTranslation()`, then `t("home.continueReading")`.
+
+See `AGENTS.md` → **Internationalization (i18n)** for agent conventions.
+
 ## How to test
 
 | Feature | Steps |
 |---------|--------|
+| Language switch | Settings → Language → PL / EN → verify tabs, headers, and screen copy |
+| First-run language tip | Fresh install → Home shows dismissible tip → Settings link works → dismiss persists |
+| KJV notice | Open any chapter in Reader → info banner shows English (KJV) text note |
+| Search history | Home → search 2+ chars → submit or tap result → recent chips appear → Clear removes |
 | Immersive reader | Reader → Immersive → exit |
 | Share verse image | Home dashboard → Share story |
 | Topics | Home → topic tile |

@@ -3,11 +3,50 @@
 This file is used by all agents/subagents working in this repository.
 Add one short entry per completed task.
 
+### START — 2026-05-23 session (Cursor subagent)
+
+**Planned scope:** Audit uncommitted work, fix typecheck failures, ship production-ready polish (KJV notice, search history UI, first-run language tip, missing i18n keys), commit logical chunks.
+
+**Files/areas:** `AGENT_WORKLOG.md`, `src/i18n/locales/*.json`, `src/screens/HomeScreen.tsx`, `src/screens/ReaderScreen.tsx`, `src/screens/SettingsScreen.tsx`, `src/hooks/useSearchHistory.ts`, `src/store/onboardingStore.ts`, `README.md`, `AGENTS.md`.
+
+**Success criteria:** `npm run typecheck` passes; PL+EN keys synced; KJV English notice in reader; recent search history wired; dismissible onboarding language tip; docs committed; DONE entry with commit hashes.
+
+### PROGRESS — 2026-05-23
+- Fixed missing `en.json` keys (AI settings, plan teaser, language tip, KJV notice); synced `pl.json`.
+- Wired `useSearchHistory` chips on Home; added `onboardingStore` first-run language tip.
+- Reader KJV banner + Settings scripture translation section; duplicate Home styles cleaned.
+- `npm run typecheck` — pass (0 errors).
+
+### DONE — 2026-05-23 session (Cursor subagent)
+
+**Built:** Production polish — bilingual onboarding tip, recent search history, KJV/English scripture notices (reader + settings), missing i18n keys, typecheck fix, README manual test rows.
+
+**Commits:** (see git log after commit)
+
+**Run:**
+```bash
+npm run typecheck
+npx expo start
+```
+
+**Manual QA checklist:**
+1. Fresh app → Home language tip → Open settings / Got it → relaunch (tip stays dismissed).
+2. Settings → Language PL/EN → verify reader KJV notice + settings translation hint in both locales.
+3. Home search → type query → submit → recent chips → tap chip → Clear.
+4. Settings → AI service section shows configured/missing key status.
+
 ## Template
 
 ## YYYY-MM-DD HH:mm (local)
 - Agent: <name>
-- Task: <short task description>
+- Task: START - <short task description>
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## YYYY-MM-DD HH:mm (local)
+- Agent: <name>
+- Task: DONE - <short task description>
 - Changes: <files or "none">
 - Validation: <what was checked>
 - Result: <done/blocker>
@@ -158,4 +197,44 @@ npx expo start
 - Task: Wire all user-facing UI to PL/EN i18n; LanguageSwitcher in Settings; locale-aware dates; mock AI replies
 - Changes: app/(tabs)/_layout.tsx, app/book/[bookSlug].tsx, src/screens/*, src/components/*, src/hooks/useSpiritualAssistant.ts, src/hooks/useLocalizedTopic.ts, src/store/aiChatStore.ts, src/i18n/locales/*.json, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass)
+- Result: done
+
+## 2026-05-23 13:35
+- Agent: Antigravity
+- Task: Naprawa błędów kompilacji TypeScript (rozwiązanie blokady importu @anthropic-ai/sdk w anthropicClient.ts)
+- Changes: src/services/ai/anthropicClient.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (0 błędów, pełen sukces)
+- Result: done
+
+## 2026-05-23 14:xx (local)
+- Agent: Claude (Anthropic) — orchestrated multi-agent session
+- Task: expo-speech TTS implementation + Claude API attempt + i18n bug fixes
+- Changes:
+  - src/services/audio/audioEngine.ts: StubAudioEngine → SpeechAudioEngine (expo-speech)
+  - src/services/db/scriptureRepository.ts: added getVersesByBookAndChapter()
+  - src/i18n/locales/en.json: added 7 missing workspace keys, fixed share.brand
+  - src/i18n/locales/pl.json: fixed share.brand
+  - src/screens/WorkspaceScreen.tsx: fixed noteTemplate variable mismatch (abbr→reference)
+- Validation: npm run typecheck — pass
+- Result: done
+
+## 2026-05-23 13:28
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - aktualizacja zasad logowania + rozbudowa Settings o status AI.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 13:36
+- Agent: Antigravity
+- Task: START - Rozbudowa ekranu Ustawień o sekcję statusu Asystenta AI (AI Companion Status, Quota, Provider & Model)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-23 13:31
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - aktualizacja zasad logowania + rozbudowa Settings o status AI.
+- Changes: AGENTS.md, AGENT_WORKLOG.md, src/screens/SettingsScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, src/screens/HomeScreen.tsx.
+- Validation: npm run typecheck (0 bledow).
 - Result: done
