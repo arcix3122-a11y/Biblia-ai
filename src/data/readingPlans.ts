@@ -17,9 +17,9 @@ export const FOUNDATION_WEEK_PLAN: ReadingPlanDefinition = {
     { day: 2, bookSlug: "psalms", chapter: 23 },
     { day: 3, bookSlug: "john", chapter: 1 },
     { day: 4, bookSlug: "romans", chapter: 8 },
-    { day: 5, bookSlug: "psalms", chapter: 1 },
-    { day: 6, bookSlug: "matthew", chapter: 5 },
-    { day: 7, bookSlug: "proverbs", chapter: 3 },
+    { day: 5, bookSlug: "genesis", chapter: 1 },
+    { day: 6, bookSlug: "john", chapter: 1 },
+    { day: 7, bookSlug: "romans", chapter: 8 },
   ],
 };
 

@@ -13,16 +13,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
+import { useFullBibleAvailable } from "@/hooks/useScripture";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useYearPlanStore } from "@/store/yearPlanStore";
 import { getAssignmentsForDay } from "@/data/readingPlan";
 import type { DayAssignment } from "@/data/readingPlan";
+import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { GlassCard } from "@/components/GlassCard";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export default function ReadingPlanScreen() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
+  const fullBibleAvailable = useFullBibleAvailable();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const {
@@ -64,9 +69,16 @@ export default function ReadingPlanScreen() {
 
   const openChapter = useCallback(
     (bookSlug: string, chapter: number) => {
-      router.push(`/reader/${bookSlug}/${chapter}`);
+      void (async () => {
+        const available = await scriptureRepo.isChapterAvailable(bookSlug, chapter, translation);
+        if (!available) {
+          Alert.alert(t("readingPlan.chapterUnavailableTitle"), t("reader.chapterUnavailable"));
+          return;
+        }
+        router.push(`/reader/${bookSlug}/${chapter}`);
+      })();
     },
-    [router]
+    [router, t, translation]
   );
 
   if (!loaded) return null;
@@ -87,7 +99,13 @@ export default function ReadingPlanScreen() {
         </View>
       </View>
 
-      {!startDate ? (
+      {!fullBibleAvailable ? (
+        <GlassCard style={styles.card}>
+          <Ionicons name="information-circle-outline" size={40} color={colors.accent} style={styles.icon} />
+          <Text style={styles.notStartedText}>{t("plan.fullBibleRequiredTitle")}</Text>
+          <Text style={styles.hintText}>{t("plan.fullBibleRequiredHint")}</Text>
+        </GlassCard>
+      ) : !startDate ? (
         /* Not started */
         <GlassCard style={styles.card}>
           <Ionicons name="calendar-outline" size={40} color={colors.accent} style={styles.icon} />

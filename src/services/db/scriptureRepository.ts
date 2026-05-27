@@ -164,6 +164,19 @@ export async function hasFullBibleTranslation(
   return (bookCount?.count ?? 0) >= FULL_BIBLE_BOOK_COUNT;
 }
 
+export async function isChapterAvailable(
+  bookSlug: string,
+  chapterNumber: number,
+  translation: ScriptureTranslation = "en"
+): Promise<boolean> {
+  const book = await getBookBySlug(bookSlug);
+  if (!book) {
+    return false;
+  }
+  const verses = await getVersesByBookAndChapter(book.id, chapterNumber, translation);
+  return verses.length > 0;
+}
+
 export async function getAdjacentChapter(
   bookId: number,
   currentChapter: number,

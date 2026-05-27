@@ -285,79 +285,10 @@ export default function HomeScreen() {
           accessibilityLabel={t("home.readScripture")}
         >
           <Ionicons name="book-outline" size={20} color={colors.canvas} />
-          <Text style={styles.primaryCtaText}>{t("home.readScripture")}</Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => router.push("/guided-prayer")}
-          style={({ pressed }) => [
-            styles.guidedPrayerCta,
-            pressed && styles.guidedPrayerCtaPressed,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={t("guidedPrayer.title")}
-        >
-          <View style={styles.guidedPrayerCtaHeader}>
-            <Ionicons name="sparkles" size={18} color={colors.accent} />
-            <Text style={styles.guidedPrayerCtaTitle}>
-              {t("guidedPrayer.title")}
-            </Text>
-          </View>
-          <Text style={styles.guidedPrayerCtaDesc}>
-            {t("guidedPrayer.welcomeSubtitle")}
+          <Text style={styles.primaryCtaText}>
+            {lastRead?.book_slug ? t("home.continueReading") : t("home.readScripture")}
           </Text>
-          <Ionicons name="chevron-forward" size={16} color={colors.accent} style={styles.guidedPrayerCtaArrow} />
         </Pressable>
-
-        <VotdFeedCard onVerse={(text, ref) => { setVotdText(text); setVotdRef(ref); }} />
-        <GuidedReflectionCards verseText={votdText} verseReference={votdRef} />
-
-        <View style={styles.emotionHub}>
-          <Text style={styles.emotionHubTitle}>{t("home.emotionalHubTitle")}</Text>
-          <Text style={styles.emotionHubSubtitle}>{t("home.emotionalHubSubtitle")}</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.emotionChipsRow}
-          >
-            {emotionalChips.map((chip) => (
-              <Pressable
-                key={chip.id}
-                onPress={() => openEmotion(chip.id, chip.action)}
-                style={({ pressed }) => [styles.emotionChip, pressed && styles.emotionChipPressed]}
-              >
-                <Text style={styles.emotionChipLabel}>{t(`home.emotions.${chip.id}`)}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        {!hasSeenLanguageTip ? (
-          <GlassCard style={styles.languageTip}>
-            <View style={styles.languageTipContent}>
-              <Ionicons name="language-outline" size={18} color={colors.accent} />
-              <Text style={styles.languageTipBody}>{t("home.languageTipBody")}</Text>
-            </View>
-            <View style={styles.languageTipActions}>
-              <Pressable
-                onPress={() => router.push("/settings")}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={t("home.languageTipOpenSettings")}
-              >
-                <Text style={styles.languageTipLink}>{t("home.languageTipOpenSettings")}</Text>
-              </Pressable>
-              <Pressable
-                onPress={dismissLanguageTip}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={t("home.languageTipDismiss")}
-              >
-                <Text style={styles.languageTipDismiss}>{t("home.languageTipDismiss")}</Text>
-              </Pressable>
-            </View>
-          </GlassCard>
-        ) : null}
 
         {lastRead?.book_slug ? (
           <Pressable onPress={resumeReading}>
@@ -373,18 +304,6 @@ export default function HomeScreen() {
                 )}
               </Text>
             </GlassCard>
-          </Pressable>
-        ) : null}
-
-        <ReadingPlanCard style={styles.sectionCard} />
-
-        {yearPlanStartDate && fullBibleAvailable ? (
-          <Pressable onPress={() => router.push("/reading-plan")} style={styles.planLink}>
-            <Ionicons name="earth-outline" size={16} color={colors.accent} />
-            <Text style={styles.planLinkText}>
-              {t("plan.dayLabel", { day: yearPlanGetCurrentDay() })} · {t("plan.progressLabel", { percent: yearPlanGetProgress() })}
-            </Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
           </Pressable>
         ) : null}
 
@@ -522,6 +441,89 @@ export default function HomeScreen() {
             </>
           )}
         </View>
+
+        <ReadingPlanCard style={styles.sectionCard} />
+
+        {yearPlanStartDate && fullBibleAvailable ? (
+          <Pressable onPress={() => router.push("/reading-plan")} style={styles.planLink}>
+            <Ionicons name="earth-outline" size={16} color={colors.accent} />
+            <Text style={styles.planLinkText}>
+              {t("plan.dayLabel", { day: yearPlanGetCurrentDay() })} · {t("plan.progressLabel", { percent: yearPlanGetProgress() })}
+            </Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+
+        <VotdFeedCard onVerse={(text, ref) => { setVotdText(text); setVotdRef(ref); }} />
+        <GuidedReflectionCards verseText={votdText} verseReference={votdRef} />
+
+        <Pressable
+          onPress={() => router.push("/guided-prayer")}
+          style={({ pressed }) => [
+            styles.guidedPrayerCta,
+            pressed && styles.guidedPrayerCtaPressed,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={t("guidedPrayer.title")}
+        >
+          <View style={styles.guidedPrayerCtaHeader}>
+            <Ionicons name="sparkles" size={18} color={colors.accent} />
+            <Text style={styles.guidedPrayerCtaTitle}>
+              {t("guidedPrayer.title")}
+            </Text>
+          </View>
+          <Text style={styles.guidedPrayerCtaDesc}>
+            {t("guidedPrayer.welcomeSubtitle")}
+          </Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.accent} style={styles.guidedPrayerCtaArrow} />
+        </Pressable>
+
+        <View style={styles.emotionHub}>
+          <Text style={styles.emotionHubTitle}>{t("home.emotionalHubTitle")}</Text>
+          <Text style={styles.emotionHubSubtitle}>{t("home.emotionalHubSubtitle")}</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.emotionChipsRow}
+          >
+            {emotionalChips.map((chip) => (
+              <Pressable
+                key={chip.id}
+                onPress={() => openEmotion(chip.id, chip.action)}
+                style={({ pressed }) => [styles.emotionChip, pressed && styles.emotionChipPressed]}
+              >
+                <Text style={styles.emotionChipLabel}>{t(`home.emotions.${chip.id}`)}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
+        {!hasSeenLanguageTip ? (
+          <GlassCard style={styles.languageTip}>
+            <View style={styles.languageTipContent}>
+              <Ionicons name="language-outline" size={18} color={colors.accent} />
+              <Text style={styles.languageTipBody}>{t("home.languageTipBody")}</Text>
+            </View>
+            <View style={styles.languageTipActions}>
+              <Pressable
+                onPress={() => router.push("/settings")}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("home.languageTipOpenSettings")}
+              >
+                <Text style={styles.languageTipLink}>{t("home.languageTipOpenSettings")}</Text>
+              </Pressable>
+              <Pressable
+                onPress={dismissLanguageTip}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("home.languageTipDismiss")}
+              >
+                <Text style={styles.languageTipDismiss}>{t("home.languageTipDismiss")}</Text>
+              </Pressable>
+            </View>
+          </GlassCard>
+        ) : null}
 
         {(recentUnique.length > 0 || bookmarkPreview.length > 0) ? (
           <View style={styles.secondarySection}>

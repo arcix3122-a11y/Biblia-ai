@@ -24,7 +24,7 @@ function heroKeyForSlide(id: number): AudioOnboardingHeroKey | undefined {
   return undefined;
 }
 
-export const AUDIO_ONBOARDING_SLIDE_COUNT = 100;
+export const AUDIO_ONBOARDING_SLIDE_COUNT = 3;
 
 export const AUDIO_ONBOARDING_SLIDES: readonly AudioOnboardingSlideConfig[] = Array.from(
   { length: AUDIO_ONBOARDING_SLIDE_COUNT },

@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
 import { GlassCard } from "@/components/GlassCard";
 import {
   FOUNDATION_WEEK_PLAN,
@@ -21,6 +22,7 @@ interface ReadingPlanCardProps {
 export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
   const router = useRouter();
   const completedDays = useReadingPlanStore((s) => s.completedDays);
   const loadProgress = useReadingPlanStore((s) => s.loadProgress);
@@ -45,9 +47,28 @@ export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
   }, [activeDay.bookSlug, locale]);
 
   const openReading = useCallback(() => {
-    void markDayComplete(activeDay.day);
-    router.push(`/reader/${activeDay.bookSlug}/${activeDay.chapter}`);
-  }, [activeDay.bookSlug, activeDay.chapter, activeDay.day, markDayComplete, router]);
+    void (async () => {
+      const available = await scriptureRepo.isChapterAvailable(
+        activeDay.bookSlug,
+        activeDay.chapter,
+        translation
+      );
+      if (!available) {
+        Alert.alert(t("readingPlan.chapterUnavailableTitle"), t("reader.chapterUnavailable"));
+        return;
+      }
+      await markDayComplete(activeDay.day);
+      router.push(`/reader/${activeDay.bookSlug}/${activeDay.chapter}`);
+    })();
+  }, [
+    activeDay.bookSlug,
+    activeDay.chapter,
+    activeDay.day,
+    markDayComplete,
+    router,
+    t,
+    translation,
+  ]);
 
   return (
     <GlassCard style={style}>

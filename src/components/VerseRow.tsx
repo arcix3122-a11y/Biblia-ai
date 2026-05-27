@@ -66,7 +66,7 @@ function VerseRowComponent({
           styles.text,
           {
             fontSize: reading.fontSize,
-            lineHeight: reading.lineHeight,
+            lineHeight: Math.round(reading.lineHeight * 1.14),
             letterSpacing: reading.letterSpacing,
           },
           isSelected && styles.textSelected,
@@ -104,6 +104,9 @@ const styles = StyleSheet.create({
   number: {
     ...typography.caption,
     color: colors.textMuted,
+    opacity: 0.62,
+    fontSize: 11,
+    letterSpacing: 0.4,
   },
   numberActive: {
     color: colors.accent,

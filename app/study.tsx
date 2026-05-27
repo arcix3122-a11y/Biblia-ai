@@ -14,7 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelectionStore } from "@/store/selectionStore";
-import { useVerseStudy, VerseTranslation, InterlinearWord } from "@/hooks/useVerseStudy";
+import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
+import { useVerseStudy } from "@/hooks/useVerseStudy";
 import { GlassCard } from "@/components/GlassCard";
 import { colors, radii, spacing, typography } from "@/theme";
 
@@ -25,6 +27,9 @@ export default function StudyScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
+  const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
+  const translationName = t(`settings.translation.${translation}Name`);
 
   const [activeTab, setActiveTab] = useState<StudyTab>("translations");
   const { details, loading, error, fetchStudyDetails } = useVerseStudy();
@@ -39,9 +44,9 @@ export default function StudyScreen() {
     return (
       <View style={styles.centered}>
         <Ionicons name="book-outline" size={48} color={colors.textMuted} />
-        <Text style={styles.errorText}>No verse selected for study.</Text>
+        <Text style={styles.errorText}>{t("study.noVerseSelected")}</Text>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Go Back</Text>
+          <Text style={styles.backButtonText}>{t("study.goBack")}</Text>
         </Pressable>
       </View>
     );
@@ -52,9 +57,7 @@ export default function StudyScreen() {
       return (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color={colors.accent} />
-          <Text style={styles.loaderText}>
-            {t("study.loading") || "Engaging theological archives..."}
-          </Text>
+          <Text style={styles.loaderText}>{t("study.loading")}</Text>
         </View>
       );
     }
@@ -69,7 +72,12 @@ export default function StudyScreen() {
           <ScrollView contentContainerStyle={styles.tabScrollContent}>
             <View style={styles.verseSourceCard}>
               <Text style={styles.sourceLabel}>
-                {selectedVerse.bookName} {selectedVerse.chapter}:{selectedVerse.verse} (KJV)
+                {t("study.sourceReference", {
+                  book: selectedVerse.bookName,
+                  chapter: selectedVerse.chapter,
+                  verse: selectedVerse.verse,
+                  translation: translationName,
+                })}
               </Text>
               <Text style={styles.sourceText}>{selectedVerse.text}</Text>
             </View>
@@ -103,11 +111,11 @@ export default function StudyScreen() {
                   </View>
                   <View style={styles.wordDetailRow}>
                     <Text style={styles.transliterationText}>
-                      <Text style={styles.label}>{t("study.transliteration") || "Translit"}:</Text>{" "}
+                      <Text style={styles.label}>{t("study.transliteration")}:</Text>{" "}
                       {word.transliteration}
                     </Text>
                     <Text style={styles.meaningText}>
-                      <Text style={styles.label}>{t("study.meaning") || "Meaning"}:</Text>{" "}
+                      <Text style={styles.label}>{t("study.meaning")}:</Text>{" "}
                       {word.translation}
                     </Text>
                   </View>
@@ -125,7 +133,7 @@ export default function StudyScreen() {
                 <GlassCard key={idx} style={styles.commentaryCard}>
                   <View style={styles.bulletHeader}>
                     <Ionicons name="sparkles" size={16} color={colors.accent} />
-                    <Text style={styles.bulletTitle}>Insight {idx + 1}</Text>
+                    <Text style={styles.bulletTitle}>{t("study.insight", { index: idx + 1 })}</Text>
                   </View>
                   <Text style={styles.commentaryText}>{point}</Text>
                 </GlassCard>
@@ -149,7 +157,7 @@ export default function StudyScreen() {
           <Ionicons name="close" size={24} color={colors.accent} />
         </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {t("study.title") || "Scripture Study"}
+          {t("study.title")}
         </Text>
         <View style={{ width: 24 }} />
       </View>
@@ -169,7 +177,7 @@ export default function StudyScreen() {
           style={[styles.tab, activeTab === "translations" && styles.tabActive]}
         >
           <Text style={[styles.tabText, activeTab === "translations" && styles.tabTextActive]}>
-            {t("study.translations") || "Translations"}
+            {t("study.translations")}
           </Text>
         </Pressable>
         <Pressable
@@ -177,7 +185,7 @@ export default function StudyScreen() {
           style={[styles.tab, activeTab === "original" && styles.tabActive]}
         >
           <Text style={[styles.tabText, activeTab === "original" && styles.tabTextActive]}>
-            {t("study.originalLanguage") || "Original"}
+            {t("study.originalLanguage")}
           </Text>
         </Pressable>
         <Pressable
@@ -185,7 +193,7 @@ export default function StudyScreen() {
           style={[styles.tab, activeTab === "commentary" && styles.tabActive]}
         >
           <Text style={[styles.tabText, activeTab === "commentary" && styles.tabTextActive]}>
-            {t("study.commentary") || "Commentary"}
+            {t("study.commentary")}
           </Text>
         </Pressable>
       </View>

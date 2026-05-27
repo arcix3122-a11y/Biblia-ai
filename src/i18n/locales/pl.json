@@ -20,7 +20,8 @@
     "on": "wł.",
     "off": "wył.",
     "close": "Zamknij",
-    "dismiss": "Ukryj"
+    "dismiss": "Ukryj",
+    "skip": "Pomiń"
   },
   "tabs": {
     "scripture": "Czytaj",
@@ -82,6 +83,21 @@
     "verseTextLocaleNoticeEn": "Tekst wersetów: angielski (KJV)",
     "verseTextLocaleNoticePl": "Tekst wersetów: polski (Biblia Gdańska 1881)",
     "readScripture": "Czytaj Pismo",
+    "welcomeTitle": "Otwórz Pismo",
+    "welcomeSubtitle": "Wybierz księgę, aby rozpocząć czytanie offline.",
+    "continueSubtitle": "Wróć tam, gdzie skończyłeś.",
+    "readNow": "Czytaj teraz",
+    "exploreHeading": "Odkryj",
+    "libraryHeading": "Biblioteka",
+    "discoveryHeading": "Twoja droga",
+    "tileCompanion": "Asystent AI",
+    "tileCompanionSub": "Zapytaj o werset",
+    "tilePlan": "Plan czytania",
+    "tilePlanSub": "Tydzień fundamentów",
+    "tilePrayer": "Modlitwa",
+    "tilePrayerSub": "Z przewodnikiem",
+    "tileStats": "Statystyki",
+    "tileStatsSub": "Twoja droga",
     "emotionalHubTitle": "W jakim stanie jest dziś Twoje serce?",
     "emotionalHubSubtitle": "Wybierz stan, aby otworzyć dopasowaną ścieżkę.",
     "emotions": {
@@ -144,7 +160,8 @@
     "readNow": "Czytaj teraz",
     "readAgain": "Czytaj ponownie",
     "planComplete": "Plan ukończony",
-    "planCompleteHint": "Ukończyłeś wszystkie siedem dni. Możesz zacząć od nowa w dowolnym momencie."
+    "planCompleteHint": "Ukończyłeś wszystkie siedem dni. Możesz zacząć od nowa w dowolnym momencie.",
+    "chapterUnavailableTitle": "Rozdział niedostępny"
   },
   "topics": {
     "heading": "Przeglądaj według tematu",
@@ -434,7 +451,9 @@
     "chapterLabel": "{{book}} {{chapter}}",
     "completedDays": "{{count}} ukończonych dni",
     "notStarted": "Nie rozpocząłeś jeszcze planu.",
-    "startHint": "Przeczytaj całą Biblię w 365 dni."
+    "startHint": "Przeczytaj całą Biblię w 365 dni.",
+    "fullBibleRequiredTitle": "Wymagana pełna Biblia",
+    "fullBibleRequiredHint": "Plan „Biblia w rok” wymaga lokalnie zaimportowanej pełnej Biblii (66 ksiąg). Przy demo bibliotece korzystaj z Tygodnia fundamentów na ekranie głównym."
   },
   "stats": {
     "title": "Statystyki",
@@ -458,13 +477,17 @@
     "translations": "Przekłady",
     "originalLanguage": "Tekst oryginalny",
     "commentary": "Komentarze",
+    "noVerseSelected": "Nie wybrano wersetu do studium.",
+    "goBack": "Wróć",
+    "insight": "Wgląd {{index}}",
     "transliteration": "Transliteracja",
     "meaning": "Znaczenie",
     "loading": "Trwa pobieranie analizy teologicznej...",
     "translationUnavailable": "Porównanie przekładów wymaga aktywnego połączenia.",
     "offlineCommentary1": "Duchowy asystent zachęca do głębokiego rozważania tego wersetu w kontekście całego rozdziału.",
     "offlineCommentary2": "Rozważ, w jaki sposób to słowo odnosi się bezpośrednio do Twojego dzisiejszego życia.",
-    "studyAction": "Studium"
+    "studyAction": "Studium",
+    "sourceReference": "{{book}} {{chapter}}:{{verse}} ({{translation}})"
   },
   "ecosystem": {
     "welcomeTitle": "Witaj w ekosystemie! 🌟",
@@ -552,19 +575,19 @@
     "revelation": "Apokalipsy"
   },
   "audioIntro": {
-    "heroLabel": "Immersyjne audio",
+    "heroLabel": "Witaj",
     "premiumLabel": "Premium {{number}}",
     "slide1": {
-      "title": "Ziemia Święta",
-      "body": "Poczuj bliskość Ducha Świętego. Usłysz Pismo w miejscach, w których żyli prorocy i apostołowie."
+      "title": "Pismo Święte zawsze przy tobie",
+      "body": "Biblia gotowa, kiedy tylko chcesz — czytaj rozdziały, wyszukuj wersety i wracaj tam, gdzie skończyłeś."
     },
     "slide2": {
-      "title": "Biblijny dramat",
-      "body": "Usłysz miłość, wiarę i dobro w żywej, dramatyzowanej narracji, która ożywia każdy werset."
+      "title": "Polski i angielski",
+      "body": "Przełączaj interfejs między polskim a angielskim. Czytnik obsługuje oba tłumaczenia obok siebie."
     },
     "slide3": {
-      "title": "Zawsze offline",
-      "body": "Odkrywaj mądrość Pisma Świętego bez względu na połączenie — Biblia jest zawsze przy tobie."
+      "title": "Asystent AI",
+      "body": "Zadaj pytanie o dowolny werset. Asystent oparty na Piśmie działa offline z wbudowanym fallbackiem."
     },
     "premium": {
       "title": "Doświadczenie premium {{number}}",

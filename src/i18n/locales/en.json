@@ -20,7 +20,8 @@
     "on": "on",
     "off": "off",
     "close": "Close",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "skip": "Skip"
   },
   "tabs": {
     "scripture": "Read",
@@ -82,6 +83,21 @@
     "verseTextLocaleNoticeEn": "Verse text: English (KJV)",
     "verseTextLocaleNoticePl": "Verse text: Polish (Biblia Gdańska 1881)",
     "readScripture": "Read Scripture",
+    "welcomeTitle": "Open Scripture",
+    "welcomeSubtitle": "Pick a book to start reading offline.",
+    "continueSubtitle": "Pick up where you left off.",
+    "readNow": "Read now",
+    "exploreHeading": "Explore",
+    "libraryHeading": "Library",
+    "discoveryHeading": "Your journey",
+    "tileCompanion": "AI Companion",
+    "tileCompanionSub": "Ask about a verse",
+    "tilePlan": "Reading plan",
+    "tilePlanSub": "Foundation week",
+    "tilePrayer": "Prayer",
+    "tilePrayerSub": "Guided session",
+    "tileStats": "Stats",
+    "tileStatsSub": "Your journey",
     "emotionalHubTitle": "How is your heart today?",
     "emotionalHubSubtitle": "Choose a state to open a guided path.",
     "emotions": {
@@ -144,7 +160,8 @@
     "readNow": "Read now",
     "readAgain": "Read again",
     "planComplete": "Plan complete",
-    "planCompleteHint": "You finished all seven days. Start a new week anytime by reading again."
+    "planCompleteHint": "You finished all seven days. Start a new week anytime by reading again.",
+    "chapterUnavailableTitle": "Chapter not available"
   },
   "topics": {
     "heading": "Explore by topic",
@@ -434,7 +451,9 @@
     "chapterLabel": "{{book}} {{chapter}}",
     "completedDays": "{{count}} days completed",
     "notStarted": "You haven't started the plan yet.",
-    "startHint": "Read through the entire Bible in 365 days."
+    "startHint": "Read through the entire Bible in 365 days.",
+    "fullBibleRequiredTitle": "Full Bible required",
+    "fullBibleRequiredHint": "The Bible-in-a-year plan needs all 66 books imported locally. Use the Foundation week on Home while the demo library is installed."
   },
   "stats": {
     "title": "Statistics",
@@ -458,13 +477,17 @@
     "translations": "Translations",
     "originalLanguage": "Original Text",
     "commentary": "Commentary",
+    "noVerseSelected": "No verse selected for study.",
+    "goBack": "Go Back",
+    "insight": "Insight {{index}}",
     "transliteration": "Transliteration",
     "meaning": "Meaning",
     "loading": "Engaging theological archives...",
     "translationUnavailable": "Polish translation comparison requires an active connection.",
     "offlineCommentary1": "The spiritual assistant encourages deep reflection on this verse in the context of the whole chapter.",
     "offlineCommentary2": "Consider how this word applies to your daily walk.",
-    "studyAction": "Study"
+    "studyAction": "Study",
+    "sourceReference": "{{book}} {{chapter}}:{{verse}} ({{translation}})"
   },
   "ecosystem": {
     "welcomeTitle": "Welcome to the Ecosystem! 🌟",
@@ -552,19 +575,19 @@
     "revelation": "Revelation"
   },
   "audioIntro": {
-    "heroLabel": "Immersive audio",
+    "heroLabel": "Welcome",
     "premiumLabel": "Premium {{number}}",
     "slide1": {
-      "title": "The Holy Land",
-      "body": "Feel the closeness of the Holy Spirit. Hear Scripture in the places where prophets and apostles walked."
+      "title": "Scripture in your pocket",
+      "body": "The Bible, ready when you are — read chapters, search verses, and pick up where you left off."
     },
     "slide2": {
-      "title": "Dramatized Bible",
-      "body": "Hear love, faith, and goodness in vivid dramatized narration that brings every verse to life."
+      "title": "Polish and English",
+      "body": "Switch the interface between Polish and English at any time. The reader supports both translations side by side."
     },
     "slide3": {
-      "title": "Always offline",
-      "body": "Discover the wisdom of Scripture without a connection — the Bible is always with you."
+      "title": "AI Companion",
+      "body": "Ask questions about any verse. The companion is grounded in Scripture and works offline with a built-in fallback."
     },
     "premium": {
       "title": "Premium experience {{number}}",

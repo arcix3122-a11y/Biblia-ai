@@ -103,15 +103,15 @@ function buildGenericStudyData(verse: SelectedVerse): VerseStudyDetails {
     translations: [
       { name: "ESV", lang: "en", text: verse.text },
       { name: "NIV", lang: "en", text: verse.text },
-      { name: "BT", lang: "pl", text: i18n.t("study.translationUnavailable") || "Tłumaczenie dynamiczne niedostępne offline." },
-      { name: "UBG", lang: "pl", text: i18n.t("study.translationUnavailable") || "Tłumaczenie dynamiczne niedostępne offline." },
+      { name: "BT", lang: "pl", text: i18n.t("study.translationUnavailable") },
+      { name: "UBG", lang: "pl", text: i18n.t("study.translationUnavailable") },
     ],
     interlinear: [
       { original: "Scripture", transliteration: verse.bookSlug, translation: "Chapter " + verse.chapter, strong: "Verse " + verse.verse },
     ],
     commentary: [
-      i18n.t("study.offlineCommentary1") || "Duchowy asystent zachęca do głębokiego czytania wersetu w kontekście całego rozdziału.",
-      i18n.t("study.offlineCommentary2") || "Rozważ, w jaki sposób to słowo odnosi się bezpośrednio do Twojego dzisiejszego dnia."
+      i18n.t("study.offlineCommentary1"),
+      i18n.t("study.offlineCommentary2"),
     ]
   };
 }

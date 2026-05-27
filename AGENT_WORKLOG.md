@@ -6,10 +6,31 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 ---
 
+## Gdzie są zmiany? (dla użytkownika)
+
+| | |
+|---|---|
+| **Ścieżka projektu na dysku** | `C:\Users\arcix\Projects\biblia-ai` |
+| **Ostatni commit (HEAD)** | `e6991c8` — *docs: worklog DONE hash 8bf9c32* (2026-05-27) |
+| **Push do GitHub** | **Nie** — gałąź `master` jest **12 commitów** przed `origin/master`. Aby opublikować: `git push origin master` |
+| **Cursor — jak zobaczyć** | **File → Open Folder…** → wybierz `C:\Users\arcix\Projects\biblia-ai` (nie inny katalog). Otwórz `AGENT_WORKLOG.md` — linia 1 powinna zaczynać się od `# Agent Worklog`. |
+| **Telefon / Expo Go** | Na tym PC: `npx expo start`. Jeśli kod był na innym komputerze: `git pull` **po** `git push` z tego PC. W Expo Go: wstrząśnij → **Reload**; ewentualnie wyczyść cache. W aplikacji: **Settings → Advanced → Wyczyść bibliotekę** (nowy seed PL/EN w SQLite). |
+| **Pliki kluczowe do sprawdzenia** | `AGENT_WORKLOG.md` (linia 1), `app/_layout.tsx`, `assets/bible-seed-pl.json` |
+
+**Commity lokalne (jeszcze nie na GitHub):** m.in. `8bf9c32` (rejestr agentów), `3822e60` (Pismo PL+EN), `42867a3` (audio onboarding), `d15dc68` (audyt).
+
+**Poza commitem (tylko working tree):** `app/guided-prayer.tsx`, `GuidedReflectionCards/Sheet`, zmiany w `study.tsx`, `HomeScreen.tsx`, locale JSON — widoczne lokalnie, ale **nie** w `git log` dopóki nie zrobisz commit.
+
+**Uwaga:** folder `C:\Users\arcix\Projects\empty-window` **nie istnieje** — to nie jest ten projekt.
+
+---
+
 ## Rejestr zmian / Change log (chronologicznie, najnowsze góra)
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-27 15:30 | Cursor subagent | Weryfikacja E2E PL+EN — pełny audyt i naprawy | *(ten commit)* | done | StudyScreen i18n, plany demo, locale 534 kl. |
+| 2026-05-27 14:15 | Cursor subagent | Weryfikacja widoczności zmian dla użytkownika | — | done | Sekcja „Gdzie są zmiany?”; 12 commitów niepushowanych |
 | 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | `8bf9c32` | done | Indeks + macierz + JSON |
 | 2026-05-27 13:03 | Cursor subagent | Dwujęzyczne Pismo PL/EN (SQLite v3, seed) | `a89fb9e`, `3822e60` | done | Biblia Gdańska + KJV; `translationStore` |
 | 2026-05-27 12:50 | Audit agent (Cursor subagent) | Audyt PL: luki, błędy, dwa języki | `d15dc68` | done | Mobile seed, AI chat po błędzie API |
@@ -318,7 +339,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 | **P1** | Deep links / typed routes — `study`, `stats`, `reading-plan`, `?verse=` scroll | Agent implementacyjny | częściowo (reader `?verse=` OK) | `app/_layout.tsx`, `app/study.tsx`, `app/stats.tsx`, `app/reading-plan.tsx` |
 | **P1** | Reading plans polish — year-plan card + usunięcie „coming soon” (unstaged Home) | Agent implementacyjny | w working tree | `HomeScreen.tsx`, `yearPlanStore.ts`, `en.json`, `pl.json` |
 | **P1** | README vs rzeczywistość — pełna Biblia (66/1189/31100), brak sekcji: stats, reminders, sync, study | Agent docs | rozbieżność | `README.md`, `assets/bible-seed.json` |
-| **P1** | Study screen — usunąć hardcoded fallbacki `t("study.x") \|\| "..."` | Agent implementacyjny | częściowo | `app/study.tsx`, `en.json`, `pl.json` |
+| **P1** | Study screen — usunąć hardcoded fallbacki `t("study.x") \|\| "..."` | Copilot 2026-05-27 → **Cursor subagent** | **zamknięte** | `app/study.tsx`, `useVerseStudy.ts`, locale |
 | **P2** | Automated tests (Jest / Detox / Maestro) — brak suite | Agent implementacyjny | brak | `package.json`, `src/**` |
 | **P2** | Professional audio Bible (obecnie TTS stub via `expo-speech`) | Product / Agent implementacyjny | backlog | `audioEngine.ts`, `GlobalAudioBar.tsx` |
 | **P2** | Parallel translations (side-by-side; single KJV SQLite) | Product | backlog | `scriptureRepository.ts`, `assets/bible-seed.json` |
@@ -1145,3 +1166,89 @@ npx expo start
 - **Sync:** `syncInFlight` + debounce 2,5 s — brak oczywistej race; `getLastSyncAt` null bez Anonymous Auth / offline — P1, nie crash.
 - **Konkurencja — braki:** profesjonalne audio MP3, pełna Biblia PL, auth opcjonalny (jest anonymous), pełny offline 66 ks. (produkt vs mobile demo), push QA na urządzeniu, testy automatyczne.
 - **Commity:** `fix: audit blockers and typecheck` — `AiChatScreen.tsx`, `assets/bible-seed.json` (jeśli zmieniony względem HEAD), `AGENT_WORKLOG.md`.
+
+---
+
+## 2026-05-27 14:15 (local)
+
+- Agent: Cursor subagent
+- Task: START - Weryfikacja widoczności zmian dla użytkownika
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 14:15 (local)
+
+- Agent: Cursor subagent
+- Task: DONE - Weryfikacja widoczności zmian dla użytkownika
+- **Ścieżka:** `C:\Users\arcix\Projects\biblia-ai` — repo istnieje; `empty-window` nie istnieje.
+- **HEAD:** `e6991c8` (*docs: worklog DONE hash 8bf9c32*); commity `8bf9c32`, `3822e60`, `42867a3` są **lokalnie na dysku**.
+- **GitHub:** **12 commitów nie wypushowanych** — użytkownik na innym PC / w PR na GitHub **nie zobaczy** zmian bez `git push origin master`.
+- **Cursor:** trzeba otworzyć folder `C:\Users\arcix\Projects\biblia-ai`; sekcja **„Gdzie są zmiany?”** dodana na górze tego pliku.
+- **Telefon:** `npx expo start` + reload Expo Go; po seedzie PL/EN — **Settings → Wyczyść bibliotekę**; część plików (guided prayer, reflection sheet) jest **tylko uncommitted** w working tree.
+- Validation: `git status`, `git log -5`, `git branch -v`, `origin/master..HEAD`, odczyt `AGENT_WORKLOG.md` linie 1–80
+- Result: done
+
+## 2026-05-27 13:30 — DONE (Claude Opus 4.7 — audyt + fix UX rozjazdu)
+
+**Diagnoza:** App po 40 agentach – Frankenstein. Onboarding wymuszal 100 slajdow z fake TTS audio (brak realnych plikow audio, slajdy 4-100 = placeholder 'Premium #N'). Home mial 7+ kart przed siatka ksiag (VOTD social, 2 karty reflection, emotion hub, guided prayer CTA, language tip, plany czytania). User mial przejsc 99 razy 'Dalej' tylko zeby otworzyc Pismo.
+
+**Decyzja produktowa:** 100-slajdowy 'Immersive Audio' carousel mial byc opcjonalna biblioteka biblijnych afirmacji – nie blokujacy onboarding. Bez realnych plikow audio i tresci dla slajdow 4-100 nie ma czego shippowac. Odlozone jako future feature. Onboarding zredukowany do 3 uczciwych slajdow o aplikacji (Pismo offline, PL/EN, Asystent AI) z opcja Pomin.
+
+**Zmiany:**
+
+| Plik | Zmiana |
+|------|--------|
+| src/data/audioOnboardingSlides.ts | AUDIO_ONBOARDING_SLIDE_COUNT: 100 -> 3 |
+| src/components/AudioOnboarding.tsx | Pelny rewrite: usuniety fake TTS player (Slider/play/+-15s), placeholder PNG, ImageBackground. Czysty welcome carousel: icon bubble + tytul + body + dots + Dalej/Zaczynamy/Pomin. ~150 linii mniej. |
+| src/hooks/useOnboardingSlideAudio.ts | USUNIETY – orphan dead code (expo-av + expo-speech zaleznosci dla nieuzywanego fake TTS). |
+| src/i18n/locales/en.json + pl.json | audioIntro.slide1/2/3 – nowa kopia: 'Pismo Swiete zawsze przy tobie' / 'Polski i angielski' / 'Asystent AI'. heroLabel: 'Witaj'. Usuniete falszywe 'immersyjne audio'. |
+| src/screens/HomeScreen.tsx | Restrukturyzacja kolejnosci: CTA Czytaj (label dynamiczny 'Kontynuuj czytanie' jesli lastRead) -> Continue card -> Search/Book grid -> ReadingPlan -> VOTD -> Reflection cards -> Guided Prayer CTA -> EmotionHub -> Language tip -> Recent/Bookmarks -> Topics. Ksiagi ~3 sekcje wyzej, three-taps-to-Scripture znowu sensowne. |
+
+**Walidacja:**
+- npm run typecheck: 0 bledow
+- npm run check:locales: 515 kluczy PL+EN parity OK
+
+**Co dalej (nie blokuje shippu, ale czeka):**
+- ~200 KB dead assets: assets/onboarding/slide-004..100.png (placeholder PNG nie uzywane przez 3-slajdowy onboarding); zostaja do reuse w przyszlej bibliotece audio afirmacji.
+- Immersive Audio Library – jesli kiedys ma byc opcjonalna biblioteka biblijnych afirmacji, potrzebuje: realne pliki MP3, oddzielny ekran (np. tab albo card na Home), recznie curated tresc, NIE blokujacy onboarding.
+- Smoke test Expo Go na fizycznym urzadzeniu (poza zakresem tej sesji – brak terminala dev).
+
+---
+
+## 2026-05-27 15:00 (local)
+
+- Agent: Cursor subagent
+- Task: START - Weryfikacja E2E PL+EN — pełny audyt i naprawy
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 15:30 (local)
+
+- Agent: Cursor subagent
+- Task: DONE - Weryfikacja E2E PL+EN — pełny audyt i naprawy
+- **Wynik (checklist PL):**
+  - **PASS** — `npm run typecheck` (0 błędów)
+  - **PASS** — `npm run check:locales` (534 klucze PL+EN)
+  - **PASS** — Seed PL/EN (`bible-seed-en.json`, `bible-seed-pl.json`); `translationStore` + `scriptureRepository` filtrują po `translation`
+  - **PASS** — StudyScreen / `useVerseStudy`: usunięto `t(...) \|\| "fallback"`; etykieta przekładu dynamiczna (`study.sourceReference`)
+  - **PASS** — Plany czytania: Tydzień fundamentów tylko rozdziały z demo seed; plan roczny ukryty/guard gdy brak pełnej Biblii
+  - **PASS** — AI Companion: input nie blokuje się po mock fallback; onboarding audio 3 slajdy + Pomiń
+  - **PASS** — UI i18n: VOTD, share, Home CTA, GuidedReflection, locale parity
+  - **MANUAL QA** — Smoke Expo Go PL+EN (patrz sekcja Test E2E poniżej)
+- **Copilot StudyScreen (2026-05-27):** wpis P1 w PLAN audytu → **superseded / DONE** przez Cursor subagent
+- Validation: typecheck, check:locales, grep fallbacków, review translationStore/seed/plany
+- Result: done
+
+## Test E2E PL / EN
+
+1. **Cold launch (PL):** Uruchom Expo Go → Pomiń onboarding (3 slajdy) → Home pokazuje siatkę ksiąg po polsku.
+2. **Pismo PL:** Settings → język Polski → Tłumaczenie Pisma: Auto/PL → Otwórz Rdz 1 → wersety po polsku (Biblia Gdańska).
+3. **Wyszukiwanie PL:** Home → szukaj „początku” → trafienia w polskim tekście demo.
+4. **Przełącz EN:** Settings → English → Auto/EN → Rdz 1 → wersety KJV po angielsku.
+5. **Study:** Reader → long-press werset → Studium → zakładki Przekłady / Oryginał / Komentarze bez angielskich fallbacków w UI.
+6. **Plan:** Tydzień fundamentów → Czytaj teraz (dni 1–7) → każdy rozdział ma tekst; `/reading-plan` przy demo pokazuje komunikat „Wymagana pełna Biblia”.
+7. **AI:** Companion → wyślij wiadomość (bez/błędny klucz API) → mock odpowiedź + banner retry, input aktywny.
+8. **Powtórz kroki 1–7 po angielsku** (Settings → English) i potwierdź etykiety tabów, Settings, VOTD share.
+
