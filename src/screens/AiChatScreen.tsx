@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { ContextPills } from "@/components/ai/ContextPills";
@@ -22,9 +23,12 @@ import { colors, radii, spacing, typography } from "@/theme";
 import type { ContextPillTemplateId } from "@/types/ui";
 
 export default function AiChatScreen() {
-  const { t } = useTranslation();
+  const { t: tAny } = useTranslation();
+  const t = tAny as any;
+  const { starterMood } = useLocalSearchParams<{ starterMood?: string }>();
   const [input, setInput] = useState("");
   const listRef = useRef<FlatList>(null);
+  const handledStarterRef = useRef<string | null>(null);
   const messages = useAiChatStore((s) => s.messages);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const resetChat = useAiChatStore((s) => s.resetChat);
@@ -54,6 +58,35 @@ export default function AiChatScreen() {
     }
   }, [isThinking]);
 
+  useEffect(() => {
+    const mood = typeof starterMood === "string" ? starterMood : "";
+    const allowedMoods = ["love", "anxiety", "healing", "anger"] as const;
+    type AllowedMood = (typeof allowedMoods)[number];
+
+    const starterPrompts: Record<AllowedMood, string> = {
+      love: t("home.emotionPrompts.love"),
+      anxiety: t("home.emotionPrompts.anxiety"),
+      healing: t("home.emotionPrompts.healing"),
+      anger: t("home.emotionPrompts.anger"),
+    };
+
+    if (
+      !mood ||
+      handledStarterRef.current === mood ||
+      !allowedMoods.includes(mood as AllowedMood)
+    ) {
+      return;
+    }
+
+    handledStarterRef.current = mood;
+    const starterPrompt = starterPrompts[mood as AllowedMood];
+    void sendMessage(starterPrompt).then((sent) => {
+      if (sent) {
+        scrollToEnd();
+      }
+    });
+  }, [sendMessage, starterMood, t]);
+
   const handleRetry = async () => {
     clearError();
     if (lastInput) {
@@ -79,7 +112,7 @@ export default function AiChatScreen() {
     }
   };
 
-  const disabled = !canSend() || isThinking || input.trim().length === 0 || lastError !== null;
+  const disabled = !canSend() || isThinking || input.trim().length === 0;
 
   return (
     <KeyboardAvoidingView
@@ -165,7 +198,7 @@ export default function AiChatScreen() {
             placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
             placeholderTextColor={colors.textMuted}
             style={styles.input}
-            editable={canSend() && !isThinking && !lastError}
+            editable={canSend() && !isThinking}
             multiline
             maxLength={500}
           />

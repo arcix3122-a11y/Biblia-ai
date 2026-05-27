@@ -1,4 +1,4 @@
-﻿# Agent Worklog
+# Agent Worklog
 
 This file is used by all agents/subagents working in this repository.
 Add one short entry per completed task.
@@ -6,6 +6,14 @@ Add one short entry per completed task.
 ## 2026-05-23 — START (Claude Code — viral feed overhaul)
 
 **Cel:** Przeprojektowanie głównego ekranu aplikacji na wzór angażującego feeda (YouVersion). Nowe elementy: premium karta VOTD z social barem (like/share/komentarz), powitanie zależne od pory dnia, dwie karty "Przewodnika duchowego" otwierające streaming AI. Pełna i18n PL+EN pod przestrzenią `viralFeed.*`.
+
+## 2026-05-23 — DONE (Claude Code — viral feed overhaul)
+
+- **VotdFeedCard** (`src/components/dashboard/VotdFeedCard.tsx`) — premium karta VOTD ze złotą obwódką, large verse text, social bar (serce z haptics + AsyncStorage, komentarz → AI, share via `react-native-view-shot` + `expo-sharing`), mini pasek streak/cel dzienny pod kartą
+- **GuidedReflectionSheet** (`src/components/dashboard/GuidedReflectionSheet.tsx`) — Modal pageSheet ze streaming-style typewriter: pełne zapytanie Groq/LLM + animacja znakowa 18 ms/char; fallback offline bez klucza API; retry przy błędzie sieci
+- **GuidedReflectionCards** (`src/components/dashboard/GuidedReflectionCards.tsx`) — dwie karty poziome "Czas na refleksję AI" i "Chwila wyciszenia z Asystentem" otwierające sheet dla obu wariantów
+- **HomeScreen** — powitanie zależne od pory dnia (rano/popołudnie/wieczór) nad brand, zamiana `MomentumDashboard` na `VotdFeedCard` + `GuidedReflectionCards`; dodano styl `greeting`
+- **i18n** `viralFeed.*` — 14 nowych kluczy w `en.json` i `pl.json` (greetingMorning/Afternoon/Evening, guidedSection, reflectionTitle/Sub, silenceTitle/Sub, readTime, generatingReflection, reflectionError, closeSheet, offlineMeditation/Silence); `npm run typecheck` — 0 błędów
 
 ---
 
@@ -911,10 +919,18 @@ npx expo start
 
 ## 2026-05-23 19:16
 - Agent: Antigravity
-- Task: START - Interaktywne kinowe doświadczenie modlitewne AI z dźwiękiem ambientowym w tle (Guided Prayer Flow)
-- Changes: pending
-- Validation: pending
-- Result: in-progress
+- Task: DONE - Interaktywne kinowe doświadczenie modlitewne AI z dźwiękiem ambientowym w tle (Guided Prayer Flow)
+- Changes: src/screens/GuidedPrayerScreen.tsx, app/guided-prayer.tsx, app/_layout.tsx, src/screens/HomeScreen.tsx, src/components/dashboard/VotdFeedCard.tsx, src/screens/AiChatScreen.tsx, src/components/dashboard/GuidedReflectionCards.tsx
+- Validation: `npm run typecheck` — 0 błędów w całej aplikacji!
+- Result: done
+
+### DONE — Doświadczenie modlitewne z przewodnikiem (≤5 punktów)
+
+- **Interaktywna ścieżka modlitewna:** Wdrożono 4-etapową sekwencję (Wyciszenie z wizualizacją oddechu → Uwielbienie oparte na wersecie dnia i generowane przez AI z bezpiecznym fallbackiem → Refleksja z zapisem trosk/modlitw do bazy notatek → Nawyk z konfiguracją i zapisem przypomnień).
+- **Immersyjny dźwięk w tle:** Zaimplementowano silnik audio `expo-av` odtwarzający zapętlony ambientowy soundtrack o optymalnej głośności (0.20), z pełnym czyszczeniem pamięci (unload) przy wyjściu z ekranu modlitwy.
+- **Kinowa animacja i haptyka:** Dodano sprężyste przejścia slajdów (fade + slide-up), unikalny pionowy wskaźnik postępu (timeline capsule) w prawym dolnym rogu oraz haptykę (delikatny tick przy slajdach, sukces przy Amen).
+- **Punkt wejścia na Home:** Zaprojektowano luksusową, złotą kartę CTA na HomeScreen ze świecącą ramką i efektem naciśnięcia, przekierowującą użytkownika do modalnej ścieżki modlitewnej.
+- **Kompatybilność i typowanie:** Zsynchronizowano lokalizacje PL/EN (guidedPrayer.*), usunięto wszystkie ostrzeżenia typowania w nowym ekranie i naprawiono stare błędy i18next w VotdFeedCard, AiChatScreen i GuidedReflectionCards. Kompilacja `npm run typecheck` kończy się z 0 błędami.
 
 ## 2026-05-23 20:30 (local)
 - Agent: Cursor subagent
@@ -933,3 +949,40 @@ npx expo start
 - **i18n:** namespace `audioIntro.*` PL/EN; system 100 slajdów — slajdy 4–100 używają `audioIntro.premium.*` z interpolacją `{{number}}`.
 - Validation: `npm run check:locales` OK; nowe pliki bez błędów TS (repo ma istniejące błędy poza zakresem).
 - Result: done
+
+---
+
+## 2026-05-27 — START (audyt PL: luki, błędy, dwa języki)
+
+- **Agent:** Cursor subagent (audyt Phase 1+2)
+- **Cel:** Głęboki audyt worklog + repo; `npm run typecheck` + `check:locales`; analiza PL UI vs EN KJV; naprawa blockerów (seed mobile, AI chat po błędzie API).
+- **Walidacja:** typecheck, check:locales, rozmiar `bible-seed.json`, smoke logiczny (grep).
+- **Result:** in-progress
+
+### PLAN — audyt 2026-05-27
+
+| Brak / Błąd | Priorytet | Kto naprawia | Status |
+|-------------|-----------|--------------|--------|
+| Pełna Biblia 66 ks. / ~7 MB w working tree (wolny seed, mylący „Numbers 20”) | P0 | Cursor audyt | **naprawione** — `create-mobile-seed.mjs` → 4 ks. / 94 wersety (~21 KB) |
+| Companion: `lastError` blokuje input po fallbacku mock | P0 | Cursor audyt | **naprawione** — `AiChatScreen.tsx` (input nie zależy od `connectionWarning`) |
+| Onboarding 100 slajdów przed zakładkami (first-run overload) | P0 | Product / UX-C | **otwarte** — `AudioOnboarding` w `_layout.tsx` |
+| Plan „Biblia w rok” (365 dni) przy seedzie 4 fragmentów | P1 | Agent implementacyjny | **otwarte** — prowadzi do pustych rozdziałów |
+| Cloud sync: Anonymous Auth wyłączony w Dashboard | P1 | User Supabase | **otwarte** — ręcznie Enable |
+| README vs seed (sample 4 vs full 66) | P1 | Agent docs | **otwarte** — README nieaktualny |
+| Audio Bible: TTS stub, brak MP3 | P2 | Product | backlog |
+| Polskie tłumaczenie Pisma (nie tylko KJV EN) | P2 | Product | backlog |
+| Hardcoded fallbacki `study.* \|\| "..."` | P1 | Agent i18n | **otwarte** |
+| Niezcommitowane: viral feed, guided prayer, VotdFeedCard | P1 | Developer | **otwarte** — untracked w git |
+
+## 2026-05-27 — DONE (audyt PL: luki, błędy, dwa języki)
+
+- **Typecheck / locale:** `npm run typecheck` — **0 błędów**; `npm run check:locales` — **500 kluczy PL+EN OK** (brak błędów paritetu).
+- **Worklog vs repo:** Dużo DONE (i18n, mobile seed `43c02ba`, UX simplify, Groq companion, cloud sync, 4 feature parity), ale **P0×8 „Przebudowa UX”** nadal **oczekuje agentów**; po `42867a3` dodano **100-slajdowy audio onboarding** — nowy P0 UX (przeciwdziała „≤3 tapy do Pisma”).
+- **Dwa języki — z założenia:** UI PL/EN przez i18n (`AGENTS.md`); **tekst wersetów KJV po angielsku** w SQLite — to nie bug tłumaczenia, tylko brak drugiego seeda PL.
+- **Dwa języki — bugi / dług:** (1) angielskie nazwy tam, gdzie nie użyto `getBookDisplayName` / `formatBookReference` (np. `readingPlan.ts` buduje listę z `book.name`); (2) historyczne mojibake — naprawione `4f56020`, do QA; (3) hardcoded EN w `app/study.tsx`; (4) użytkownik widzi PL + EN werset = oczekiwane bez bannera KJV.
+- **Antigravity:** 9+ DONE (Workspace, Study, Stats, EcosystemModal, Guided Prayer) — wartość za tabem; **EcosystemModal** już nie auto na Home (grep), ale **AudioOnboarding 100 slajdów** zastąpił „first-run light”.
+- **Seed:** Working tree miał **66 ks. / 31100 wersetów (~6,87 MB)** — przywrócono **mobile seed** (Genesis 1, Ps 23, J 1, Rz 8:26–31); reinstall / wyczyść `@biblia-ai/db-seeded`.
+- **Logika AI:** Po błędzie Groq hook zwraca mock, ale UI **blokował kolejne wiadomości** — poprawione; quota 20 tylko przy udanym live API — OK.
+- **Sync:** `syncInFlight` + debounce 2,5 s — brak oczywistej race; `getLastSyncAt` null bez Anonymous Auth / offline — P1, nie crash.
+- **Konkurencja — braki:** profesjonalne audio MP3, pełna Biblia PL, auth opcjonalny (jest anonymous), pełny offline 66 ks. (produkt vs mobile demo), push QA na urządzeniu, testy automatyczne.
+- **Commity:** `fix: audit blockers and typecheck` — `AiChatScreen.tsx`, `assets/bible-seed.json` (jeśli zmieniony względem HEAD), `AGENT_WORKLOG.md`.
