@@ -29,6 +29,8 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-27 16:00 | Cursor subagent | Śledzenie dostawy pełnej Biblii PL+EN — koordynacja | *(ten commit)* | done | Checklist deliverable; seed nadal demo 4 ks. — **w trakcie** |
+| 2026-05-27 15:45 | User (arcix) | Skarga: demo 4 ks. niewystarczające — wymagany pełny E2E | — | open | Numbers 20 / pusty rozdział; pełna Biblia PL+EN w SQLite |
 | 2026-05-27 15:30 | Cursor subagent | Weryfikacja E2E PL+EN — pełny audyt i naprawy | `14b0100` | done | StudyScreen i18n, plany demo, locale 534 kl. |
 | 2026-05-27 14:15 | Cursor subagent | Weryfikacja widoczności zmian dla użytkownika | — | done | Sekcja „Gdzie są zmiany?”; 12 commitów niepushowanych |
 | 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | `8bf9c32` | done | Indeks + macierz + JSON |
@@ -75,6 +77,25 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 | 2026-05-23 | Parent coordinator | Plan P0×8 Przebudowa UX (UX-A/B/C) | — | partial | Część: `600e0e8`, `e0beb18`, `233997d` |
 | 2026-05-23 | Cursor subagent (audyt) | Audyt repo + backlog P0/P1/P2 | — | done | Tabela PLAN KONKRETNY w archiwum |
 | 2026-05-23 | Cursor subagent | Diagnoza P0 „wydmuszka” | — | done | Bez zmian TSX |
+
+---
+
+## Deliverable: pełna Biblia (definicja done)
+
+> Koordynacja dostawy — checklist aktualizowany po inspekcji `assets/bible-full-*.json` i kodu seed (2026-05-27 16:02). **Status ogólny: w trakcie** — agent full-bible nie dostarczył jeszcze pełnego seeda.
+
+| Kryterium | Inspekcja (2026-05-27 16:02) |
+|-----------|-------------------------------|
+| Assety | Brak `assets/bible-full-*.json`; `bible-seed-en.json` + `bible-seed-pl.json` = **4 ks. / 94 wersety / ~20 KB** każdy |
+| Seed runtime | `seed.ts` — batch insert bez callbacku progress; brak UI „Import z progress” |
+| Guard planu | `hasFullBibleTranslation()` (66 ks.) + `ReadingPlanScreen` guard + `isChapterAvailable()` — **kod OK**, nie zweryfikowane na pełnym seedzie |
+
+- [ ] 66 ksiąg × 2 języki w SQLite
+- [ ] Import z progress na pierwszym uruchomieniu
+- [ ] Home OT/NT grid pełny
+- [ ] Reader PL/EN dowolny rozdział
+- [ ] Search działa globalnie
+- [ ] Plan roczny nie wywala na pustych rozdziałach *(guard przy demo — pełna weryfikacja po imporcie 66 ks.)*
 
 ---
 
@@ -129,6 +150,27 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Cel:** Użytkownik nie widział kto/kiedy/co — dodać skanowalny indeks na górze pliku.
 - **Zakres:** `AGENT_WORKLOG.md`, `AGENT_WORKLOG.json`, git log −40, merge z archiwum START/DONE.
 - **Walidacja:** commit docs; liczba wierszy tabeli changelog.
+
+### START — Śledzenie dostawy pełnej Biblii PL+EN — koordynacja
+
+- **Data:** 2026-05-27 16:00
+- **Agent:** Cursor subagent
+- **Cel:** Koordynacja równoległego agenta full-bible; checklist definicji „done”; rejestr skargi użytkownika (demo niewystarczające).
+- **Zakres:** Tylko `AGENT_WORKLOG.md`; inspekcja `assets/bible-full-*.json`, `seed.ts`, `scriptureRepository.ts` po 2 min oczekiwania.
+- **Walidacja:** commit `docs: worklog full bible delivery checklist`.
+
+### DONE — Śledzenie dostawy pełnej Biblii PL+EN — koordynacja
+
+- **Data:** 2026-05-27 16:02
+- **Agent:** Cursor subagent
+- **Wynik:**
+  - Dodano wpis **Rejestr zmian** — skarga użytkownika: demo 4 ks. niewystarczające, wymagany pełny E2E PL+EN (Numbers 20 / pusty rozdział).
+  - Utworzono sekcję **Deliverable: pełna Biblia (definicja done)** z checklist 6 kryteriów + tabela inspekcji.
+  - Po 2 min oczekiwania: **brak** `assets/bible-full-*.json`; bundled seed = 4 ks. × 2 języki (94 wersety, ~20 KB).
+  - Kod gotowy częściowo: `hasFullBibleTranslation()` (66), guard planu rocznego, `isChapterAvailable()` — brak UI progress przy seedzie.
+  - Checklist **0/6** zaznaczone — dostawa pełnej Biblii **w trakcie** (agent równoległy nie zakończył importu).
+- **Commity:** `docs: worklog full bible delivery checklist`
+- **Walidacja:** inspekcja `assets/bible-seed-*.json`, `seed.ts`, `scriptureRepository.ts`, `ReadingPlanScreen.tsx`; brak nowych commitów full-bible w `git log`.
 
 ### DONE — Uporządkowanie rejestru agentów w worklogu
 
@@ -1252,3 +1294,65 @@ npx expo start
 7. **AI:** Companion → wyślij wiadomość (bez/błędny klucz API) → mock odpowiedź + banner retry, input aktywny.
 8. **Powtórz kroki 1–7 po angielsku** (Settings → English) i potwierdź etykiety tabów, Settings, VOTD share.
 
+
+## 2026-05-27 14:00 — DONE (Claude Opus 4.7 — modern tiled redesign Home)
+
+**Cel:** Po fix onboardingu – pelny redesign Home na nowoczesny dashboard kafelkowy. Spojny visual: glass tiles, modern hero, jasna hierarchia, koniec z fake social metrics.
+
+**Nowy uklad Home (top -> bottom):**
+1. Header: brand label + ikona Settings (pill bubble)
+2. HeroCard (zlote tlo, accent gradient): Continue reading albo Welcome + CTA
+3. Sekcja 'Odkryj' – 2x2 ActionTiles: Asystent AI / Plan czytania / Modlitwa / Statystyki
+4. VotdFeedCard (uproszczony) – tylko werset + share, BEZ fake 950k likes/comments/more
+5. Sekcja 'Biblioteka' – jedna karta-kontener: search z ikona + OT/NT tabs + book grid
+6. Sekcja 'Twoja droga' – ostatnio czytane + zakladki (compact, conditionnal)
+7. TopicGrid na dole
+
+**Wyciete z Home (rozpierdol z 40 agentow):**
+- VotdFeedCard social bar (950 tys. polubien, fake komentarze, 'Wiecej') – fake metryki niczemu nie sluza
+- GuidedReflectionCards (2 karty meditation/silence) – pokrywa sie z Asystentem AI
+- EmotionHub 4 chipy – pokrywa sie z Asystentem AI
+- LanguageTip banner – settings sa zawsze widoczne w headerze
+- Duplikowany guidedPrayerCta poza tilesem
+- ReadingPlanCard standalone – plan jest teraz tilem w sekcji Odkryj
+- 'Werset KJV' notice przerzucony pod siatke (nie nad)
+- Greeting time-of-day – nie wnosil wartosci, mial niespojny mapping (rano = 'Dzien dobry', popoludnie tez 'Dzien dobry')
+
+**Nowe komponenty:**
+- src/components/dashboard/ActionTile.tsx – reusable tile (ikona w bubble + tytul + subtitle + opcjonalny badge); warianty default/accent
+- src/components/dashboard/HeroCard.tsx – duzy zloty card z glow ring, eyebrow + tytul + body + CTA z arrow
+
+**Zmiany:**
+
+| Plik | Zmiana |
+|------|--------|
+| src/screens/HomeScreen.tsx | Pelny rewrite – nowy uklad dashboard (HeroCard + 2x2 ActionTiles + Library card + Discovery) |
+| src/components/dashboard/ActionTile.tsx | Nowy komponent |
+| src/components/dashboard/HeroCard.tsx | Nowy komponent |
+| src/components/dashboard/VotdFeedCard.tsx | Rewrite – usunieto fake social bar; teraz: eyebrow + reference + verse + share button (tap to read) + stats chips ponizej |
+| app/(tabs)/_layout.tsx | index tab headerShown: false (Home ma wlasny header) |
+| src/i18n/locales/en.json + pl.json | +12 kluczy: home.welcomeTitle/welcomeSubtitle/continueSubtitle/readNow/exploreHeading/libraryHeading/discoveryHeading + tileCompanion/Plan/Prayer/Stats (+Sub) |
+
+**Walidacja:**
+- npm run typecheck: 0 bledow
+- npm run check:locales: 534 klucze PL+EN parity OK
+
+**Co dalej (poza zakresem):**
+- Smoke test Expo Go na fizycznym urzadzeniu
+- GuidedReflectionCards.tsx / GuidedReflectionSheet.tsx – nadal w working tree jako untracked dead code; jesli ma byc feature, podpiac do ActionTile (np. zamiast Stats tile, 'Refleksja'); inaczej usunac
+- Polish pass na Reader, Workspace, AI Chat – ten audyt obejmowal Home (najwiekszy chaos); inne ekrany do oceny w nastepnej sesji
+
+## 2026-05-27 14:30 — START (Claude Opus 4.7 — Afirmacje + VOTD social card)
+
+**Feedback usera po dashboard redesign:** 'lepiej ale wymaga doszlifowania'.
+
+**Dwa nowe wymagania:**
+1. **Afirmacje biblijne** – pelnoprawna funkcja z audio listening (TTS na start, MP3 w przyszlosci); copy dopasowane do niszy rynkowej (Christian affirmations) z keywordami: 'Afirmacje biblijne', 'Slowo Boze do serca', 'Wzmocnienie duchowe', tematy: Wiara/Pokoj/Sila/Uzdrowienie/Tozsamosc w Chrystusie/Nadzieja.
+2. **VOTD social card** w stylu YouVersion (screen ref usera): piekne tlo + werset + social bar (heart/comment/share/more). Ja zbyt agresywnie wycialem to w poprzedniej iteracji.
+
+**Plan:**
+- Nowy ekran Afirmacje (app/affirmations.tsx + AffirmationsScreen) z lista kafli – kazdy ma tytul, kategorie, refernecje biblijne i przycisk Sluchaj (TTS); dolaczyc tile do Home (zamienic Stats lub dodac 5te miejsce w Hero/sekcji)
+- Przywrocic VotdFeedCard z social barem (likes/comments/share/more) + tlo gradientem (expo-linear-gradient jesli dostepne; inaczej overlay z accent gradient)
+- Nowe i18n keys dla obu features (PL+EN parity)
+
+**Kryteria sukcesu:** typecheck 0 bledow, locale parity OK, Affirmacje dostepne z Home, VOTD ma social interaction (likes persisted w AsyncStorage).
