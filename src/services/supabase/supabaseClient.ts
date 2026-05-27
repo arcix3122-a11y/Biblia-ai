@@ -3,6 +3,17 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let client: SupabaseClient | null | undefined;
 let cachedUserId: string | null = null;
+let anonymousAuthBlocked = false;
+
+function isAnonymousDisabledError(error: unknown): boolean {
+  const message =
+    error instanceof Error ? error.message : typeof error === "string" ? error : String(error);
+  return (
+    message.includes("Anonymous sign-ins are disabled") ||
+    message.includes("anonymous_provider_disabled") ||
+    message.includes("Anonymous sign-ins are disabled for this project")
+  );
+}
 
 function isNetworkFailure(error: unknown): boolean {
   const message =
@@ -75,30 +86,47 @@ export async function getSessionUserIdAsync(): Promise<string | null> {
   }
 }
 
-export async function ensureAnonymousSession(): Promise<void> {
+/** True when Supabase Dashboard has Anonymous sign-in disabled. */
+export function isAnonymousAuthBlocked(): boolean {
+  return anonymousAuthBlocked;
+}
+
+export async function ensureAnonymousSession(): Promise<boolean> {
   const supabase = getSupabaseClient();
   if (!supabase) {
-    return;
+    return false;
   }
 
   try {
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) {
       updateCachedUserId(sessionData.session.user.id);
-      return;
+      anonymousAuthBlocked = false;
+      return true;
     }
 
     const { data, error } = await supabase.auth.signInAnonymously();
     if (error) {
+      if (isAnonymousDisabledError(error)) {
+        anonymousAuthBlocked = true;
+        return false;
+      }
       if (!isNetworkFailure(error)) {
         throw error;
       }
-      return;
+      return false;
     }
+    anonymousAuthBlocked = false;
     updateCachedUserId(data.user?.id ?? data.session?.user.id ?? null);
+    return Boolean(cachedUserId);
   } catch (error) {
+    if (isAnonymousDisabledError(error)) {
+      anonymousAuthBlocked = true;
+      return false;
+    }
     if (!isNetworkFailure(error)) {
       throw error;
     }
+    return false;
   }
 }

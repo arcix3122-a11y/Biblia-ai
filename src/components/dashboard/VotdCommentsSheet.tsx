@@ -19,12 +19,19 @@ import {
   authorTag,
   deleteComment,
   isCommentsEnabled,
+  isCommentsPostingAvailable,
+  isPendingCommentId,
   listComments,
   postComment,
   type VotdComment,
 } from "@/services/social/votdSocialRepository";
 import { removePendingComment } from "@/services/social/commentQueue";
-import { getSessionUserId } from "@/services/supabase/supabaseClient";
+import {
+  ensureAnonymousSession,
+  getSessionUserId,
+  getSessionUserIdAsync,
+  isAnonymousAuthBlocked,
+} from "@/services/supabase/supabaseClient";
 import { useLocaleStore } from "@/store/localeStore";
 import { getDeviceLocale } from "@/i18n";
 import { formatNoteDate } from "@/utils/formatDate";
@@ -57,19 +64,24 @@ export function VotdCommentsSheet({
   const [draft, setDraft] = useState("");
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [queuedNotice, setQueuedNotice] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const myUserId = getSessionUserId();
   const commentsEnabled = isCommentsEnabled();
+  const postingAvailable = isCommentsPostingAvailable();
 
   const refresh = useCallback(async () => {
     if (!verseRef || !commentsEnabled) return;
     setLoading(true);
     setError(null);
     try {
+      await ensureAnonymousSession();
+      setAuthReady(true);
       const list = await listComments(verseRef);
       setComments(list);
       onCountChange?.(list.length);
-    } catch (err) {
+    } catch {
       setError(t("votdComments.loadError"));
     } finally {
       setLoading(false);
@@ -78,6 +90,8 @@ export function VotdCommentsSheet({
 
   useEffect(() => {
     if (visible && verseRef) {
+      setQueuedNotice(false);
+      setAuthReady(false);
       void refresh();
     }
   }, [refresh, verseRef, visible]);
@@ -86,15 +100,35 @@ export function VotdCommentsSheet({
     if (!verseRef || !commentsEnabled) return;
     const trimmed = draft.trim();
     if (trimmed.length === 0 || posting) return;
+
+    const userId = (await getSessionUserIdAsync()) ?? "offline";
+    const optimisticId = `local-opt-${Date.now()}`;
+    const optimistic: VotdComment = {
+      id: optimisticId,
+      user_id: userId,
+      verse_ref: verseRef,
+      body: trimmed,
+      created_at: new Date().toISOString(),
+    };
+
     setPosting(true);
     setError(null);
+    setQueuedNotice(false);
+    setComments((prev) => [optimistic, ...prev]);
+    onCountChange?.(comments.length + 1);
+    setDraft("");
+
     try {
       const created = await postComment(verseRef, trimmed);
-      setComments((prev) => [created, ...prev]);
-      onCountChange?.(comments.length + 1);
-      setDraft("");
+      setComments((prev) => prev.map((c) => (c.id === optimisticId ? created : c)));
+      if (isPendingCommentId(created.id)) {
+        setQueuedNotice(true);
+      }
       void hapticSuccess();
-    } catch (err) {
+    } catch {
+      setComments((prev) => prev.filter((c) => c.id !== optimisticId));
+      onCountChange?.(Math.max(0, comments.length));
+      setDraft(trimmed);
       setError(t("votdComments.postError"));
     } finally {
       setPosting(false);
@@ -115,7 +149,7 @@ export function VotdCommentsSheet({
               void hapticLight();
               setComments((prev) => prev.filter((c) => c.id !== commentId));
               onCountChange?.(Math.max(0, comments.length - 1));
-              if (commentId.startsWith("local-")) {
+              if (isPendingCommentId(commentId)) {
                 void removePendingComment(commentId);
               } else {
                 void deleteComment(commentId).catch(() => {
@@ -132,7 +166,11 @@ export function VotdCommentsSheet({
 
   const renderComment = useCallback(
     ({ item }: { item: VotdComment }) => {
-      const mine = myUserId === item.user_id || item.id.startsWith("local-");
+      const mine =
+        myUserId === item.user_id ||
+        item.user_id === "offline" ||
+        isPendingCommentId(item.id);
+      const pending = isPendingCommentId(item.id);
       return (
         <View style={[styles.commentRow, mine && styles.commentRowMine]}>
           <View style={styles.commentHeader}>
@@ -145,7 +183,11 @@ export function VotdCommentsSheet({
                   ? t("votdComments.you")
                   : `${t("votdComments.reader")} #${authorTag(item.user_id)}`}
               </Text>
-              <Text style={styles.commentTime}>{formatNoteDate(item.created_at, locale)}</Text>
+              <Text style={styles.commentTime}>
+                {pending
+                  ? t("votdComments.pendingLabel")
+                  : formatNoteDate(item.created_at, locale)}
+              </Text>
             </View>
             {mine ? (
               <Pressable
@@ -165,6 +207,8 @@ export function VotdCommentsSheet({
   );
 
   const remaining = useMemo(() => COMMENT_MAX - draft.length, [draft.length]);
+  const showAnonWarning =
+    commentsEnabled && authReady && (isAnonymousAuthBlocked() || !postingAvailable);
 
   return (
     <Modal
@@ -199,14 +243,35 @@ export function VotdCommentsSheet({
             {!commentsEnabled ? (
               <View style={styles.offlineBlock}>
                 <Ionicons name="chatbubbles-outline" size={24} color={colors.textMuted} />
-                <Text style={styles.offlineText}>{t("votdComments.comingSoon")}</Text>
+                <Text style={styles.offlineText}>{t("votdComments.offlineHint")}</Text>
               </View>
             ) : (
               <>
+                {showAnonWarning ? (
+                  <View style={styles.warningBanner}>
+                    <Ionicons name="warning-outline" size={16} color={colors.accent} />
+                    <Text style={styles.warningText}>{t("votdComments.anonAuthDisabled")}</Text>
+                  </View>
+                ) : null}
+
                 <View style={styles.listContainer}>
                   {loading && comments.length === 0 ? (
                     <View style={styles.loadingWrap}>
                       <ActivityIndicator color={colors.accent} />
+                      <Text style={styles.loadingLabel}>{t("common.loading")}</Text>
+                    </View>
+                  ) : error && comments.length === 0 ? (
+                    <View style={styles.errorWrap}>
+                      <Ionicons name="cloud-offline-outline" size={32} color={colors.textMuted} />
+                      <Text style={styles.errorBlockText}>{error}</Text>
+                      <Pressable
+                        onPress={() => void refresh()}
+                        style={styles.retryBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("votdComments.retry")}
+                      >
+                        <Text style={styles.retryLabel}>{t("votdComments.retry")}</Text>
+                      </Pressable>
                     </View>
                   ) : comments.length === 0 ? (
                     <View style={styles.emptyWrap}>
@@ -230,7 +295,21 @@ export function VotdCommentsSheet({
                   )}
                 </View>
 
-                {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                {error && comments.length > 0 ? (
+                  <View style={styles.inlineErrorRow}>
+                    <Text style={styles.errorText}>{error}</Text>
+                    <Pressable onPress={() => void refresh()} hitSlop={8}>
+                      <Text style={styles.retryInline}>{t("votdComments.retry")}</Text>
+                    </Pressable>
+                  </View>
+                ) : null}
+
+                {queuedNotice ? (
+                  <View style={styles.queuedBanner}>
+                    <Ionicons name="time-outline" size={14} color={colors.accent} />
+                    <Text style={styles.queuedText}>{t("votdComments.queuedMessage")}</Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.composer}>
                   <TextInput
@@ -331,6 +410,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.cardHover,
   },
+  warningBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.xs,
+    backgroundColor: colors.accentGlow,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  warningText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    flex: 1,
+    lineHeight: 18,
+  },
   listContainer: {
     minHeight: 220,
     maxHeight: 380,
@@ -338,6 +434,36 @@ const styles = StyleSheet.create({
   loadingWrap: {
     paddingVertical: spacing.xl,
     alignItems: "center",
+    gap: spacing.sm,
+  },
+  loadingLabel: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  errorWrap: {
+    paddingVertical: spacing.xl,
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  errorBlockText: {
+    ...typography.body,
+    color: colors.textMuted,
+    textAlign: "center",
+  },
+  retryBtn: {
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    backgroundColor: colors.accentGlow,
+  },
+  retryLabel: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "700",
   },
   emptyWrap: {
     paddingVertical: spacing.xl,
@@ -412,11 +538,35 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 22,
   },
+  inlineErrorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.xs,
+    gap: spacing.sm,
+  },
   errorText: {
     ...typography.caption,
     color: colors.danger,
+    flex: 1,
+  },
+  retryInline: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "700",
+  },
+  queuedBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
     paddingHorizontal: spacing.sm,
     paddingTop: spacing.xs,
+  },
+  queuedText: {
+    ...typography.caption,
+    color: colors.accent,
+    flex: 1,
   },
   composer: {
     paddingTop: spacing.sm,

@@ -2,6 +2,7 @@ import {
   ensureAnonymousSession,
   getSessionUserIdAsync,
   getSupabaseClient,
+  isAnonymousAuthBlocked,
 } from "@/services/supabase/supabaseClient";
 import {
   enqueueComment,
@@ -58,12 +59,13 @@ export function isSocialAvailable(): boolean {
   return getSupabaseClient() !== null;
 }
 
-/** Comments require Supabase + optional EXPO_PUBLIC_COMMENTS_ENABLED flag (default on). */
+/** Comments require Supabase client (enabled by default when env is set). */
 export function isCommentsEnabled(): boolean {
-  if (process.env.EXPO_PUBLIC_COMMENTS_ENABLED === "false") {
-    return false;
-  }
   return isSocialAvailable();
+}
+
+export function isCommentsPostingAvailable(): boolean {
+  return isSocialAvailable() && !isAnonymousAuthBlocked();
 }
 
 export async function getLikeState(verseRef: string): Promise<VotdLikeState | null> {
@@ -325,6 +327,10 @@ export async function deleteComment(commentId: string): Promise<void> {
     }
     throw error;
   }
+}
+
+export function isPendingCommentId(commentId: string): boolean {
+  return commentId.startsWith("local-");
 }
 
 /** Short display tag from a UUID (last 6 chars uppercased) — used as anonymous author handle. */

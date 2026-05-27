@@ -1615,3 +1615,76 @@ npx expo start
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+## 2026-05-27 14:22 (local)
+- Agent: Codex
+- Task: DONE - przebudowa asystenta AI end-to-end, zachowanie religijne, guardraile, UI, haptics i animacje
+- Changes: AGENT_WORKLOG.md, src/components/ChatBubble.tsx, src/components/ai/AnimatedSacredBackdrop.tsx, src/components/ai/ContextPills.tsx, src/hooks/useSpiritualAssistant.ts, src/i18n/locales/en.json, src/i18n/locales/pl.json, src/screens/AiChatScreen.tsx, src/screens/SettingsScreen.tsx, src/services/ai/spiritualAssistantProfile.ts, src/store/aiChatStore.ts, src/types/chat.ts, src/types/ui.ts, src/utils/haptics.ts
+- Validation: npm run typecheck (pass), npm run check:locales (pass), próba uruchomienia npm run web (zablokowana: brak react-native-web w zależnościach)
+- Result: done
+## 2026-05-27 14:25 (local)
+- Agent: Codex
+- Task: START - naprawa błędu Expo Go z expo-image / bundlingiem Metro
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+## 2026-05-27 14:29 (local)
+- Agent: Codex
+- Task: DONE - naprawa błędu Expo Go z expo-image / bundlingiem Metro
+- Changes: AGENT_WORKLOG.md, src/components/PhotoBackground.tsx
+- Validation: npm run typecheck (pass), rg expo-image w src/app (brak wyników)
+- Result: done
+## 2026-05-27 14:35 (local)
+- Agent: Codex
+- Task: START - naprawa uszkodzonych polskich tłumaczeń w sekcji AI
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+## 2026-05-27 14:37 (local)
+- Agent: Codex
+- Task: DONE - naprawa uszkodzonych polskich tłumaczeń w sekcji AI
+- Changes: AGENT_WORKLOG.md, src/i18n/locales/pl.json
+- Validation: npm run typecheck (pass), npm run check:locales (pass), weryfikacja codepointów UTF-8 dla nowych stringów AI (pass)
+- Result: done
+## 2026-05-27 14:41 (local)
+- Agent: Codex
+- Task: START - dopracowanie naturalności polskiego copy na ekranie AI Companion
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+## 2026-05-27 14:43 (local)
+- Agent: Codex
+- Task: DONE - dopracowanie naturalności polskiego copy na ekranie AI Companion
+- Changes: AGENT_WORKLOG.md, src/i18n/locales/pl.json
+- Validation: npm run typecheck (pass), npm run check:locales (pass), ręczna weryfikacja kluczowych stringów PL w sekcji ai (pass)
+- Result: done
+## 2026-05-27 14:49 (local)
+- Agent: Codex
+- Task: START - rozbudowa ekranu Notatki / Workspace o konkretny pusty stan, szybkie akcje i lepszy UX
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 (local)
+- Agent: Composer
+- Task: START - Udostępnianie + deep link + komentarze
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 (local)
+- Agent: Composer
+- Task: START - Komentarze — Supabase anon E2E
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 (local)
+- Agent: Composer
+- Task: DONE - Udostępnianie + deep link + komentarze
+- Changes: `850a6fe` feat(share), `48aab11` feat(comments); deepLinks.ts, shareVerse.ts, VotdFeedCard, ReaderScreen, commentQueue, votdSocialRepository, VotdCommentsSheet, app.json intentFilters, .env.example
+- Validation: npm run typecheck (1 pre-existing WorkspaceScreen error, brak regresji w zmienionych plikach)
+- Result: done
+- Udostępnianie: reference + excerpt + `biblia-ai://reader/{book}/{chapter}?verse={n}` + opcjonalny `EXPO_PUBLIC_SHARE_URL`; fallback tekstowy offline
+- Deep link: scheme `biblia-ai` w app.json; Reader już scrolluje do `?verse=`; Android intentFilters
+- Komentarze: sesja anon przed insert, kolejka AsyncStorage + flush przy starcie; `EXPO_PUBLIC_COMMENTS_ENABLED=false` → „Komentarze wkrótce” bez błędu wysyłki
+- Migracja Supabase: `supabase/migrations/003_votd_social.sql` (votd_comments) — wymaga `supabase db push` + Anonymous Auth
