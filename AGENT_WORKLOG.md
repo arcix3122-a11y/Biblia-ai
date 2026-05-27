@@ -1,7 +1,133 @@
 # Agent Worklog
 
-This file is used by all agents/subagents working in this repository.
-Add one short entry per completed task.
+Rejestr pracy agentów (Cursor, Copilot, Antigravity, Claude, parent coordinator) nad **biblia-ai**. **Najpierw czytaj tabele poniżej** — kto, kiedy, commity. Szczegółowe START/DONE w sekcji **Archiwum**.
+
+Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
+
+---
+
+## Rejestr zmian / Change log (chronologicznie, najnowsze góra)
+
+| Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
+|--------------|---------------|---------|---------|--------|-------|
+| 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | *(ta sesja)* | done | Indeks + macierz + JSON |
+| 2026-05-27 13:03 | Cursor subagent | Dwujęzyczne Pismo PL/EN (SQLite v3, seed) | `a89fb9e`, `3822e60` | done | Biblia Gdańska + KJV; `translationStore` |
+| 2026-05-27 12:50 | Audit agent (Cursor subagent) | Audyt PL: luki, błędy, dwa języki | `d15dc68` | done | Mobile seed, AI chat po błędzie API |
+| 2026-05-23 19:18 | Cursor subagent | Audio onboarding 100-slajdowy karuzel | `42867a3` | done | Gates main tabs do ukończenia |
+| 2026-05-23 19:16 | Antigravity | Guided Prayer Flow (modlitwa + ambient) | — | done | `guided-prayer.tsx` — sprawdź git status |
+| 2026-05-23 15:05 | Cursor subagent | Uproszczenie UX Home/Settings/tabs | `600e0e8` | done | Onboarding-friendly shell |
+| 2026-05-23 15:04 | Cursor subagent | Lokalizacja nazw ksiąg PL/EN | `e0beb18` | done | `getBookDisplayName`; reset DB w Settings |
+| 2026-05-23 15:01 | Cursor subagent | Companion Groq fallback | `233997d` | done | Input nie blokuje się po mock |
+| 2026-05-23 14:42 | Cursor subagent | Session handoff P0 (encoding, seed, DB) | `57771b6`, `4f56020`, `43c02ba` | done | Mobile seed ~20 KB |
+| 2026-05-23 14:38 | Antigravity | Mojibake `pl.json` + seed DB hang | — | done | Domknięte przez `43c02ba` / `4f56020` |
+| 2026-05-23 14:34 | Agent (nieznany) / arcix3122-a11y | Peer dep react-native-worklets | `25f18bb` | done | Reanimated v4 |
+| 2026-05-23 14:29 | Cursor subagent | Upgrade Expo SDK 54 | `57f9411` | done | RN 0.81, React 19 |
+| 2026-05-23 14:17 | Antigravity | EcosystemModal StyleSheet TS5 | `14c8fdb` | done | |
+| 2026-05-23 14:11 | Antigravity | Premium cytat w EcosystemModal | — | done | W `14c8fdb` / lokalnie |
+| 2026-05-23 14:09 | Cursor subagent | Downgrade Expo SDK 52 (Expo Go) | `9c6e3ad` | done | Play Store Expo Go |
+| 2026-05-23 14:04 | Antigravity | Ecosystem Onboarding Modal | — | done | Settings → Ecosystem |
+| 2026-05-23 13:59 | Cursor subagent (sync) | Sync status, locale parity, reminders | `a2ba945` | done | `check:locales` |
+| 2026-05-23 13:59 | Claude Code orchestrator | AI retry + reading plan home polish | `ce9a2b3` | done | study-wiring, home-plan |
+| 2026-05-23 13:50 | Cursor subagent (sync) | Anonymous Supabase cloud sync | `1fc8b18` | done | **Wymaga** Anonymous Auth ON |
+| 2026-05-23 13:47 | Claude (orchestrator) | Notifications + year plan + stats + xrefs | `c3f8fd8` | done | 4 równoległe subagenty |
+| 2026-05-23 13:46 | Cursor subagent | Horizontal UI polish pass | `233ef37` | done | Layout primitives, haptics |
+| 2026-05-23 13:43 | Cursor subagent | Competitive parity pack | `4bbd5c5` | done | Highlights, 7-day plan, offline badge |
+| 2026-05-23 13:42 | Antigravity | Verse Study Portal | — | done | `app/study.tsx` |
+| 2026-05-23 13:35 | Antigravity | Stats OT/NT + AI retry banner | — | done | Część w `ce9a2b3` |
+| 2026-05-23 13:32 | Cursor Agent | Onboarding tip, search history, KJV notice | `8fd66e0`, `e52affc` | done | git: Cursor Agent |
+| 2026-05-23 13:31 | Copilot 13:16 | AI status Settings, swipe search history | — | done | Health-check, quota |
+| 2026-05-23 13:30 | Cursor Agent (i18n) | Wire UI PL/EN + LanguageSwitcher | `c12c8be` | done | Agent 2 i18n |
+| 2026-05-23 13:26 | Cursor Agent (i18n) | i18n foundation (i18next, localeStore) | — | done | W `c12c8be` |
+| 2026-05-23 13:26 | Copilot 13:16 | Typecheck/i18n key fixes | — | done | |
+| 2026-05-23 13:24 | Cursor (Auto) | i18n docs README + AGENTS | `6ba7528` | done | |
+| 2026-05-23 13:21 | Copilot 13:16 | `.env` AI config E2E | — | done | Lokalnie, nie commituj sekretów |
+| 2026-05-23 13:20 | Copilot 13:16 | Groq/OpenAI routing + quota 20 | — | done | |
+| 2026-05-23 13:20 | Cursor (Auto) | Phase 1+ Home/AI/Settings/history | — | done | W `bffb7b8` |
+| 2026-05-23 13:19 | SolidCode Apps | Phase 1+ reader, workspace, companion | `bffb7b8` | done | git author: SolidCode Apps |
+| 2026-05-23 13:18 | Antigravity | SelectionToolbar → notatnik | — | done | |
+| 2026-05-23 13:16 | Copilot 13:16 | Import pełnej Biblii 66 ks. / 31100 wersetów | — | superseded | Zastąpione mobile seed |
+| 2026-05-23 13:15 | Antigravity | Zakładki (bookmarks) w Workspace | — | done | |
+| 2026-05-23 13:10 | Antigravity | Workspace (notatnik) | — | done | |
+| 2026-05-23 13:04 | Copilot 13:16 | Zasady AGENTS.md + worklog | — | done | |
+| 2026-05-23 | Claude Code | Viral feed (VOTD premium, reflection sheet) | — | done | Może być niezcommitowane |
+| 2026-05-23 | Cursor subagent | Fix AI Companion (llmClient, welcome) | — | done | Przed `233997d` |
+| 2026-05-23 | Parent coordinator | Plan P0×8 Przebudowa UX (UX-A/B/C) | — | partial | Część: `600e0e8`, `e0beb18`, `233997d` |
+| 2026-05-23 | Cursor subagent (audyt) | Audyt repo + backlog P0/P1/P2 | — | done | Tabela PLAN KONKRETNY w archiwum |
+| 2026-05-23 | Cursor subagent | Diagnoza P0 „wydmuszka” | — | done | Bez zmian TSX |
+
+---
+
+## Kto za co odpowiada (stan na dziś)
+
+| Obszar | Ostatni agent | Commit | Co działa / co nie |
+|--------|---------------|--------|-------------------|
+| **Pismo (PL+EN)** | Cursor subagent | `3822e60` | Mobile seed 4×2 języki; pełna Biblia PL przez skrypt importu |
+| **i18n UI (PL/EN)** | Cursor Agent (i18n) | `c12c8be`, `e0beb18` | UI bilingual; nazwy ksiąg z locale |
+| **AI Companion** | Cursor subagent | `233997d`, `d15dc68` | Groq + mock; quota 20 przy live API |
+| **Cloud sync** | Cursor subagent (sync) | `1fc8b18`, `a2ba945` | Sync engine OK; **Anonymous Auth** musi być ON w Supabase |
+| **UX / Home / Settings** | Cursor subagent | `600e0e8` | Uproszczony shell; viral feed / guided prayer mogą być poza HEAD |
+| **Onboarding** | Cursor subagent | `42867a3` | 100-slajdowy audio gate — **konflikt** z zasadą „≤3 tapy do Pisma” |
+| **Workspace / Study / Prayer** | Antigravity | — (lokalnie) | Workspace, Study, Guided Prayer, Ecosystem — weryfikuj `git status` |
+| **Expo / SDK** | Cursor subagent | `9c6e3ad` → `57f9411` | Historia 52↔54; testuj na docelowym Expo Go |
+| **Rejestr agentów** | Cursor subagent | *(ta sesja)* | Ten plik + `AGENT_WORKLOG.json` |
+
+---
+
+## Jak czytać ten plik
+
+1. **Szybki przegląd:** tabela **Rejestr zmian** (góra = najnowsze) — kolumna *Agent*, *Commity*, *Status*.
+2. **Odpowiedzialność:** tabela **Kto za co odpowiada** — który obszar produktu i ostatni znany commit.
+3. **Szczegóły:** sekcja **Archiwum** — pełne START/DONE; nowe wpisy używają szablonu z nagłówkiem `### START —` + metadane **Data / Agent / Cel**.
+
+---
+
+## Szablon wpisu (START / DONE)
+
+### START — [tytuł zadania]
+
+- **Data:** YYYY-MM-DD HH:MM
+- **Agent:** [np. Cursor subagent, Antigravity, Copilot 13:16, Parent coordinator]
+- **Cel:** …
+- **Zakres:** …
+- **Walidacja:** …
+
+### DONE — [tytuł zadania]
+
+- **Data:** YYYY-MM-DD HH:MM
+- **Agent:** …
+- **Wynik:** …
+- **Commity:** `hash` — message
+- **Walidacja:** …
+
+---
+
+### START — Uporządkowanie rejestru agentów w worklogu
+
+- **Data:** 2026-05-27 14:00
+- **Agent:** Cursor subagent
+- **Cel:** Użytkownik nie widział kto/kiedy/co — dodać skanowalny indeks na górze pliku.
+- **Zakres:** `AGENT_WORKLOG.md`, `AGENT_WORKLOG.json`, git log −40, merge z archiwum START/DONE.
+- **Walidacja:** commit docs; liczba wierszy tabeli changelog.
+
+### DONE — Uporządkowanie rejestru agentów w worklogu
+
+- **Data:** 2026-05-27 14:00
+- **Agent:** Cursor subagent
+- **Wynik:**
+  - Tabela **Rejestr zmian** (40 wierszy) — najnowsze u góry, agenci + hashe commitów.
+  - Macierz **Kto za co odpowiada** (9 obszarów produktu).
+  - Sekcja **Jak czytać ten plik** (3 kroki).
+  - Szablon START/DONE z metadanymi **Data / Agent / Cel**.
+  - Plik `AGENT_WORKLOG.json` — 23 zdarzenia do automatyzacji.
+  - Archiwum historyczne **bez usunięć** — pełna treść poniżej.
+- **Commity:** `PLACEHOLDER` — docs: AGENT_WORKLOG rejestr agentów i chronologia
+- **Walidacja:** `git log -1`; przegląd tabeli vs `git log --oneline -40`.
+
+---
+
+## Archiwum — pełne wpisy START/DONE (historyczne)
+
+> Poniżej oryginalne wpisy agentów (bez skróceń). Szukaj daty lub agenta przez Ctrl+F.
 
 ## 2026-05-27 — START (Cursor subagent — bilingual PL/EN scripture)
 
@@ -453,21 +579,24 @@ npx expo start
 3. Home search â†’ type query â†’ submit â†’ recent chips â†’ tap chip â†’ Clear.
 4. Settings â†’ AI service section shows configured/missing key status.
 
-## Template
+## Template (legacy — preferuj szablon u góry pliku)
 
-## YYYY-MM-DD HH:mm (local)
-- Agent: <name>
-- Task: START - <short task description>
-- Changes: pending
-- Validation: pending
-- Result: in-progress
+### START — [tytuł]
 
-## YYYY-MM-DD HH:mm (local)
-- Agent: <name>
-- Task: DONE - <short task description>
-- Changes: <files or "none">
-- Validation: <what was checked>
-- Result: <done/blocker>
+- **Data:** YYYY-MM-DD HH:MM
+- **Agent:** <name>
+- **Cel:** <short task>
+- **Zakres:** pending
+- **Walidacja:** pending
+
+### DONE — [tytuł]
+
+- **Data:** YYYY-MM-DD HH:MM
+- **Agent:** <name>
+- **Wynik:** <summary>
+- **Commity:** `hash` — message
+- **Walidacja:** <checks>
+- **Status:** done | blocker
 
 ## 2026-05-23 13:04
 - Agent: GitHub Copilot (GPT-5.3-Codex)

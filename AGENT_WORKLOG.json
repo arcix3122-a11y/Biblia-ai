@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-05-27T14:00:00+02:00",
+  "events": [
+    {
+      "date": "2026-05-27 14:00",
+      "agent": "Cursor subagent",
+      "task": "Uporządkowanie rejestru agentów w worklogu",
+      "commits": [],
+      "status": "done",
+      "notes": "Indeks changelog + macierz odpowiedzialności na górze AGENT_WORKLOG.md"
+    },
+    {
+      "date": "2026-05-27 13:03",
+      "agent": "Cursor subagent",
+      "task": "Dwujęzyczne Pismo PL/EN (SQLite v3, seed mobilny)",
+      "commits": ["a89fb9e", "3822e60"],
+      "status": "done",
+      "notes": "Biblia Gdańska 1881 + KJV; translationStore"
+    },
+    {
+      "date": "2026-05-27 12:50",
+      "agent": "Audit agent (Cursor subagent)",
+      "task": "Audyt PL: luki, błędy, dwa języki",
+      "commits": ["d15dc68"],
+      "status": "done",
+      "notes": "Mobile seed, AiChat input po błędzie API"
+    },
+    {
+      "date": "2026-05-23 19:18",
+      "agent": "Cursor subagent",
+      "task": "Immersive audio onboarding (100 slajdów)",
+      "commits": ["42867a3"],
+      "status": "done",
+      "notes": "Gates tabs until complete"
+    },
+    {
+      "date": "2026-05-23 19:16",
+      "agent": "Antigravity",
+      "task": "Guided Prayer Flow (kinowe modlitewne AI)",
+      "commits": [],
+      "status": "done",
+      "notes": "Część plików może być niezcommitowana w git"
+    },
+    {
+      "date": "2026-05-23 15:05",
+      "agent": "Cursor subagent",
+      "task": "Uproszczenie UX (Home, Settings, tabs, Reader, AI)",
+      "commits": ["600e0e8"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 15:04",
+      "agent": "Cursor subagent",
+      "task": "Lokalizacja nazw ksiąg PL/EN + reset biblioteki",
+      "commits": ["e0beb18"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 15:01",
+      "agent": "Cursor subagent",
+      "task": "Companion Groq fallback (chat nie blokuje inputu)",
+      "commits": ["233997d"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 14:41",
+      "agent": "Cursor subagent",
+      "task": "Mobile-first DB seed + odblokowanie shell (Expo Go)",
+      "commits": ["43c02ba", "4f56020", "57771b6"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 14:38",
+      "agent": "Antigravity",
+      "task": "Mojibake i18n + optymalizacja seed DB",
+      "commits": [],
+      "status": "done",
+      "notes": "START 14:38 domknięty przez Cursor 43c02ba"
+    },
+    {
+      "date": "2026-05-23 14:09",
+      "agent": "Cursor subagent",
+      "task": "Expo SDK 52 dla Expo Go (Play Store)",
+      "commits": ["9c6e3ad"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:59",
+      "agent": "Cursor subagent (sync)",
+      "task": "Cloud sync status, locale parity, reminder restore",
+      "commits": ["a2ba945"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:50",
+      "agent": "Cursor subagent (sync)",
+      "task": "Anonymous Supabase cloud sync",
+      "commits": ["1fc8b18"],
+      "status": "done",
+      "notes": "Wymaga Enable Anonymous Auth w Dashboard"
+    },
+    {
+      "date": "2026-05-23 13:47",
+      "agent": "Claude (orchestrator)",
+      "task": "Session-2: reminders, year plan, stats, cross-refs",
+      "commits": ["c3f8fd8"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:46",
+      "agent": "Cursor subagent",
+      "task": "Horizontal UI polish pass",
+      "commits": ["233ef37"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:43",
+      "agent": "Cursor subagent",
+      "task": "Competitive parity (highlights, plan, offline badge)",
+      "commits": ["4bbd5c5"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:31",
+      "agent": "Cursor Agent",
+      "task": "Onboarding tip, search history, KJV notice",
+      "commits": ["8fd66e0", "e52affc"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:26",
+      "agent": "Cursor Agent (i18n)",
+      "task": "PL/EN i18n infrastructure + UI wiring",
+      "commits": ["c12c8be"],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23 13:19",
+      "agent": "SolidCode Apps / Agent (nieznany)",
+      "task": "Phase 1+ reader, workspace, companion",
+      "commits": ["bffb7b8"],
+      "status": "done",
+      "gitAuthor": "SolidCode Apps"
+    },
+    {
+      "date": "2026-05-23 13:16",
+      "agent": "Copilot 13:16",
+      "task": "Import pełnej Biblii 66 ksiąg do seed/SQLite",
+      "commits": [],
+      "status": "superseded",
+      "notes": "Zastąpione mobile seed 43c02ba; pełny import opcjonalny"
+    },
+    {
+      "date": "2026-05-23 13:10",
+      "agent": "Antigravity",
+      "task": "Workspace (notatnik), zakładki, SelectionToolbar",
+      "commits": [],
+      "status": "done"
+    },
+    {
+      "date": "2026-05-23",
+      "agent": "Parent coordinator",
+      "task": "Przebudowa UX P0×8 (UX-A/B/C)",
+      "commits": [],
+      "status": "partial",
+      "notes": "Plan w worklogu; część domknięta przez Cursor 600e0e8 / e0beb18"
+    },
+    {
+      "date": "2026-05-23",
+      "agent": "Claude Code",
+      "task": "Viral feed (VOTD premium, guided reflection)",
+      "commits": [],
+      "status": "done",
+      "notes": "Pliki mogą być niezcommitowane"
+    }
+  ]
+}
