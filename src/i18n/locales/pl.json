@@ -169,7 +169,8 @@
     "postError": "Nie udało się wysłać komentarza. Spróbuj ponownie.",
     "offlineHint": "Komentarze są dostępne po włączeniu trybu online (Supabase Anonymous Auth).",
     "deleteTitle": "Usunąć komentarz?",
-    "deleteMessage": "Tej operacji nie można cofnąć."
+    "deleteMessage": "Tej operacji nie można cofnąć.",
+    "comingSoon": "Komentarze wkrótce — wróć po kolejnej aktualizacji."
   },
   "readingPlan": {
     "foundationTitle": "Tydzień fundamentów",

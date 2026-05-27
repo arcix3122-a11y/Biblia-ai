@@ -18,11 +18,12 @@ import { useTranslation } from "react-i18next";
 import {
   authorTag,
   deleteComment,
-  isSocialAvailable,
+  isCommentsEnabled,
   listComments,
   postComment,
   type VotdComment,
 } from "@/services/social/votdSocialRepository";
+import { removePendingComment } from "@/services/social/commentQueue";
 import { getSessionUserId } from "@/services/supabase/supabaseClient";
 import { useLocaleStore } from "@/store/localeStore";
 import { getDeviceLocale } from "@/i18n";
@@ -58,10 +59,10 @@ export function VotdCommentsSheet({
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<TextInput>(null);
   const myUserId = getSessionUserId();
-  const socialAvailable = isSocialAvailable();
+  const commentsEnabled = isCommentsEnabled();
 
   const refresh = useCallback(async () => {
-    if (!verseRef || !socialAvailable) return;
+    if (!verseRef || !commentsEnabled) return;
     setLoading(true);
     setError(null);
     try {
@@ -73,7 +74,7 @@ export function VotdCommentsSheet({
     } finally {
       setLoading(false);
     }
-  }, [onCountChange, socialAvailable, t, verseRef]);
+  }, [commentsEnabled, onCountChange, t, verseRef]);
 
   useEffect(() => {
     if (visible && verseRef) {
@@ -82,7 +83,7 @@ export function VotdCommentsSheet({
   }, [refresh, verseRef, visible]);
 
   const handleSend = useCallback(async () => {
-    if (!verseRef || !socialAvailable) return;
+    if (!verseRef || !commentsEnabled) return;
     const trimmed = draft.trim();
     if (trimmed.length === 0 || posting) return;
     setPosting(true);
@@ -98,7 +99,7 @@ export function VotdCommentsSheet({
     } finally {
       setPosting(false);
     }
-  }, [comments.length, draft, onCountChange, posting, socialAvailable, t, verseRef]);
+  }, [comments.length, commentsEnabled, draft, onCountChange, posting, t, verseRef]);
 
   const handleDelete = useCallback(
     (commentId: string) => {
@@ -114,10 +115,13 @@ export function VotdCommentsSheet({
               void hapticLight();
               setComments((prev) => prev.filter((c) => c.id !== commentId));
               onCountChange?.(Math.max(0, comments.length - 1));
-              void deleteComment(commentId).catch(() => {
-                // restore on failure
-                void refresh();
-              });
+              if (commentId.startsWith("local-")) {
+                void removePendingComment(commentId);
+              } else {
+                void deleteComment(commentId).catch(() => {
+                  void refresh();
+                });
+              }
             },
           },
         ]
@@ -128,7 +132,7 @@ export function VotdCommentsSheet({
 
   const renderComment = useCallback(
     ({ item }: { item: VotdComment }) => {
-      const mine = myUserId === item.user_id;
+      const mine = myUserId === item.user_id || item.id.startsWith("local-");
       return (
         <View style={[styles.commentRow, mine && styles.commentRowMine]}>
           <View style={styles.commentHeader}>
@@ -192,10 +196,10 @@ export function VotdCommentsSheet({
               </Pressable>
             </View>
 
-            {!socialAvailable ? (
+            {!commentsEnabled ? (
               <View style={styles.offlineBlock}>
-                <Ionicons name="cloud-offline-outline" size={24} color={colors.textMuted} />
-                <Text style={styles.offlineText}>{t("votdComments.offlineHint")}</Text>
+                <Ionicons name="chatbubbles-outline" size={24} color={colors.textMuted} />
+                <Text style={styles.offlineText}>{t("votdComments.comingSoon")}</Text>
               </View>
             ) : (
               <>

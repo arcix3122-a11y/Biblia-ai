@@ -13,6 +13,7 @@ import i18n from "@/i18n";
 import { initializeErrorLogger, logError } from "@/services/errors/errorLogger";
 import { getDatabase, resetDatabaseInit } from "@/services/db/database";
 import { ensureAnonymousSession } from "@/services/supabase/supabaseClient";
+import { flushPendingComments } from "@/services/social/votdSocialRepository";
 import { initSyncEngine, scheduleSync } from "@/services/sync/syncEngine";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHighlightsStore } from "@/store/highlightsStore";
@@ -155,6 +156,7 @@ export default function RootLayout() {
     void ensureAnonymousSession()
       .then(() => {
         scheduleSync();
+        void flushPendingComments();
       })
       .catch((err: unknown) => {
         logError(err, "AnonymousAuthInit");

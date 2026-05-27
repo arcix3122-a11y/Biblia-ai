@@ -169,7 +169,8 @@
     "postError": "Could not post your comment. Please try again.",
     "offlineHint": "Comments are available when online mode is enabled (Supabase Anonymous Auth).",
     "deleteTitle": "Delete comment?",
-    "deleteMessage": "This action cannot be undone."
+    "deleteMessage": "This action cannot be undone.",
+    "comingSoon": "Comments coming soon — check back after the next update."
   },
   "readingPlan": {
     "foundationTitle": "Foundation week",
