@@ -11,8 +11,8 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 | | |
 |---|---|
 | **Ścieżka projektu na dysku** | `C:\Users\arcix\Projects\biblia-ai` |
-| **Ostatni commit (HEAD)** | `e6991c8` — *docs: worklog DONE hash 8bf9c32* (2026-05-27) |
-| **Push do GitHub** | **Nie** — gałąź `master` jest **12 commitów** przed `origin/master`. Aby opublikować: `git push origin master` |
+| **Ostatni commit (HEAD)** | `14b0100` — *fix(i18n): e2e bilingual verification and StudyScreen* (2026-05-27) |
+| **Push do GitHub** | **Nie** — gałąź `master` jest **13 commitów** przed `origin/master`. Aby opublikować: `git push origin master` |
 | **Cursor — jak zobaczyć** | **File → Open Folder…** → wybierz `C:\Users\arcix\Projects\biblia-ai` (nie inny katalog). Otwórz `AGENT_WORKLOG.md` — linia 1 powinna zaczynać się od `# Agent Worklog`. |
 | **Telefon / Expo Go** | Na tym PC: `npx expo start`. Jeśli kod był na innym komputerze: `git pull` **po** `git push` z tego PC. W Expo Go: wstrząśnij → **Reload**; ewentualnie wyczyść cache. W aplikacji: **Settings → Advanced → Wyczyść bibliotekę** (nowy seed PL/EN w SQLite). |
 | **Pliki kluczowe do sprawdzenia** | `AGENT_WORKLOG.md` (linia 1), `app/_layout.tsx`, `assets/bible-seed-pl.json` |
@@ -29,7 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
-| 2026-05-27 15:30 | Cursor subagent | Weryfikacja E2E PL+EN — pełny audyt i naprawy | *(ten commit)* | done | StudyScreen i18n, plany demo, locale 534 kl. |
+| 2026-05-27 15:30 | Cursor subagent | Weryfikacja E2E PL+EN — pełny audyt i naprawy | `14b0100` | done | StudyScreen i18n, plany demo, locale 534 kl. |
 | 2026-05-27 14:15 | Cursor subagent | Weryfikacja widoczności zmian dla użytkownika | — | done | Sekcja „Gdzie są zmiany?”; 12 commitów niepushowanych |
 | 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | `8bf9c32` | done | Indeks + macierz + JSON |
 | 2026-05-27 13:03 | Cursor subagent | Dwujęzyczne Pismo PL/EN (SQLite v3, seed) | `a89fb9e`, `3822e60` | done | Biblia Gdańska + KJV; `translationStore` |
