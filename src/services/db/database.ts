@@ -1,10 +1,12 @@
 import * as SQLite from "expo-sqlite";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CREATE_TABLES_SQL, MIGRATION_V2_SQL, MIGRATION_V3_SQL, SCHEMA_VERSION } from "./schema";
-import { runPolishSeedIfNeeded, runSeedIfNeeded } from "./seed";
+import { needsFullBibleSeed, runFullBibleSeed, runPolishSeedIfNeeded } from "./seed";
+import { useSeedProgressStore } from "@/store/seedProgressStore";
 
 const DB_NAME = "biblia.db";
-const SEED_FLAG_KEY = "@biblia-ai/db-seeded";
+export const SEED_FLAG_KEY = "@biblia-ai/db-seeded";
+export const FULL_BIBLE_IMPORT_FLAG = "@biblia-ai/full-bible-imported-v1";
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 let initPromise: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -52,6 +54,24 @@ async function applyMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   }
 }
 
+export async function isFullBibleImported(): Promise<boolean> {
+  const flag = await AsyncStorage.getItem(FULL_BIBLE_IMPORT_FLAG);
+  if (flag !== "true") {
+    return false;
+  }
+  if (!dbInstance) {
+    return false;
+  }
+  const bookRow = await dbInstance.getFirstAsync<{ count: number }>(
+    "SELECT COUNT(*) AS count FROM books"
+  );
+  return (bookRow?.count ?? 0) >= 66;
+}
+
+export function isDatabaseSeeding(): boolean {
+  return useSeedProgressStore.getState().active;
+}
+
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (dbInstance) {
     return dbInstance;
@@ -69,15 +89,30 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
         await db.execAsync("PRAGMA foreign_keys = ON;");
         await applyMigrations(db);
 
-        const seeded = await AsyncStorage.getItem(SEED_FLAG_KEY);
-        if (seeded !== "true") {
-          await runSeedIfNeeded(db);
+        const needsSeed = await needsFullBibleSeed(db);
+        if (needsSeed) {
+          await runFullBibleSeed(db);
           await AsyncStorage.setItem(SEED_FLAG_KEY, "true");
+          await AsyncStorage.setItem(FULL_BIBLE_IMPORT_FLAG, "true");
+        } else {
+          const seeded = await AsyncStorage.getItem(SEED_FLAG_KEY);
+          if (seeded !== "true") {
+            await AsyncStorage.setItem(SEED_FLAG_KEY, "true");
+          }
+          const imported = await AsyncStorage.getItem(FULL_BIBLE_IMPORT_FLAG);
+          if (imported !== "true") {
+            await AsyncStorage.setItem(FULL_BIBLE_IMPORT_FLAG, "true");
+          }
         }
 
         dbInstance = db;
         return db;
       } catch (error) {
+        useSeedProgressStore.getState().setProgress({
+          active: false,
+          phase: "error",
+          error: error instanceof Error ? error.message : "Seed failed",
+        });
         initPromise = null;
         throw error;
       }
@@ -93,6 +128,8 @@ export async function resetDatabaseForDev(): Promise<void> {
     dbInstance = null;
     initPromise = null;
   }
+  useSeedProgressStore.getState().reset();
   await AsyncStorage.removeItem(SEED_FLAG_KEY);
+  await AsyncStorage.removeItem(FULL_BIBLE_IMPORT_FLAG);
   await SQLite.deleteDatabaseAsync(DB_NAME);
 }

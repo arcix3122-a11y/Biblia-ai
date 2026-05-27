@@ -21,7 +21,14 @@
     "off": "wył.",
     "close": "Zamknij",
     "dismiss": "Ukryj",
-    "skip": "Pomiń"
+    "skip": "Pomiń",
+    "new": "Nowość",
+    "scriptureImportTitle": "Przygotowujemy Pismo Święte…",
+    "scriptureImportBooks": "Importujemy księgi i rozdziały…",
+    "scriptureImportVerses": "Importujemy wersety (polski + angielski)…",
+    "scriptureImportProgress": "Trwa import",
+    "scriptureImportPercent": "{{percent}}%",
+    "scriptureImportHint": "Pierwsze uruchomienie może potrwać 1–3 minuty. Nie zamykaj aplikacji."
   },
   "tabs": {
     "scripture": "Czytaj",
@@ -374,7 +381,7 @@
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
     "scriptureTranslation": "Tłumaczenie Pisma",
-    "scriptureTranslationHint": "Pełną Biblię zaimportujesz skryptem scripts/import-polish-bible.mjs. W paczce jest demo 94 wersetów w obu językach.",
+    "scriptureTranslationHint": "Aplikacja zawiera pełną Biblię: KJV (angielski) i Biblia Gdańska (polski) — 66 ksiąg, ok. 31 100 wersetów w każdym języku.",
     "translation": {
       "title": "Tłumaczenie Pisma",
       "hint": "Domyślnie zgodnie z językiem aplikacji. Możesz wymusić KJV lub Biblię Gdańską.",
@@ -453,7 +460,7 @@
     "notStarted": "Nie rozpocząłeś jeszcze planu.",
     "startHint": "Przeczytaj całą Biblię w 365 dni.",
     "fullBibleRequiredTitle": "Wymagana pełna Biblia",
-    "fullBibleRequiredHint": "Plan „Biblia w rok” wymaga lokalnie zaimportowanej pełnej Biblii (66 ksiąg). Przy demo bibliotece korzystaj z Tygodnia fundamentów na ekranie głównym."
+    "fullBibleRequiredHint": "Plan „Biblia w rok” wymaga pełnej biblioteki. Jeśli widzisz niepełny katalog, wyczyść bibliotekę w Ustawieniach."
   },
   "stats": {
     "title": "Statystyki",
@@ -573,6 +580,83 @@
     "3-john": "3 Jana",
     "jude": "Judy",
     "revelation": "Apokalipsy"
+  },
+  "affirmations": {
+    "title": "Afirmacje biblijne",
+    "subtitle": "Słowo Boże do serca. Wzmocnij wiarę Bożymi obietnicami.",
+    "tagline": "Codzienna porcja prawdy",
+    "filterAll": "Wszystkie",
+    "listen": "Słuchaj",
+    "pause": "Wstrzymaj",
+    "stop": "Zatrzymaj",
+    "duration": "{{sec}} s",
+    "playing": "Odtwarzam…",
+    "scriptureLabel": "Werset bazowy",
+    "openInReader": "Otwórz w czytniku",
+    "shuffle": "Losuj",
+    "homeTileTitle": "Afirmacje",
+    "homeTileSub": "Mowa Boga nad tobą",
+    "emptyHint": "Wybierz kategorię, aby zobaczyć afirmacje.",
+    "categories": {
+      "identity": "Tożsamość w Chrystusie",
+      "peace": "Pokój i ukojenie",
+      "strength": "Siła i odwaga",
+      "faith": "Wiara",
+      "healing": "Uzdrowienie",
+      "hope": "Nadzieja",
+      "love": "Miłość Boga",
+      "gratitude": "Wdzięczność"
+    },
+    "entries": {
+      "identityBeloved": {
+        "title": "Jestem ukochanym dzieckiem Boga",
+        "body": "Bóg mnie wybrał i nazwał swoim dzieckiem. Jego miłość nie zależy od tego, co robię — jest darem. Dziś odpoczywam w tej prawdzie: jestem kochany, akceptowany i bezpieczny w Jego ojcowskim sercu."
+      },
+      "identityNewCreation": {
+        "title": "Jestem nowym stworzeniem w Chrystusie",
+        "body": "W Chrystusie stare przeminęło, a wszystko stało się nowe. Mój dawny wstyd, błędy i lęki nie definiują już tego, kim jestem. Dziś żyję jako nowe stworzenie — z czystą kartą i Bożym powołaniem."
+      },
+      "peaceNotAsWorld": {
+        "title": "Pokój Boży strzeże mojego serca",
+        "body": "Pokój, który daje mi Jezus, nie jest taki, jaki daje świat. Nie zależy od okoliczności. Dziś biorę głęboki oddech i pozwalam Jego pokojowi strzec mojego serca i umysłu."
+      },
+      "peaceAnxiousNothing": {
+        "title": "Nie troszczę się o nic",
+        "body": "Oddaję Bogu każdą sprawę, która mnie dziś niepokoi. Z dziękczynieniem przedstawiam Mu moje prośby. Wierzę, że Jego pokój — przewyższający wszelki rozum — strzeże mojego serca w Chrystusie."
+      },
+      "strengthCanDo": {
+        "title": "Wszystko mogę w Chrystusie",
+        "body": "Nie polegam na własnej sile. Wszystko, co dziś przede mną, mogę w Tym, który mnie umacnia. Jego moc działa we mnie, gdy idę naprzód krok po kroku."
+      },
+      "strengthBeStrong": {
+        "title": "Bóg jest ze mną wszędzie",
+        "body": "Bądź mocny i mężny. Nie boję się ani nie lękam, bo Pan, mój Bóg, jest ze mną wszędzie, dokądkolwiek pójdę. Jego obecność idzie przede mną i odpoczywa we mnie."
+      },
+      "faithMountains": {
+        "title": "Moja wiara porusza góry",
+        "body": "Choćby moja wiara była mała jak ziarno gorczycy, w Bogu jest wystarczająca. Dziś wybieram wierzyć ponad to, co widzę, i ufać Bożej mocy w mojej sytuacji."
+      },
+      "healingStripes": {
+        "title": "Jego ranami zostałem uzdrowiony",
+        "body": "Jezus wziął na siebie moje słabości i choroby. Jego ranami zostałem uzdrowiony — ciałem, duszą i duchem. Dziś przyjmuję Jego uzdrawiającą obecność w każdej części mojego życia."
+      },
+      "hopeFuture": {
+        "title": "Bóg ma dla mnie plan pełen nadziei",
+        "body": "Bóg zna myśli, które myśli o mnie — myśli o pokoju, a nie o nieszczęściu, by dać mi przyszłość i nadzieję. Idę naprzód z pewnością, że On prowadzi moje kroki."
+      },
+      "loveNothingSeparate": {
+        "title": "Nic mnie nie odłączy od miłości Boga",
+        "body": "Ani śmierć, ani życie, ani teraźniejszość, ani przyszłość — nic nie może mnie odłączyć od miłości Boga, która jest w Chrystusie Jezusie. Dziś żyję w tej niezachwianej miłości."
+      },
+      "lovePerfectCastsOut": {
+        "title": "Doskonała miłość usuwa strach",
+        "body": "W miłości nie ma lęku, lecz doskonała miłość usuwa strach. Dziś przyjmuję, że jestem bezpieczny w Bożej miłości — pełnej, doskonałej i wystarczającej."
+      },
+      "gratitudeEveryGood": {
+        "title": "Każdy dobry dar pochodzi z góry",
+        "body": "Każdy dobry dar i każda doskonała rzecz pochodzi z góry, od Ojca świateł. Dziś dziękuję za małe i wielkie błogosławieństwa, które otrzymuję z Jego rąk."
+      }
+    }
   },
   "audioIntro": {
     "heroLabel": "Witaj",

@@ -192,6 +192,15 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 > Poniżej oryginalne wpisy agentów (bez skróceń). Szukaj daty lub agenta przez Ctrl+F.
 
+## 2026-05-27 13:25 (local)
+- Agent: Cursor Agent (full-bible E2E)
+- Task: START - Pełna Biblia PL+EN end-to-end (66 ksiąg, seed z progressem, ScriptureImportScreen)
+- Cel: 31100 wersetów EN KJV + 31073 PL Biblia Gdańska, assety bible-full-*.json, SQLite batch seed, pierwszy launch ~1-3 min
+- Plan: ~15% skrypty importu | ~25% generacja assetów | ~30% seed.ts + progress UI | ~20% wiring app | ~10% QA + commity
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
 ## 2026-05-27 — START (Cursor subagent — bilingual PL/EN scripture)
 
 - **Agent:** Cursor subagent

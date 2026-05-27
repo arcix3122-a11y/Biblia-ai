@@ -6,7 +6,7 @@ import { getDatabase, resetDatabaseInit } from "@/services/db/database";
 import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
 
-const DB_INIT_TIMEOUT_MS = 30_000;
+const DB_INIT_TIMEOUT_MS = 300_000;
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {

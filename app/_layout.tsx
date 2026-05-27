@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { GlobalAudioBar } from "@/components/audio/GlobalAudioBar";
 import { AudioOnboarding } from "@/components/AudioOnboarding";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
+import { ScriptureImportScreen } from "@/components/ScriptureImportScreen";
 import { ChromeProvider } from "@/context/ChromeContext";
 import { initI18n } from "@/i18n";
 import i18n from "@/i18n";
@@ -19,6 +20,7 @@ import { useHistoryStore } from "@/store/historyStore";
 import { useAudioOnboardingStore } from "@/store/audioOnboardingStore";
 import { useLocaleStore } from "@/store/localeStore";
 import { useReminderStore } from "@/store/reminderStore";
+import { useSeedProgressStore } from "@/store/seedProgressStore";
 import { useYearPlanStore } from "@/store/yearPlanStore";
 import { scheduleDailyReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
 import { colors } from "@/theme";
@@ -89,6 +91,7 @@ function RootStack() {
           headerShown: false,
         }}
       />
+      <Stack.Screen name="affirmations" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -99,6 +102,8 @@ export default function RootLayout() {
   const locale = useLocaleStore((s) => s.locale);
   const hasCompletedAudioOnboarding = useAudioOnboardingStore((s) => s.hasCompleted);
   const completeAudioOnboarding = useAudioOnboardingStore((s) => s.complete);
+  const seedingActive = useSeedProgressStore((s) => s.active);
+  const [dbBootstrapped, setDbBootstrapped] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -140,6 +145,7 @@ export default function RootLayout() {
 
     void getDatabase()
       .then(() => {
+        setDbBootstrapped(true);
         void useBookmarksStore.getState().loadBookmarks();
         void useHighlightsStore.getState().loadHighlights();
         void useHistoryStore.getState().loadHistory();
@@ -162,6 +168,7 @@ export default function RootLayout() {
         void useYearPlanStore.getState().load();
       })
       .catch((err: unknown) => {
+        setDbBootstrapped(true);
         resetDatabaseInit();
         logError(err, "DatabaseInit");
       });
@@ -175,7 +182,7 @@ export default function RootLayout() {
     return () => subscription.remove();
   }, [i18nReady]);
 
-  if (!i18nReady || !storesReady) {
+  if (!i18nReady || !storesReady || !dbBootstrapped) {
     return (
       <View
         style={{
@@ -197,6 +204,19 @@ export default function RootLayout() {
           <StatusBar style="light" />
           <View style={{ flex: 1, backgroundColor: colors.canvas }} key={locale ?? "en"}>
             <AudioOnboarding onComplete={completeAudioOnboarding} />
+          </View>
+        </ChromeProvider>
+      </GlobalErrorBoundary>
+    );
+  }
+
+  if (seedingActive) {
+    return (
+      <GlobalErrorBoundary>
+        <ChromeProvider>
+          <StatusBar style="light" />
+          <View style={{ flex: 1, backgroundColor: colors.canvas }} key={locale ?? "en"}>
+            <ScriptureImportScreen />
           </View>
         </ChromeProvider>
       </GlobalErrorBoundary>

@@ -21,7 +21,14 @@
     "off": "off",
     "close": "Close",
     "dismiss": "Dismiss",
-    "skip": "Skip"
+    "skip": "Skip",
+    "new": "New",
+    "scriptureImportTitle": "Preparing Scripture…",
+    "scriptureImportBooks": "Importing books and chapters…",
+    "scriptureImportVerses": "Importing verses (English + Polish)…",
+    "scriptureImportProgress": "Import in progress",
+    "scriptureImportPercent": "{{percent}}%",
+    "scriptureImportHint": "First launch may take 1–3 minutes. Please keep the app open."
   },
   "tabs": {
     "scripture": "Read",
@@ -374,7 +381,7 @@
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
     "scriptureTranslation": "Scripture translation",
-    "scriptureTranslationHint": "Import a full Bible with scripts/import-polish-bible.mjs or prepare-bible-seed.mjs. The bundled app includes a 94-verse demo in both languages.",
+    "scriptureTranslationHint": "The app ships the full Bible: KJV (English) and Biblia Gdańska (Polish) — 66 books, ~31,100 verses per language.",
     "translation": {
       "title": "Scripture translation",
       "hint": "Follows app language by default. Override to always read KJV or Biblia Gdańska.",
@@ -453,7 +460,7 @@
     "notStarted": "You haven't started the plan yet.",
     "startHint": "Read through the entire Bible in 365 days.",
     "fullBibleRequiredTitle": "Full Bible required",
-    "fullBibleRequiredHint": "The Bible-in-a-year plan needs all 66 books imported locally. Use the Foundation week on Home while the demo library is installed."
+    "fullBibleRequiredHint": "The Bible-in-a-year plan needs the full library imported. Clear library in Settings if you still see a partial catalog."
   },
   "stats": {
     "title": "Statistics",
@@ -573,6 +580,83 @@
     "3-john": "3 John",
     "jude": "Jude",
     "revelation": "Revelation"
+  },
+  "affirmations": {
+    "title": "Biblical affirmations",
+    "subtitle": "God's word for your heart. Strengthen your faith with His promises.",
+    "tagline": "Your daily dose of truth",
+    "filterAll": "All",
+    "listen": "Listen",
+    "pause": "Pause",
+    "stop": "Stop",
+    "duration": "{{sec}}s",
+    "playing": "Playing…",
+    "scriptureLabel": "Scripture anchor",
+    "openInReader": "Open in reader",
+    "shuffle": "Shuffle",
+    "homeTileTitle": "Affirmations",
+    "homeTileSub": "God speaks over you",
+    "emptyHint": "Pick a category to see affirmations.",
+    "categories": {
+      "identity": "Identity in Christ",
+      "peace": "Peace & comfort",
+      "strength": "Strength & courage",
+      "faith": "Faith",
+      "healing": "Healing",
+      "hope": "Hope",
+      "love": "God's love",
+      "gratitude": "Gratitude"
+    },
+    "entries": {
+      "identityBeloved": {
+        "title": "I am God's beloved child",
+        "body": "God chose me and called me His child. His love does not depend on what I do — it is a gift. Today I rest in this truth: I am loved, accepted, and safe in His Father's heart."
+      },
+      "identityNewCreation": {
+        "title": "I am a new creation in Christ",
+        "body": "In Christ the old has passed away, and everything has become new. My past shame, mistakes, and fears no longer define who I am. Today I live as a new creation — with a clean slate and a holy calling."
+      },
+      "peaceNotAsWorld": {
+        "title": "God's peace guards my heart",
+        "body": "The peace Jesus gives is not the peace the world offers. It does not depend on circumstances. Today I take a deep breath and let His peace guard my heart and mind."
+      },
+      "peaceAnxiousNothing": {
+        "title": "I am anxious for nothing",
+        "body": "I bring every concern to God today. With thanksgiving I present my requests to Him. I trust His peace — which surpasses understanding — to guard my heart in Christ."
+      },
+      "strengthCanDo": {
+        "title": "I can do all things through Christ",
+        "body": "I do not rely on my own strength. Whatever stands before me today, I can do it through Him who strengthens me. His power works in me as I move forward step by step."
+      },
+      "strengthBeStrong": {
+        "title": "God is with me wherever I go",
+        "body": "Be strong and courageous. I will not fear or be dismayed, for the Lord my God is with me wherever I go. His presence walks ahead of me and rests within me."
+      },
+      "faithMountains": {
+        "title": "My faith moves mountains",
+        "body": "Even if my faith is as small as a mustard seed, in God it is enough. Today I choose to believe beyond what I see and to trust His power in my situation."
+      },
+      "healingStripes": {
+        "title": "By His wounds I am healed",
+        "body": "Jesus carried my weakness and sickness. By His wounds I am healed — in body, soul, and spirit. Today I receive His healing presence in every area of my life."
+      },
+      "hopeFuture": {
+        "title": "God has a hope-filled plan for me",
+        "body": "God knows the thoughts He thinks toward me — thoughts of peace and not of evil, to give me a future and a hope. I walk forward confident that He directs my steps."
+      },
+      "loveNothingSeparate": {
+        "title": "Nothing separates me from God's love",
+        "body": "Neither death nor life, neither present nor future — nothing can separate me from the love of God in Christ Jesus. Today I live anchored in that unwavering love."
+      },
+      "lovePerfectCastsOut": {
+        "title": "Perfect love casts out fear",
+        "body": "There is no fear in love; perfect love casts out fear. Today I accept that I am safe in God's love — complete, perfect, and enough."
+      },
+      "gratitudeEveryGood": {
+        "title": "Every good gift comes from above",
+        "body": "Every good gift and every perfect thing comes from above, from the Father of lights. Today I give thanks for the small and great blessings that come from His hand."
+      }
+    }
   },
   "audioIntro": {
     "heroLabel": "Welcome",

@@ -1,4 +1,4 @@
-import { getDatabase } from "./database";
+import { getDatabase, isFullBibleImported as isFullBibleImportedFlag } from "./database";
 import type {
   Book,
   Chapter,
@@ -162,6 +162,11 @@ export async function hasFullBibleTranslation(
     translation
   );
   return (bookCount?.count ?? 0) >= FULL_BIBLE_BOOK_COUNT;
+}
+
+export async function isFullBibleImported(): Promise<boolean> {
+  await getDatabase();
+  return isFullBibleImportedFlag();
 }
 
 export async function isChapterAvailable(
