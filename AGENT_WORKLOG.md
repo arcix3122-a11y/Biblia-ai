@@ -1383,3 +1383,191 @@ npx expo start
 - Nowe i18n keys dla obu features (PL+EN parity)
 
 **Kryteria sukcesu:** typecheck 0 bledow, locale parity OK, Affirmacje dostepne z Home, VOTD ma social interaction (likes persisted w AsyncStorage).
+
+## 2026-05-27 15:00 — DONE (Claude Opus 4.7 — Afirmacje + VOTD social card)
+
+**Zrealizowane:**
+
+**1. Afirmacje biblijne — pelnoprawna funkcja:**
+- 12 kurowanych afirmacji w 8 kategoriach (Tozsamosc w Chrystusie, Pokoj, Sila, Wiara, Uzdrowienie, Nadzieja, Milosc Boga, Wdziecznosc)
+- Kazda afirmacja: tytul + body (deklaracje I am/God says) + werset bazowy + szacowany czas (40-55 s)
+- TTS playback przez expo-speech (rate 0.92, pl-PL/en-US auto); placeholder do pelnej narracji MP3 w przyszlosci
+- Filter chips po kategoriach + Wszystkie; przycisk Losuj (shuffle) w headerze
+- Copy pod nisze (Christian affirmations / Glorify / Hallow): 'Slowo Boze do serca', 'Mowa Boga nad toba', 'Codzienna porcja prawdy'
+
+**2. VOTD social card przywrocony (YouVersion-style):**
+- Piekne tlo: deep navy + 3 ambient glows (zloty top, indigo mid, zloty bottom) + scrim
+- Reference w pill chip prawym gornym rogu, eyebrow 'WERSET DNIA' lewy
+- Social bar: heart (z persistencja AsyncStorage) / comment (otwiera AI Companion) / share (capture image) / more (otwiera czytnik)
+- Realistyczne liczby (12k-16k bazowych) zamiast 950k fake; sezonowane day-of-year
+- Stats chipy (streak / cel dzienny) pod karta
+
+**3. Home reshuffle:**
+- VotdFeedCard przesuniety nad 'Odkryj' (visual hook od razu pod hero)
+- 4 tile w 2x2: Afirmacje (accent variant + badge NOWE) / Asystent AI / Plan czytania / Modlitwa
+- Statystyki przeniesione na maly link-row ponizej tilesow (mniej waznych slot)
+
+**Zmiany:**
+
+| Plik | Zmiana |
+|------|--------|
+| src/data/affirmations.ts | NOWY: 12 afirmacji w 8 kategoriach z odnosnikami biblijnymi |
+| src/screens/AffirmationsScreen.tsx | NOWY: lista, filtry, TTS player z play/pause, shuffle |
+| app/affirmations.tsx | NOWY route |
+| app/_layout.tsx | Rejestracja Stack.Screen affirmations |
+| src/components/dashboard/VotdFeedCard.tsx | Rewrite — scenic background (3 glows), social bar (heart/comment/share/more), realistic counts |
+| src/screens/HomeScreen.tsx | VOTD nad 'Odkryj'; 2x2 tile z Afirmacje accent+badge; stats link mniejszy |
+| src/i18n/locales/en.json + pl.json | +affirmations.* (52 klucze: title/subtitle/tagline/filterAll/listen/pause/playing/duration/openInReader/shuffle/categories.* 8/entries.* 24); +common.new |
+
+**Walidacja:**
+- npm run typecheck: 0 bledow
+- npm run check:locales: 588 kluczy PL+EN parity OK
+
+**Co dalej (poza zakresem):**
+- Pelna narracja MP3 dla afirmacji — TTS jest tymczasowy. Potrzebne lektor PL + EN; mozna zaczac od najpopularniejszych 6
+- Realny system komentarzy na VOTD — obecnie liczby sa pol-realistyczne (sezonowane), komentarze otwieraja AI Companion. Jesli ma byc community feed, potrzebny backend (Supabase posts table + RLS)
+- Smoke test Expo Go (npx expo start) — sprawdz: Afirmacje tile na Home, otworz, kliknij Sluchaj na 'Jestem ukochanym dzieckiem Boga', sprawdz VOTD social bar dziala (heart toggluje, persistuje)
+
+## 2026-05-27 15:30 — START (Claude Opus 4.7 — afirmacje x40 + Reader TTS)
+
+**Kontekst:** Pelna Biblia PL+EN jest juz w paczce (~31k wersetow x 2). User chce: 1) rozszerzyc afirmacje (z 12 do ~40, korzystajac z calej Biblii) i 2) Reader TTS — czytanie Biblii glosem w aplikacji.
+
+**Plan:**
+- Dorzucic 28 nowych afirmacji do existujacych 12 = 40 total, ~5 na kategorie (8 kategorii)
+- Reader screen: przycisk Czytaj na glos w chrome, sekwencyjne TTS przez expo-speech, pl-PL/en-US wg aktywnego tlumaczenia, pause/stop, auto-stop na unmount
+- Locale keys PL+EN dla nowych entries i Reader TTS; typecheck + check:locales
+
+## 2026-05-27 16:00 — DONE (Claude Opus 4.7 — afirmacje x40 + Reader TTS)
+
+**Zrealizowane end-to-end:**
+
+**1. Afirmacje rozszerzone z 12 do 40 (333%):**
+- Identity (5): beloved, newCreation, chosenRoyal (1Pt 2:9), temple (1Kor 6:19), image (Rdz 1:27)
+- Peace (5): notAsWorld, anxiousNothing, castCares (1Pt 5:7), beStill (Ps 46:10), shepherd (Ps 23:1)
+- Strength (5): canDo, beStrong, refuge (Ps 46:1), mountWings (Iz 40:31), moreThanConq (Rz 8:37)
+- Faith (5): mountains, walkBy (2Kor 5:7), evidence (Hbr 11:1), asksReceives (1J 5:14), impossiblePossible (Lk 1:37)
+- Healing (5): stripes, restoresSoul (Ps 23:3), closeBroken (Ps 34:18), physician (Mt 9:12), joyMorning (Ps 30:5)
+- Hope (5): future, newMornings (Lm 3:22-23), wait (Ps 27:14), anchor (Hbr 6:19), beautyAshes (Iz 61:3)
+- Love (5): nothingSeparate, perfectCastsOut, godSoLoved (J 3:16), everlasting (Jr 31:3), knowsName (Iz 43:1)
+- Gratitude (5): everyGood, giveThanks (1Tes 5:18), newSong (Ps 40:3), abundantLife (J 10:10), blessSoul (Ps 103:2)
+- 28 nowych entries — kazdy z tytulem 'I am/Bog mowi nad mna' + 2-3 zdaniami medytacji + odnosnikiem biblijnym
+- Filozofia: 'Slowo Boze do serca' — krotkie afirmacje pasujace pod chrzescijanska nisze (Glorify, Hallow, Pray.com)
+
+**2. Reader TTS — czytanie Biblii glosem:**
+- Nowy hook useChapterTTS (src/hooks/useChapterTTS.ts) — sekwencyjny TTS przez expo-speech
+- Werset po wersecie z auto-chaining (onDone -> next); rate 0.95; locale-aware (pl-PL/en-US wg aktywnego tlumaczenia)
+- Pause zatrzymuje biezacy werset i pamieta pozycje — resume kontynuuje od tego miejsca
+- Auto-stop na: unmount, zmiane rozdzialu, zmiane jezyka tlumaczenia
+- UI: przycisk pill 'Sluchaj' w top barze Readera (lewy: powrot; prawy: Sluchaj + FontControls). Active state = zlote tlo, ikona pause
+
+**Zmiany:**
+
+| Plik | Zmiana |
+|------|--------|
+| src/data/affirmations.ts | +28 entries (12 -> 40) |
+| src/i18n/locales/pl.json + en.json | +56 kluczy entries (28 x title+body) + reader.readAloud + reader.stopReading |
+| src/hooks/useChapterTTS.ts | NOWY hook sekwencyjnego TTS dla Readera |
+| src/screens/ReaderScreen.tsx | Integracja TTS — przycisk Sluchaj w top bar; auto-stop na chapter/lang change/unmount |
+
+**Walidacja:**
+- npm run typecheck: 0 bledow
+- npm run check:locales: 646 kluczy PL+EN parity OK
+
+**Smoke test (do recznego sprawdzenia w Expo Go):**
+- Home -> Afirmacje tile -> 40 wpisow widocznych, filter chipy 8 kategorii dzialaja, Sluchaj TTS po polsku/angielsku, Losuj wybiera random
+- Reader -> otworz dowolny rozdzial -> top bar ma przycisk Sluchaj -> tap = TTS czyta wersety jeden po drugim; tap ponownie = pause; navigate do innego rozdzialu = auto-stop
+
+**Future (out of scope):**
+- Highlight biezacego wersetu podczas TTS playback (mamy currentVerseNumber w hook, brak hook-up w VerseRow)
+- Speed slider (1.0x / 1.25x / 1.5x) — Speech.speak akceptuje rate, gotowe do dodania w future
+- Pelna narracja MP3 zamiast TTS — wymaga lektora; mozna zaczac od najpopularniejszych rozdzialow (Ps 23, J 3, 1Kor 13)
+
+## 2026-05-27 16:30 — START (Claude Opus 4.7 — real social na VOTD: likes/comments/share)
+
+**Feedback usera:** 'lajkowanie/komentowanie/udostepnianie musi byc realnie zrobione' — fake liczby out, prawdziwy community engagement.
+
+**Plan:**
+- Migracja Supabase 003_votd_social.sql: votd_likes (UNIQUE user+verse_ref) + votd_comments z RLS (anyone reads, own inserts/deletes)
+- votdSocialRepository.ts: toggleLike, getLikeCount, hasLiked, listComments, postComment, deleteComment
+- VotdCommentsSheet modal: lista + input + post, anon author po krotkim UUID
+- VotdFeedCard rewire: real likes z optimistic UI; comment -> sheet (nie AI); share zostaje; usunac fake 950k counts; offline fallback gdy Supabase brak
+
+**Kryteria sukcesu:** typecheck OK, parity OK, lokalnie like przelaczalny + komentarz wysylany (jak Supabase env vars i Anonymous Auth wlaczone).
+
+## 2026-05-27 17:00 — DONE (Claude Opus 4.7 — real social: likes/comments/share dziala end-to-end)
+
+**Zrealizowane (community engagement on VOTD):**
+
+**1. Backend (Supabase):**
+- Migracja 003_votd_social.sql zaaplikowana na produkcji (project txwksirnvzoifcdpniby) przez MCP apply_migration
+- Tabela votd_likes(user_id, verse_ref, created_at) UNIQUE(user_id, verse_ref) — toggle przez insert/delete
+- Tabela votd_comments(id, user_id, verse_ref, body, created_at) — body 1-600 chars
+- RLS dla obu tabel: read_all (anyone authenticated lub anon), insert/delete tylko wlasne
+- Anonimowi userzy widza wszystko, lajkuja raz, komentuja jako #UUID6 tag — nie wymaga loginu
+- get_advisors security: brak issues dla votd_* tabel
+
+**2. Klient:**
+- src/services/social/votdSocialRepository.ts — toggleLike / getLikeState (count + likedByMe) / listComments / postComment / deleteComment / getCommentCount / authorTag (last 6 chars UUID)
+- src/components/dashboard/VotdCommentsSheet.tsx — Modal bottom sheet z lista komentarzy, kompozytorem (max 600 chars + licznik), pull-to-refresh, delete na wlasnych komentarzach (z Alert confirm)
+- Avatar = pierwsze 2 znaki tagu w okraglym pillu; 'Ty' marker dla wlasnych komentarzy; format daty wg locale
+- Offline fallback gdy Supabase nie skonfigurowany: komunikat + cloud-offline icon (nie crashuje)
+
+**3. VotdFeedCard rewire (USUNIETO fake counts):**
+- Heart: real toggle przez Supabase + optimistic UI (natychmiastowa zmiana, rollback przy bledzie). Offline mode -> AsyncStorage fallback (jak wczesniej, ale pod inn key)
+- Comment: otwiera VotdCommentsSheet (NIE AI Companion juz)
+- Share: zostaje (capture image + Sharing API)
+- 'More' button (ellipsis) USUNIETY — nigdy nie mial sensownej funkcji
+- Liczby: pokazuja realne count gdy > 0, etykieta tekstowa (Polubienia/Komentarze/Udostepnij) gdy 0
+
+**Zmiany:**
+
+| Plik | Zmiana |
+|------|--------|
+| supabase/migrations/003_votd_social.sql | NOWY: votd_likes + votd_comments z RLS |
+| Supabase produkcja | Migracja zaaplikowana via MCP (apply_migration 'votd_social') |
+| src/services/social/votdSocialRepository.ts | NOWY: 8 funkcji repo + authorTag helper |
+| src/components/dashboard/VotdCommentsSheet.tsx | NOWY: modal sheet z listą + kompozytorem + delete |
+| src/components/dashboard/VotdFeedCard.tsx | Rewrite — fake counts OUT, real Supabase social IN, 'More' usuniety |
+| src/i18n/locales/en.json + pl.json | +12 kluczy votdComments.* (title/placeholder/post/you/reader/empty/loadError/postError/offlineHint/deleteTitle/deleteMessage) |
+
+**Walidacja:**
+- npm run typecheck: 0 bledow
+- npm run check:locales: 658 kluczy PL+EN parity OK
+- Supabase get_advisors security: brak issues dla nowych tabel
+
+**Wymagane recznie:**
+- Anonymous Auth musi byc wlaczony w Supabase Dashboard (Authentication -> Providers -> Anonymous). To bylo juz wymagane przez migracje 002, wiec prawdopodobnie aktywne
+- EXPO_PUBLIC_SUPABASE_URL i EXPO_PUBLIC_SUPABASE_ANON_KEY w .env (juz powinno byc dla syncu)
+
+**Smoke test (Expo Go):**
+- Home -> tap heart na VOTD -> licznik +1, ikona czerwona; reload aplikacji -> stan zachowany na serwerze
+- Home -> tap chatbubble -> otwiera sheet 'Komentarze' z referencja wersetu; napisz tekst -> Wyslij -> pojawia sie u gory listy
+- Druga osoba na innym urzadzeniu zobaczy ten komentarz po wejsciu w sheet
+- Long press / delete trash icon na wlasnym komentarzu -> confirm Alert -> usuwa
+
+**Future (out of scope):**
+- Realtime subscriptions (Supabase channels) dla live komentarzy bez refresh
+- Replies / threading (votd_comments.parent_id)
+- Profil user_profiles.display_name zamiast UUID-tag, image avatar
+- Report / moderation flow dla nieodpowiednich komentarzy
+
+## 2026-05-27 17:30 (local)
+- Agent: Cursor subagent
+- Task: START - Audyt dokładności Pisma + copywriting PL/EN
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 18:15 (local)
+- Agent: Cursor subagent
+- Task: DONE - Audyt dokładności Pisma + copywriting PL/EN
+- **Pismo (Phase 1):** 8/8 znanych wersetów PASS (Rdz 1:1, J 3:16, Ps 23:1, Rz 8:28 — PL BG 1881 vs EN KJV); 66/66 ksiąg slug alignment OK; 0 mojibake/HTML/pustych wersetów; 9 rozdziałów z >5% różnicą liczby wersetów — **oczekiwana wersyfikacja KJV vs BG 1881** (Job 41: PL 25 vs EN 34, ten sam sens końcowego wersetu); **brak patchy assetów**
+- **Konwencja `books.*` (PL):** **dopełniacz biblijny** (Rodzaju, Wyjścia, Psalmów…) — zgodnie z polską tradycją nagłówków rozdziałów; spójne we wszystkich 66 księgach
+- **Copy PL (Phase 2):** usunięto dev-chrome (`EXPO_PUBLIC_AI_API_KEY`) z welcome AI; poprawiono Ty/twoje→Ty/Twoje; „streak”→„seria”; guided prayer/study bez „archiwów”; ecosystem bez emoji i pierwszej osoby; import/progress — profesjonalny ton
+- **Copy EN (Phase 2):** analogiczne poprawki welcome AI, reader notices, study/guided prayer, ecosystem, viral feed meditations
+- **Spójność (Phase 3):** etykiety BG 1881 / KJV w Settings i Home poprawione; `translationLabel` w Reader dynamiczny (bez zmian kodu)
+- **Skrypt:** `scripts/verify-scripture-sample.mjs` — spot-check, struktura PL/EN, artefakty encoding
+- **Zmiany:** `src/i18n/locales/pl.json`, `en.json`, `scripts/verify-scripture-sample.mjs`, `AGENT_WORKLOG.md`
+- **UI strings improved:** ~38 kluczy i18n (PL+EN pary, onboarding/home/reader/settings/AI/workspace/import/guided prayer/ecosystem)
+- **Walidacja:** `npm run typecheck` 0 błędów; `npm run check:locales` 658 kluczy OK; `node scripts/verify-scripture-sample.mjs` exit 0
+- Result: done

@@ -25,8 +25,8 @@
     "new": "New",
     "scriptureImportTitle": "Preparing Scripture…",
     "scriptureImportBooks": "Importing books and chapters…",
-    "scriptureImportVerses": "Importing verses (English + Polish)…",
-    "scriptureImportProgress": "Import in progress",
+    "scriptureImportVerses": "Importing verses (Polish and English)…",
+    "scriptureImportProgress": "Import progress",
     "scriptureImportPercent": "{{percent}}%",
     "scriptureImportHint": "First launch may take 1–3 minutes. Please keep the app open."
   },
@@ -86,13 +86,13 @@
     "searchHint_few": "Type {{count}} more characters to search.",
     "searchHint_many": "Type {{count}} more characters to search.",
     "plansHeading": "Plans",
-    "verseTextLocaleNotice": "Verse text: English (KJV)",
+    "verseTextLocaleNotice": "Verse text: follows your translation setting",
     "verseTextLocaleNoticeEn": "Verse text: English (KJV)",
     "verseTextLocaleNoticePl": "Verse text: Polish (Biblia Gdańska 1881)",
     "readScripture": "Read Scripture",
     "welcomeTitle": "Open Scripture",
     "welcomeSubtitle": "Pick a book to start reading offline.",
-    "continueSubtitle": "Pick up where you left off.",
+    "continueSubtitle": "Continue where you left off.",
     "readNow": "Read now",
     "exploreHeading": "Explore",
     "libraryHeading": "Library",
@@ -146,16 +146,30 @@
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",
     "guidedSection": "Spiritual guide",
-    "reflectionTitle": "AI reflection time",
-    "reflectionSub": "Guided 2–5 min meditation",
-    "silenceTitle": "Moment of silence with assistant",
-    "silenceSub": "Personalized spiritual alignment",
+    "reflectionTitle": "Guided reflection",
+    "reflectionSub": "2–5 minutes of focus",
+    "silenceTitle": "A moment of silence",
+    "silenceSub": "A calm alignment for today",
     "readTime": "{{min}} min",
     "generatingReflection": "Preparing your reflection…",
     "reflectionError": "Could not generate reflection. Please try again.",
     "closeSheet": "Close",
-    "offlineMeditation": "Take a quiet moment to sit with this verse. Let its words settle into your heart. What does it say to you today? Rest in the truth that God's word is alive, and He speaks through it to your specific situation.",
-    "offlineSilence": "Breathe slowly. Read the verse once more. Ask yourself: what is one thing God may be inviting you to trust, release, or embrace today? Sit in that question."
+    "offlineMeditation": "Take a quiet moment with this verse. Let its words settle in your heart. What is it saying to you today? Rest in the truth that God's word is living and speaks into your situation.",
+    "offlineSilence": "Breathe slowly. Read the verse once more. Ask yourself: what might God be inviting you to trust, release, or receive today? Stay with that question."
+  },
+  "votdComments": {
+    "title": "Comments",
+    "placeholder": "Share what God is saying to your heart…",
+    "post": "Send",
+    "you": "You",
+    "reader": "Reader",
+    "emptyTitle": "Be the first",
+    "emptyHint": "Share what this verse means to you. Your comment can encourage others in the community.",
+    "loadError": "Could not load comments. Check your connection.",
+    "postError": "Could not post your comment. Please try again.",
+    "offlineHint": "Comments are available when online mode is enabled (Supabase Anonymous Auth).",
+    "deleteTitle": "Delete comment?",
+    "deleteMessage": "This action cannot be undone."
   },
   "readingPlan": {
     "foundationTitle": "Foundation week",
@@ -236,6 +250,8 @@
     "chapterCount_many": "{{count}} chapters"
   },
   "reader": {
+    "readAloud": "Listen",
+    "stopReading": "Stop",
     "bookNotFound": "Book not found.",
     "chapterUnavailable": "This chapter is not available in the local library yet.",
     "selected": "Selected: {{reference}}",
@@ -264,11 +280,11 @@
       "rose": "Rose highlight"
     },
     "scriptureTranslationNotice": "Scripture text is in English (KJV).",
-    "scriptureTranslationNoticeShort": "You chose English (KJV) for verse text. Switch translation in Settings for Polish.",
+    "scriptureTranslationNoticeShort": "You are reading English (KJV). Switch to Biblia Gdańska in Settings.",
     "scriptureTranslationNoticeLong": "Scripture text is in English (KJV). The app interface follows your language setting.",
     "translationLabel": "Translation: {{name}}",
-    "flowSubtitle": "Read slowly. Let the text breathe.",
-    "dismissTranslationNotice": "Dismiss KJV notice",
+    "flowSubtitle": "Read slowly. Let the word speak.",
+    "dismissTranslationNotice": "Dismiss notice",
     "crossReferences": "Related passages",
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "No related passages for this chapter.",
@@ -288,10 +304,10 @@
     "pillHistorical": "Explain historical context",
     "pillApplication": "Give a daily life application",
     "pillOriginalLanguage": "Break down original Greek/Hebrew",
-    "welcomeMessage": "Peace be with you. I am your spiritual companion — ask about Scripture, prayer, or faith. Set EXPO_PUBLIC_AI_API_KEY for live responses; otherwise local previews are used.",
+    "welcomeMessage": "Peace be with you. I am your spiritual companion — ask about Scripture, prayer, or faith. When live service is unavailable, I draw on built-in guidance.",
     "chatCleared": "Chat cleared. How may I walk with you in Scripture today?",
     "liveServiceError": "I could not reach the live AI service right now. Please try again in a moment.",
-    "connectionFallback": "Live AI is unavailable — showing an offline preview. You can keep chatting or tap Retry.",
+    "connectionFallback": "Live AI is temporarily unavailable — showing a local response. You can keep chatting or tap Retry.",
     "liveError": "I could not reach the live AI service right now. Please try again in a moment.",
     "templateHistorical": "Explain the historical context of {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
     "templateApplication": "Give a practical daily-life application for {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
@@ -326,7 +342,7 @@
     "editTab": "Edit",
     "previewTab": "Preview (auto-links)",
     "titlePlaceholder": "Reflection title…",
-    "bodyPlaceholder": "Write your thoughts. Polish verse references (e.g. Rdz 1:1, Ps 23:1, J 3:16, Rz 8:28) become interactive links in preview mode…",
+    "bodyPlaceholder": "Write your reflections. Verse references (e.g. Gen 1:1, Ps 23:1, Jn 3:16, Rom 8:28) become reader links in preview…",
     "previewPlaceholder": "Your reflection preview will appear here in real time…",
     "filterNotes": "Filter notes…",
     "emptyNotes": "No notes yet",
@@ -381,10 +397,10 @@
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
     "scriptureTranslation": "Scripture translation",
-    "scriptureTranslationHint": "The app ships the full Bible: KJV (English) and Biblia Gdańska (Polish) — 66 books, ~31,100 verses per language.",
+    "scriptureTranslationHint": "The app ships the full Bible: Biblia Gdańska 1881 (Polish) and King James Version (English) — 66 books in each language.",
     "translation": {
       "title": "Scripture translation",
-      "hint": "Follows app language by default. Override to always read KJV or Biblia Gdańska.",
+      "hint": "Follows app language by default. Override to always read Biblia Gdańska or KJV.",
       "auto": "Auto",
       "pl": "PL",
       "en": "EN",
@@ -457,7 +473,7 @@
     "resetConfirmMessage": "All progress will be lost.",
     "chapterLabel": "{{book}} {{chapter}}",
     "completedDays": "{{count}} days completed",
-    "notStarted": "You haven't started the plan yet.",
+    "notStarted": "The plan has not been started yet.",
     "startHint": "Read through the entire Bible in 365 days.",
     "fullBibleRequiredTitle": "Full Bible required",
     "fullBibleRequiredHint": "The Bible-in-a-year plan needs the full library imported. Clear library in Settings if you still see a partial catalog."
@@ -489,23 +505,23 @@
     "insight": "Insight {{index}}",
     "transliteration": "Transliteration",
     "meaning": "Meaning",
-    "loading": "Engaging theological archives...",
-    "translationUnavailable": "Polish translation comparison requires an active connection.",
-    "offlineCommentary1": "The spiritual assistant encourages deep reflection on this verse in the context of the whole chapter.",
-    "offlineCommentary2": "Consider how this word applies to your daily walk.",
+    "loading": "Preparing verse study…",
+    "translationUnavailable": "Translation comparison requires an internet connection.",
+    "offlineCommentary1": "Consider this verse in the context of the whole chapter — how it fits the larger story of Scripture.",
+    "offlineCommentary2": "Reflect on how this word touches your life today.",
     "studyAction": "Study",
     "sourceReference": "{{book}} {{chapter}}:{{verse}} ({{translation}})"
   },
   "ecosystem": {
-    "welcomeTitle": "Welcome to the Ecosystem! 🌟",
+    "welcomeTitle": "Welcome to the SolidCode ecosystem",
     "quoteIntro": "One of the Dominican fathers said:",
     "quoteText": "\"The Bible must be comfortable for you. Comfortable in your hand, but also comfortable to understand.\"",
-    "quoteExplanation": "That's why instead of an old app that hadn't been developed for months, I created Biblia AI. You can customize it to your needs, and the built-in spiritual companion will answer any question you have...",
-    "continueCTA": "Explore Ecosystem ➔",
+    "quoteExplanation": "Biblia AI was built for calm, personal Scripture reading — with study tools and a spiritual companion when you need support.",
+    "continueCTA": "Explore the ecosystem",
     "activeApp": "ACTIVE APP",
     "install": "GET APP",
     "installed": "Installed & Active",
-    "intro": "Thank you for downloading our app! We build minimalistic, ultra-fast, local-first tools without unnecessary spam. Check out what else we have created for you:",
+    "intro": "Thank you for using our app. We build minimal, fast, offline-first tools without unnecessary noise. Here are other SolidCode projects:",
     "viewInStore": "View in Store",
     "seeAllApps": "See all SolidCode apps",
     "bibliaDesc": "Your personal spiritual companion and mobile center for studying the Holy Scripture. Theological analysis, original languages, and offline reading plans.",
@@ -655,6 +671,118 @@
       "gratitudeEveryGood": {
         "title": "Every good gift comes from above",
         "body": "Every good gift and every perfect thing comes from above, from the Father of lights. Today I give thanks for the small and great blessings that come from His hand."
+      },
+      "identityChosenRoyal": {
+        "title": "I am chosen, a royal priesthood",
+        "body": "I am part of a chosen generation, a royal priesthood, a holy nation, a people for God's own possession. Today I live as one who proclaims the excellencies of Him who called me out of darkness into His marvelous light."
+      },
+      "identityTemple": {
+        "title": "My body is a temple of the Spirit",
+        "body": "My body is a temple of the Holy Spirit who lives in me. I am not my own — I have been bought with a price. Today I honor my body, mind, and soul as God's dwelling place."
+      },
+      "identityImage": {
+        "title": "I am made in God's image",
+        "body": "God created me in His own image, in His likeness. I carry worth, dignity, and purpose that nothing can take away. Today I live conscious of my identity as a reflection of the Creator."
+      },
+      "peaceCastCares": {
+        "title": "I cast every care on God",
+        "body": "I cast all my anxieties on God, because He cares for me. Today I do not carry burdens that are not mine to carry. His shoulders are strong enough to hold it all."
+      },
+      "peaceBeStill": {
+        "title": "I am still, and I know He is God",
+        "body": "I am still and I know that He is God. In my stillness is my strength. Today I stop fighting in my own power and let the Lord move in my situation."
+      },
+      "peaceShepherd": {
+        "title": "The Lord is my shepherd",
+        "body": "The Lord is my shepherd — I shall not want. He leads me beside still waters, restores my soul, and guides me in paths of righteousness. Today I follow Him with confidence."
+      },
+      "strengthRefuge": {
+        "title": "God is my refuge and strength",
+        "body": "God is my refuge and strength, a very present help in trouble. I will not fear even when the earth shakes. Today I hide in Him and draw power from His presence."
+      },
+      "strengthMountWings": {
+        "title": "I mount up with wings like eagles",
+        "body": "Those who wait on the Lord renew their strength — they mount up with wings like eagles, they run and do not grow weary, they walk and do not faint. Today I choose trust over exhaustion."
+      },
+      "strengthMoreThanConq": {
+        "title": "I am more than a conqueror",
+        "body": "In all these things I am more than a conqueror through Him who loved me. Today I walk forward as one who has already overcome in Christ."
+      },
+      "faithWalkBy": {
+        "title": "I walk by faith, not by sight",
+        "body": "I walk by faith and not by sight. I do not lean on circumstances but on God's promises. Today I trust Him even when I cannot see the whole road."
+      },
+      "faithEvidence": {
+        "title": "Faith is assurance of things unseen",
+        "body": "Faith is the assurance of things hoped for, the evidence of things not seen. Today I hold on to God's promises as a firm anchor in an uncertain world."
+      },
+      "faithAsksReceives": {
+        "title": "God hears my prayers",
+        "body": "This is the confidence I have toward Him: if I ask anything according to His will, He hears me. And if I know He hears, I know I have what I asked. Today I pray boldly."
+      },
+      "faithImpossiblePossible": {
+        "title": "With God nothing is impossible",
+        "body": "With God nothing shall be impossible. What is beyond my strength is within reach of His hand. Today I bring Him my impossible and trust Him to act."
+      },
+      "healingRestoresSoul": {
+        "title": "God restores my soul",
+        "body": "The Lord restores my soul and leads me in paths of righteousness. Where I am tired or broken, His presence brings renewal. Today I receive His refreshing."
+      },
+      "healingCloseBroken": {
+        "title": "God is close to the brokenhearted",
+        "body": "The Lord is near to the brokenhearted and saves those crushed in spirit. Today I know God is nearest when I am most wounded."
+      },
+      "healingPhysician": {
+        "title": "Jesus is the physician of my soul",
+        "body": "It is not the healthy who need a doctor, but the sick. I come to Jesus with my weakness and my wounds. Today I let Him heal me where no one else can reach."
+      },
+      "healingJoyMorning": {
+        "title": "After a night of weeping, joy comes in the morning",
+        "body": "Weeping may stay for the night, but joy comes in the morning. My suffering is not my ending. Today I hold on to the promise that a new dawn is coming."
+      },
+      "hopeNewMornings": {
+        "title": "God's mercies are new every morning",
+        "body": "The Lord's mercies never cease — they are new every morning. Great is His faithfulness. Today I wake aware that God's grace is fresh and enough for this day."
+      },
+      "hopeWait": {
+        "title": "I wait on the Lord and am strengthened",
+        "body": "I wait on the Lord, I am of good courage, and He strengthens my heart. Waiting is not loss — it is the place where God builds my strength. Today I wait with trust."
+      },
+      "hopeAnchor": {
+        "title": "Hope is the anchor of my soul",
+        "body": "I have hope as an anchor for the soul, sure and steadfast, reaching into the inner place behind the veil where Jesus is. Today I stay anchored in Him no matter the waves."
+      },
+      "hopeBeautyAshes": {
+        "title": "God turns ashes into beauty",
+        "body": "God gives those who mourn a crown of beauty instead of ashes, the oil of joy instead of mourning, a garment of praise instead of a spirit of despair. Today I believe He will make something beautiful from my pain."
+      },
+      "loveGodSoLoved": {
+        "title": "God loved me enough to give His Son",
+        "body": "God so loved the world that He gave His only Son — that whoever believes in Him should not perish but have eternal life. Today I stand in the shadow of that love."
+      },
+      "loveEverlasting": {
+        "title": "God loves me with an everlasting love",
+        "body": "I have loved you with an everlasting love — therefore I have continued my faithfulness to you. Today I accept that God's love never ends and never turns away."
+      },
+      "loveKnowsName": {
+        "title": "God knows me by name",
+        "body": "Do not fear, for I have redeemed you — I have called you by name; you are mine. God knows me personally, exactly, intimately. Today I live knowing I am seen and known."
+      },
+      "gratitudeGiveThanks": {
+        "title": "I give thanks in all things",
+        "body": "In everything give thanks — for this is the will of God in Christ Jesus for me. Today I find thanksgiving even in hard moments, because God is good."
+      },
+      "gratitudeNewSong": {
+        "title": "God put a new song in my mouth",
+        "body": "The Lord lifted me out of the pit, set my feet upon a rock, and put a new song in my mouth. Today I sing Him a song of thanks for what He has done."
+      },
+      "gratitudeAbundantLife": {
+        "title": "I have life in abundance",
+        "body": "Jesus came that I might have life, and have it abundantly. Not just survival — fullness. Today I receive that abundance in my relationship with Him."
+      },
+      "gratitudeBlessSoul": {
+        "title": "Bless the Lord, O my soul",
+        "body": "Bless the Lord, O my soul, and forget not all His benefits. Today I name them one by one — forgiveness, healing, redemption, mercy — and I give thanks."
       }
     }
   },
@@ -670,8 +798,8 @@
       "body": "Switch the interface between Polish and English at any time. The reader supports both translations side by side."
     },
     "slide3": {
-      "title": "AI Companion",
-      "body": "Ask questions about any verse. The companion is grounded in Scripture and works offline with a built-in fallback."
+      "title": "Spiritual companion",
+      "body": "Ask about any verse. The companion is grounded in Scripture and works offline with built-in responses."
     },
     "premium": {
       "title": "Premium experience {{number}}",
@@ -692,16 +820,16 @@
     "exitAlertConfirm": "Exit",
     "welcome": "Welcome",
     "welcomeSubtitle": "Breathe in, quiet your mind.",
-    "welcomeText": "God hears your prayers. Let us pause, reflect on His presence, and enter into this holy moment.",
+    "welcomeText": "God hears your prayers. Quiet your mind, become aware of His presence, and enter this moment of prayer.",
     "adoration": "Adoration",
     "adorationSubtitle": "Honor God's holiness.",
-    "adorationLoading": "Consulting spiritual archives to prepare your adoration...",
+    "adorationLoading": "Preparing your adoration…",
     "reflection": "Reflection",
-    "reflectionSubtitle": "Surrender your worries.",
-    "addPrayer": "Add Prayer Request",
-    "prayerInputPlaceholder": "What is on your heart today? Surrender it to God...",
+    "reflectionSubtitle": "Entrust your cares to God.",
+    "addPrayer": "Add a prayer request",
+    "prayerInputPlaceholder": "What is on your heart today? Entrust it to God…",
     "habit": "Habit",
-    "habitSubtitle": "Stay consistent in prayer.",
+    "habitSubtitle": "Prayer every day.",
     "habitMessage": "Let prayer become a daily habit. Consistent communion with God builds a peaceful soul.",
     "scheduleReminder": "Schedule Daily Reminder",
     "continueButton": "Continue",

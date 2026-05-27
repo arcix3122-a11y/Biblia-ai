@@ -25,10 +25,10 @@
     "new": "Nowość",
     "scriptureImportTitle": "Przygotowujemy Pismo Święte…",
     "scriptureImportBooks": "Importujemy księgi i rozdziały…",
-    "scriptureImportVerses": "Importujemy wersety (polski + angielski)…",
-    "scriptureImportProgress": "Trwa import",
+    "scriptureImportVerses": "Importujemy wersety (polski i angielski)…",
+    "scriptureImportProgress": "Postęp importu",
     "scriptureImportPercent": "{{percent}}%",
-    "scriptureImportHint": "Pierwsze uruchomienie może potrwać 1–3 minuty. Nie zamykaj aplikacji."
+    "scriptureImportHint": "Pierwsze uruchomienie może potrwać 1–3 minuty. Pozostaw aplikację otwartą."
   },
   "tabs": {
     "scripture": "Czytaj",
@@ -36,7 +36,7 @@
     "workspace": "Notatki",
     "headerScripture": "Pismo Święte",
     "headerCompanion": "Towarzysz",
-    "headerWorkspace": "Przestrzeń robocza"
+    "headerWorkspace": "Notatki"
   },
   "navigation": {
     "chapters": "Rozdziały",
@@ -86,13 +86,13 @@
     "offlineReady": "Tryb offline",
     "pullToRefresh": "Przeciągnij w dół, aby odświeżyć bibliotekę i dane czytania",
     "plansHeading": "Plany",
-    "verseTextLocaleNotice": "Tekst wersetów: angielski (KJV)",
+    "verseTextLocaleNotice": "Tekst wersetów: zgodnie z ustawieniem tłumaczenia",
     "verseTextLocaleNoticeEn": "Tekst wersetów: angielski (KJV)",
     "verseTextLocaleNoticePl": "Tekst wersetów: polski (Biblia Gdańska 1881)",
     "readScripture": "Czytaj Pismo",
     "welcomeTitle": "Otwórz Pismo",
     "welcomeSubtitle": "Wybierz księgę, aby rozpocząć czytanie offline.",
-    "continueSubtitle": "Wróć tam, gdzie skończyłeś.",
+    "continueSubtitle": "Kontynuuj tam, gdzie przerwałeś.",
     "readNow": "Czytaj teraz",
     "exploreHeading": "Odkryj",
     "libraryHeading": "Biblioteka",
@@ -146,16 +146,30 @@
     "greetingAfternoon": "Dzień dobry",
     "greetingEvening": "Dobry wieczór",
     "guidedSection": "Przewodnik duchowy",
-    "reflectionTitle": "Czas na refleksję AI",
-    "reflectionSub": "Skupienie 2–5 min",
-    "silenceTitle": "Chwila wyciszenia z Asystentem",
-    "silenceSub": "Duchowe dopasowanie dnia",
+    "reflectionTitle": "Refleksja z towarzyszem",
+    "reflectionSub": "2–5 minut skupienia",
+    "silenceTitle": "Chwila ciszy z towarzyszem",
+    "silenceSub": "Spokojne dopasowanie na dziś",
     "readTime": "{{min}} min",
     "generatingReflection": "Przygotowuję refleksję…",
     "reflectionError": "Nie udało się wygenerować refleksji. Spróbuj ponownie.",
     "closeSheet": "Zamknij",
-    "offlineMeditation": "Zatrzymaj się na chwilę i daj temu wersetowi czas, by osiadł w sercu. Co mówi ci dziś? Odpocznij w prawdzie, że Słowo Boże jest żywe i przemawia do twojej konkretnej sytuacji.",
-    "offlineSilence": "Oddychaj spokojnie. Przeczytaj werset jeszcze raz. Zadaj sobie pytanie: do czego Bóg może zapraszać cię dziś — do zaufania, uwolnienia lub przyjęcia? Pozostań w tym pytaniu."
+    "offlineMeditation": "Zatrzymaj się na chwilę i daj temu wersetowi czas, by osiadł w sercu. Co mówi Ci dziś? Odpocznij w prawdzie, że Słowo Boże jest żywe i przemawia do Twojej sytuacji.",
+    "offlineSilence": "Oddychaj spokojnie. Przeczytaj werset jeszcze raz. Zadaj sobie pytanie: do czego Bóg może zapraszać Cię dziś — do zaufania, uwolnienia lub przyjęcia? Pozostań w tym pytaniu."
+  },
+  "votdComments": {
+    "title": "Komentarze",
+    "placeholder": "Napisz, co Bóg mówi do Twojego serca…",
+    "post": "Wyślij",
+    "you": "Ty",
+    "reader": "Czytelnik",
+    "emptyTitle": "Bądź pierwszy",
+    "emptyHint": "Podziel się tym, co ten werset znaczy dla ciebie. Twój komentarz może zachęcić innych w społeczności.",
+    "loadError": "Nie udało się załadować komentarzy. Sprawdź połączenie.",
+    "postError": "Nie udało się wysłać komentarza. Spróbuj ponownie.",
+    "offlineHint": "Komentarze są dostępne po włączeniu trybu online (Supabase Anonymous Auth).",
+    "deleteTitle": "Usunąć komentarz?",
+    "deleteMessage": "Tej operacji nie można cofnąć."
   },
   "readingPlan": {
     "foundationTitle": "Tydzień fundamentów",
@@ -167,7 +181,7 @@
     "readNow": "Czytaj teraz",
     "readAgain": "Czytaj ponownie",
     "planComplete": "Plan ukończony",
-    "planCompleteHint": "Ukończyłeś wszystkie siedem dni. Możesz zacząć od nowa w dowolnym momencie.",
+    "planCompleteHint": "Ukończono wszystkie siedem dni. Możesz rozpocząć ponownie w dowolnym momencie.",
     "chapterUnavailableTitle": "Rozdział niedostępny"
   },
   "topics": {
@@ -242,6 +256,8 @@
     "aiAssistant": "Asystent AI",
     "notebook": "Notatnik",
     "listen": "Słuchaj",
+    "readAloud": "Słuchaj",
+    "stopReading": "Zatrzymaj",
     "previous": "Poprzedni",
     "next": "Następny",
     "exitImmersive": "Wyjdź z trybu immersyjnego",
@@ -264,11 +280,11 @@
       "rose": "Różowe podświetlenie"
     },
     "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV).",
-    "scriptureTranslationNoticeShort": "Wybrałeś angielski (KJV). W Ustawieniach możesz przełączyć na polski tekst Pisma.",
-    "scriptureTranslationNoticeLong": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku.",
+    "scriptureTranslationNoticeShort": "Czytasz angielski tekst (KJV). W Ustawieniach możesz przełączyć na Biblię Gdańską.",
+    "scriptureTranslationNoticeLong": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji pozostaje w wybranym języku.",
     "translationLabel": "Tłumaczenie: {{name}}",
-    "flowSubtitle": "Czytaj wolno. Pozwól tekstowi oddychać.",
-    "dismissTranslationNotice": "Ukryj informację o KJV",
+    "flowSubtitle": "Czytaj spokojnie. Pozwól, by Słowo przemawiało.",
+    "dismissTranslationNotice": "Ukryj powiadomienie",
     "crossReferences": "Powiązane fragmenty",
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "Brak powiązanych fragmentów dla tego rozdziału.",
@@ -288,10 +304,10 @@
     "pillHistorical": "Wyjaśnij kontekst historyczny",
     "pillApplication": "Podaj zastosowanie w codziennym życiu",
     "pillOriginalLanguage": "Omów oryginalne znaczenie (grecki/hebrajski)",
-    "welcomeMessage": "Pokój z Tobą. Jestem Twoim duchowym towarzyszem — pytaj o Pismo, modlitwę lub wiarę. Ustaw EXPO_PUBLIC_AI_API_KEY, aby korzystać z odpowiedzi na żywo; w przeciwnym razie używane są lokalne podglądy.",
+    "welcomeMessage": "Pokój z Tobą. Jestem Twoim duchowym towarzyszem — pytaj o Pismo, modlitwę lub wiarę. Gdy usługa na żywo jest niedostępna, korzystam z wbudowanych wskazówek.",
     "chatCleared": "Czat wyczyszczony. W czym mogę Ci towarzyszyć w Piśmie?",
     "liveServiceError": "Nie udało się połączyć z usługą AI. Spróbuj ponownie za chwilę.",
-    "connectionFallback": "Usługa AI niedostępna — pokazuję lokalny podgląd. Możesz kontynuować czat lub dotknąć „Spróbuj ponownie”.",
+    "connectionFallback": "Usługa AI jest chwilowo niedostępna — pokazuję lokalną odpowiedź. Możesz kontynuować rozmowę lub dotknąć „Spróbuj ponownie”.",
     "liveError": "Nie udało się połączyć z usługą AI. Spróbuj ponownie za chwilę.",
     "templateHistorical": "Wyjaśnij kontekst historyczny wersetu {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
     "templateApplication": "Podaj praktyczne zastosowanie w codziennym życiu dla {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
@@ -313,7 +329,7 @@
     "starterHint": "Pytaj o Pismo, modlitwę lub wiarę. Wybierz werset w czytniku, aby włączyć kontekstowe podpowiedzi."
   },
   "workspace": {
-    "title": "Przestrzeń robocza",
+    "title": "Notatki",
     "notes": "Rozważania",
     "notesWithCount": "Rozważania ({{count}})",
     "notesCount": "Rozważania ({{count}})",
@@ -326,7 +342,7 @@
     "editTab": "Edycja",
     "previewTab": "Podgląd (auto-linki)",
     "titlePlaceholder": "Tytuł rozważania…",
-    "bodyPlaceholder": "Zapisz swoje przemyślenia. Polskie sygnatury wersetów (np. Rdz 1:1, Ps 23:1, J 3:16, Rz 8:28) w trybie podglądu automatycznie zamienią się w interaktywne odnośniki do czytnika biblijnego…",
+    "bodyPlaceholder": "Zapisz swoje rozważania. Odnośniki do wersetów (np. Rdz 1:1, Ps 23:1, J 3:16, Rz 8:28) w podglądzie staną się linkami do czytnika…",
     "previewPlaceholder": "Podgląd przemyśleń wygeneruje się w czasie rzeczywistym…",
     "filterNotes": "Filtruj notatki…",
     "emptyNotes": "Brak notatek",
@@ -381,10 +397,10 @@
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
     "scriptureTranslation": "Tłumaczenie Pisma",
-    "scriptureTranslationHint": "Aplikacja zawiera pełną Biblię: KJV (angielski) i Biblia Gdańska (polski) — 66 ksiąg, ok. 31 100 wersetów w każdym języku.",
+    "scriptureTranslationHint": "Aplikacja zawiera pełną Biblię: Biblia Gdańska 1881 (polski) i King James Version (angielski) — 66 ksiąg w każdym języku.",
     "translation": {
       "title": "Tłumaczenie Pisma",
-      "hint": "Domyślnie zgodnie z językiem aplikacji. Możesz wymusić KJV lub Biblię Gdańską.",
+      "hint": "Domyślnie zgodnie z językiem aplikacji. Możesz wymusić Biblię Gdańską lub KJV.",
       "auto": "Auto",
       "pl": "PL",
       "en": "EN",
@@ -457,7 +473,7 @@
     "resetConfirmMessage": "Cały postęp zostanie utracony.",
     "chapterLabel": "{{book}} {{chapter}}",
     "completedDays": "{{count}} ukończonych dni",
-    "notStarted": "Nie rozpocząłeś jeszcze planu.",
+    "notStarted": "Plan nie został jeszcze rozpoczęty.",
     "startHint": "Przeczytaj całą Biblię w 365 dni.",
     "fullBibleRequiredTitle": "Wymagana pełna Biblia",
     "fullBibleRequiredHint": "Plan „Biblia w rok” wymaga pełnej biblioteki. Jeśli widzisz niepełny katalog, wyczyść bibliotekę w Ustawieniach."
@@ -465,7 +481,7 @@
   "stats": {
     "title": "Statystyki",
     "subtitle": "Twoja podróż przez Pismo",
-    "currentStreak": "Aktualny streak",
+    "currentStreak": "Aktualna seria",
     "days": "{{count}} dni",
     "days_one": "{{count}} dzień",
     "days_few": "{{count}} dni",
@@ -489,23 +505,23 @@
     "insight": "Wgląd {{index}}",
     "transliteration": "Transliteracja",
     "meaning": "Znaczenie",
-    "loading": "Trwa pobieranie analizy teologicznej...",
-    "translationUnavailable": "Porównanie przekładów wymaga aktywnego połączenia.",
-    "offlineCommentary1": "Duchowy asystent zachęca do głębokiego rozważania tego wersetu w kontekście całego rozdziału.",
-    "offlineCommentary2": "Rozważ, w jaki sposób to słowo odnosi się bezpośrednio do Twojego dzisiejszego życia.",
+    "loading": "Przygotowuję analizę wersetu…",
+    "translationUnavailable": "Porównanie przekładów wymaga połączenia z internetem.",
+    "offlineCommentary1": "Rozważ ten werset w kontekście całego rozdziału — jak wpisuje się w większą całość Pisma.",
+    "offlineCommentary2": "Zastanów się, jak to Słowo dotyka Twojego życia dziś.",
     "studyAction": "Studium",
     "sourceReference": "{{book}} {{chapter}}:{{verse}} ({{translation}})"
   },
   "ecosystem": {
-    "welcomeTitle": "Witaj w ekosystemie! 🌟",
+    "welcomeTitle": "Witaj w ekosystemie SolidCode",
     "quoteIntro": "Jeden z ojców dominikańskich powiedział:",
-    "quoteText": "„Biblia musi być dla ciebie wygodna. Wygodna w dłoni, ale też wygodna do zrozumienia.”",
-    "quoteExplanation": "Dlatego zamiast starej aplikacji, która nie była rozwijana od miesięcy, stworzyłem Biblia AI. Możesz dostosować ją do swoich potrzeb, a wbudowany duchowy towarzysz odpowie na każde pytanie…",
-    "continueCTA": "Odkryj ekosystem ➔",
+    "quoteText": "„Biblia musi być dla ciebie wygodna — wygodna w dłoni, ale też wygodna do zrozumienia.”",
+    "quoteExplanation": "Biblia AI powstała z myślą o spokojnym, osobistym czytaniu Pisma — z narzędziami studium i duchowym towarzyszem, gdy potrzebujesz wsparcia.",
+    "continueCTA": "Poznaj ekosystem",
     "activeApp": "AKTYWNA APLIKACJA",
     "install": "POBIERZ",
     "installed": "Zainstalowana i aktywna",
-    "intro": "Dziękujemy za pobranie naszej aplikacji! Tworzymy minimalistyczne, ultraszybkie narzędzia local-first bez zbędnego spamu. Zobacz, co jeszcze dla Ciebie przygotowaliśmy:",
+    "intro": "Dziękujemy za korzystanie z naszej aplikacji. Tworzymy minimalistyczne, szybkie narzędzia działające offline — bez zbędnego szumu. Oto inne projekty SolidCode:",
     "viewInStore": "Zobacz w sklepie",
     "seeAllApps": "Zobacz wszystkie aplikacje SolidCode",
     "bibliaDesc": "Twój osobisty duchowy towarzysz i mobilne centrum studiowania Pisma Świętego. Analiza teologiczna, języki oryginalne i plany czytania offline.",
@@ -595,7 +611,7 @@
     "openInReader": "Otwórz w czytniku",
     "shuffle": "Losuj",
     "homeTileTitle": "Afirmacje",
-    "homeTileSub": "Mowa Boga nad tobą",
+    "homeTileSub": "Słowo Boga nad Tobą",
     "emptyHint": "Wybierz kategorię, aby zobaczyć afirmacje.",
     "categories": {
       "identity": "Tożsamość w Chrystusie",
@@ -655,6 +671,118 @@
       "gratitudeEveryGood": {
         "title": "Każdy dobry dar pochodzi z góry",
         "body": "Każdy dobry dar i każda doskonała rzecz pochodzi z góry, od Ojca świateł. Dziś dziękuję za małe i wielkie błogosławieństwa, które otrzymuję z Jego rąk."
+      },
+      "identityChosenRoyal": {
+        "title": "Jestem wybranym i królewskim kapłaństwem",
+        "body": "Jestem z rodu wybranego, królewskiego kapłaństwa, narodu świętego i ludu nabytego. Dziś żyję jako ten, kto głosi cnoty Tego, który mnie powołał z ciemności do swojej cudownej światłości."
+      },
+      "identityTemple": {
+        "title": "Moje ciało jest świątynią Ducha",
+        "body": "Moje ciało jest świątynią Ducha Świętego, który we mnie mieszka. Nie należę do siebie — zostałem kupiony za cenę. Dziś szanuję moje ciało, umysł i duszę jako mieszkanie Boże."
+      },
+      "identityImage": {
+        "title": "Jestem stworzony na obraz Boga",
+        "body": "Bóg stworzył mnie na swój obraz i podobieństwo. Mam wartość, godność i cel, których nikt nie może mi odebrać. Dziś żyję świadomy mojej tożsamości jako odbicie Stwórcy."
+      },
+      "peaceCastCares": {
+        "title": "Zrzucam wszystkie troski na Boga",
+        "body": "Wszystkie moje troski składam na Boga, ponieważ On się o mnie troszczy. Dziś nie noszę ciężarów, które do mnie nie należą. Jego ramiona są wystarczająco mocne, by wszystko unieść."
+      },
+      "peaceBeStill": {
+        "title": "Spoczywam i wiem, że On jest Bogiem",
+        "body": "Zatrzymuję się i wiem, że On jest Bogiem. W moim spoczynku jest moja siła. Dziś przestaję walczyć w swojej mocy i pozwalam Panu działać w mojej sytuacji."
+      },
+      "peaceShepherd": {
+        "title": "Pan jest moim pasterzem",
+        "body": "Pan jest moim pasterzem — nie braknie mi niczego. Prowadzi mnie do wód spokojnych, posila moją duszę i kieruje ścieżkami sprawiedliwości. Dziś idę za Nim z ufnością."
+      },
+      "strengthRefuge": {
+        "title": "Bóg jest moją ucieczką i mocą",
+        "body": "Bóg jest moją ucieczką i siłą, pomocą zawsze obecną w utrapieniu. Nie boję się, choćby ziemia drżała. Dziś chowam się w Nim i czerpię moc z Jego obecności."
+      },
+      "strengthMountWings": {
+        "title": "Wzlatuję na skrzydłach jak orzeł",
+        "body": "Ci, którzy ufają Panu, nabywają nowej siły. Wzlatują na skrzydłach jak orły — biegną, a nie ustają, idą, a nie mdleją. Dziś wybieram zaufanie zamiast zmęczenia."
+      },
+      "strengthMoreThanConq": {
+        "title": "Jestem więcej niż zwycięzcą",
+        "body": "We wszystkich tych rzeczach przezwyciężam — i to o wiele — przez Tego, który mnie umiłował. Dziś idę naprzód jako ten, kto już zwyciężył w Chrystusie."
+      },
+      "faithWalkBy": {
+        "title": "Chodzę przez wiarę, nie przez widzenie",
+        "body": "Chodzę przez wiarę, a nie przez widzenie. Nie polegam na okolicznościach, lecz na obietnicach Boga. Dziś ufam Mu nawet wtedy, gdy nie widzę całej drogi."
+      },
+      "faithEvidence": {
+        "title": "Wiara to pewność rzeczy niewidzialnych",
+        "body": "Wiara jest pewnością tego, czego się spodziewam, dowodem rzeczy niewidzialnych. Dziś trzymam się Bożych obietnic jako mocnej kotwicy w niepewnym świecie."
+      },
+      "faithAsksReceives": {
+        "title": "Bóg słyszy moje modlitwy",
+        "body": "Mam tę śmiałość, że gdy proszę o coś według Jego woli, On mnie słyszy. A skoro wiem, że mnie słyszy, wiem też, że mam to, o co prosiłem. Dziś modlę się z odwagą."
+      },
+      "faithImpossiblePossible": {
+        "title": "U Boga nie ma rzeczy niemożliwych",
+        "body": "U Boga żadna rzecz nie jest niemożliwa. To, co przerasta moją siłę, leży w zasięgu Jego ręki. Dziś przynoszę Mu moje niemożliwe i ufam, że On dokona."
+      },
+      "healingRestoresSoul": {
+        "title": "Bóg posila moją duszę",
+        "body": "Pan posila moją duszę i prowadzi mnie ścieżkami sprawiedliwości. Tam, gdzie jestem zmęczony lub złamany, Jego obecność przynosi odnowę. Dziś przyjmuję Jego odświeżenie."
+      },
+      "healingCloseBroken": {
+        "title": "Bóg jest blisko skruszonych serc",
+        "body": "Bliski jest Pan tym, którzy są skruszonego serca, i wybawia tych, którzy są przygnębieni na duchu. Dziś wiem, że Bóg jest najbliżej, gdy jestem najbardziej zraniony."
+      },
+      "healingPhysician": {
+        "title": "Jezus jest lekarzem mojej duszy",
+        "body": "Nie zdrowi potrzebują lekarza, lecz ci, którzy źle się mają. Przychodzę do Jezusa z moimi słabościami i ranami. Dziś pozwalam Mu uzdrawiać mnie tam, gdzie nikt inny nie sięga."
+      },
+      "healingJoyMorning": {
+        "title": "Po nocy płaczu przychodzi radość",
+        "body": "Wieczorem gości u nas płacz, ale rano pieśń radości. Moje cierpienie nie jest moim końcem. Dziś trzymam się obietnicy, że nowy poranek przyjdzie."
+      },
+      "hopeNewMornings": {
+        "title": "Miłosierdzie Boga jest nowe każdego ranka",
+        "body": "Miłosierdzie Pańskie nie ustaje — odnawia się każdego ranka. Wielka jest Jego wierność. Dziś budzę się świadomy, że Boża łaska jest świeża i wystarczająca na ten dzień."
+      },
+      "hopeWait": {
+        "title": "Oczekuję Pana, On mnie umacnia",
+        "body": "Oczekuję Pana, mężnie się trzymam, a serce moje będzie umocnione. Czekanie nie jest stratą — jest miejscem, gdzie Bóg buduje moją siłę. Dziś czekam z ufnością."
+      },
+      "hopeAnchor": {
+        "title": "Nadzieja jest kotwicą mojej duszy",
+        "body": "Mam nadzieję jako kotwicę duszy, bezpieczną i mocną, sięgającą wnętrza zasłony, gdzie jest Jezus. Dziś trwam zakotwiczony w Nim, niezależnie od fali."
+      },
+      "hopeBeautyAshes": {
+        "title": "Bóg zamienia popiół w piękno",
+        "body": "Bóg daje płaczącym ozdobę zamiast popiołu, olejek wesela zamiast smutku, szatę chwały zamiast ducha przygnębienia. Dziś wierzę, że On uczyni coś pięknego z mojego bólu."
+      },
+      "loveGodSoLoved": {
+        "title": "Bóg umiłował mnie aż do oddania Syna",
+        "body": "Tak Bóg umiłował świat, że Syna swego jednorodzonego dał — abym ja, wierząc w Niego, nie zginął, ale miał życie wieczne. Dziś staję w cieniu tej miłości."
+      },
+      "loveEverlasting": {
+        "title": "Bóg umiłował mnie miłością wieczną",
+        "body": "Miłością wieczną umiłowałem cię — mówi Pan. Dlatego trwam wiernie przy tobie. Dziś przyjmuję, że Boża miłość nigdy się nie kończy i nigdy się nie odwraca."
+      },
+      "loveKnowsName": {
+        "title": "Bóg zna mnie po imieniu",
+        "body": "Nie bój się, bo cię odkupiłem — wezwałem cię po imieniu, mój jesteś. Bóg zna mnie osobiście, dokładnie, intymnie. Dziś żyję wiedząc, że jestem widziany i znany."
+      },
+      "gratitudeGiveThanks": {
+        "title": "Dziękuję we wszystkim",
+        "body": "Za wszystko dziękuję — taka jest wola Boga w Chrystusie Jezusie względem mnie. Dziś znajduję dziękczynienie nawet w trudnych chwilach, bo Bóg jest dobry."
+      },
+      "gratitudeNewSong": {
+        "title": "Bóg włożył w moje usta pieśń nową",
+        "body": "Pan wyprowadził mnie z dołu zguby, postawił moje stopy na skale i włożył w moje usta pieśń nową. Dziś śpiewam Mu pieśń wdzięczności za to, co uczynił."
+      },
+      "gratitudeAbundantLife": {
+        "title": "Mam życie w obfitości",
+        "body": "Jezus przyszedł, abym miał życie i miał je w obfitości. Nie tylko przetrwanie — pełnię. Dziś chwytam się tej obfitości w relacji z Nim."
+      },
+      "gratitudeBlessSoul": {
+        "title": "Błogosław duszo moja Panu",
+        "body": "Błogosław duszo moja Panu i nie zapominaj wszystkich dobrodziejstw Jego. Dziś nazywam je po imieniu — przebaczenie, uzdrowienie, wykupienie, miłosierdzie — i dziękuję."
       }
     }
   },
@@ -670,8 +798,8 @@
       "body": "Przełączaj interfejs między polskim a angielskim. Czytnik obsługuje oba tłumaczenia obok siebie."
     },
     "slide3": {
-      "title": "Asystent AI",
-      "body": "Zadaj pytanie o dowolny werset. Asystent oparty na Piśmie działa offline z wbudowanym fallbackiem."
+      "title": "Duchowy towarzysz",
+      "body": "Zadaj pytanie o dowolny werset. Asystent oparty na Piśmie działa także offline, z wbudowanymi odpowiedziami."
     },
     "premium": {
       "title": "Doświadczenie premium {{number}}",
@@ -692,16 +820,16 @@
     "exitAlertConfirm": "Przerwij",
     "welcome": "Witaj",
     "welcomeSubtitle": "Zatrzymaj się i weź głęboki oddech.",
-    "welcomeText": "Bóg słyszy twoje modlitwy. Wycisz umysł, uświadom sobie Jego świętą obecność i wejdź w ten wyjątkowy moment.",
+    "welcomeText": "Bóg słyszy Twoje modlitwy. Wycisz umysł, uświadom sobie Jego obecność i wejdź w ten chwilę modlitwy.",
     "adoration": "Uwielbienie",
-    "adorationSubtitle": "Uhonoruj Boga.",
-    "adorationLoading": "Czerpanie z duchowych archiwów w celu przygotowania uwielbienia...",
+    "adorationSubtitle": "Uhonoruj świętość Boga.",
+    "adorationLoading": "Przygotowuję uwielbienie…",
     "reflection": "Refleksja",
-    "reflectionSubtitle": "Oddaj Bogu swoje troski.",
-    "addPrayer": "Dodaj modlitwę",
-    "prayerInputPlaceholder": "Co dzisiaj leży Ci na sercu? Powierz to Bogu...",
+    "reflectionSubtitle": "Powierz Bogu swoje troski.",
+    "addPrayer": "Dodaj prośbę modlitewną",
+    "prayerInputPlaceholder": "Co dziś leży Ci na sercu? Powierz to Bogu…",
     "habit": "Nawyk",
-    "habitSubtitle": "Módl się regularnie.",
+    "habitSubtitle": "Modlitwa na co dzień.",
     "habitMessage": "Niech modlitwa stanie się codziennym nawykiem. Regularna rozmowa z Bogiem przynosi pokój serca.",
     "scheduleReminder": "Ustaw codzienne przypomnienie",
     "continueButton": "Dalej",
