@@ -13,6 +13,26 @@ Add one short entry per completed task.
 - **Walidacja:** `npm run typecheck`, `npm run check:locales`, commit `feat(bible): bilingual PL/EN scripture in SQLite`.
 - **Poza zakresem:** onboarding 100 slajdów (notatka tylko).
 
+## 2026-05-27 — PROGRESS (Cursor subagent — bilingual PL/EN scripture)
+
+- Schema v3 + seed PL z midvash API — gotowe
+- UI Reader/Settings/VOTD/search — podpięte pod `translationStore`
+- `npm run typecheck` + `check:locales` — 0 błędów
+
+## 2026-05-27 — DONE (Cursor subagent — bilingual PL/EN scripture)
+
+- **Źródło PL:** Biblia Gdańska (1881), public domain — [midvash/bible-data `versions/pl/bg`](https://github.com/midvash/bible-data/tree/main/versions/pl/bg); licencja w `docs/BIBLE_TRANSLATIONS.md`
+- **Seed mobilny:** 94 wersety × 2 języki (Gen 1, Ps 23, J 1, Rz 8:26–31) — łącznie ~40 KB (`bible-seed-en.json` + `bible-seed-pl.json`)
+- **SQLite v3:** kolumna `verses.translation` (`en`|`pl`), unikat `(chapter_id, number, translation)`; backfill PL na istniejących instalacjach
+- **Skrypty:** `scripts/import-polish-bible.mjs --midvash`, `scripts/prepare-bilingual-seed.mjs` (ścieżka do pełnej Biblii bez commitu 7 MB)
+- **Aplikacja:** `translationStore` (Auto/PL/EN), Settings → Tłumaczenie Pisma, Reader/search/VOTD/share/audio po aktywnym tłumaczeniu; banner KJV tylko gdy PL UI + wymuszony EN
+- **Plan roczny:** ukryty na Home dopóki `hasFullBibleTranslation()` nie zwróci true (66 ksiąg)
+- **i18n:** `settings.translation.*`, `reader.translationLabel`, dynamiczne etykiety Home
+- **Commit:** `3822e60` — `feat(bible): bilingual PL/EN scripture in SQLite`
+- **Walidacja:** `npm run typecheck` OK, `npm run check:locales` OK (511 kluczy)
+- **Test na telefonie:** (1) Ustaw PL → Rodzaju 1 po polsku; (2) EN → Genesis 1 KJV; (3) Settings Auto vs wymuszone EN/PL; (4) wyszukaj „światłość” vs „light”; (5) po aktualizacji: Settings → wyczyść bibliotekę lub reinstall dla v3 seed
+- **Poza zakresem:** onboarding 100 slajdów — bez zmian w tej sesji
+
 ## 2026-05-23 — START (Claude Code — viral feed overhaul)
 
 **Cel:** Przeprojektowanie głównego ekranu aplikacji na wzór angażującego feeda (YouVersion). Nowe elementy: premium karta VOTD z social barem (like/share/komentarz), powitanie zależne od pory dnia, dwie karty "Przewodnika duchowego" otwierające streaming AI. Pełna i18n PL+EN pod przestrzenią `viralFeed.*`.
