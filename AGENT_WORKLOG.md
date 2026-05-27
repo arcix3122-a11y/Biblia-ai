@@ -1593,6 +1593,22 @@ npx expo start
 - Validation: pending
 - Result: in-progress
 
+## 2026-05-27 19:45 (local)
+- Agent: Cursor subagent
+- Task: DONE - YouVersion-style photo backgrounds — dokończenie
+- **Przed:** płaskie gradienty / złote tła (HeroCard, kafelki Odkryj), VOTD bez pełnoekranowego zdjęcia, Afirmacje ze zdjęciem u góry, toast „Network request failed” przy offline Supabase
+- **Po:** pełnoekranowe seeded photos (picsum) + ciemny scrim, serif na wersecie, zdjęcie po prawej na kartach afirmacji, ciche łapanie błędów sieci
+- `src/data/photoBackgrounds.ts` — mapa kategorii (`votd`, `continueReading`, `discoverAffirmations`, `guidedPrayer`, …) + `getCategoryPhotoUrl(key)`
+- `src/components/PhotoBackground.tsx` — `expo-image` + cache, fallback glow (bez brzydkiego gradientu jako primary)
+- `VotdFeedCard` — full-bleed photo, większy italic verse, social bar na scrim
+- `HeroCard` — continue-reading photo zamiast solid gold
+- `ActionTile` — photo + scrim na kafelkach Odkryj (Afirmacje, Asystent, Plan, Modlitwa)
+- `AffirmationsScreen` — layout poziomy: tekst lewo, photo 120px prawo
+- `ReadingPlanCard`, `MomentumDashboard`, `GuidedReflectionCards` — photo backgrounds
+- Sieć: `LogBox.ignoreLogs`, global handler pomija benign network, `votdSocialRepository` / `supabaseClient` / `errorLogger` bez wycieku toastów
+- `npm run typecheck` 0 błędów; commit `94cab86`
+- Result: done
+
 ## 2026-05-27 13:53 (local)
 - Agent: Codex
 - Task: START - przebudowa asystenta AI end-to-end, zachowanie religijne, guardraile, UI, haptics i animacje
