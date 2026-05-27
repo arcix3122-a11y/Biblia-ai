@@ -58,9 +58,24 @@ Theme is fixed dark in Phase 1. Reader font size and immersive mode are in **Set
 
 ## Seeded Scripture
 
-`assets/bible-seed.json` — Genesis 1, Psalms 23, John 1, Romans 8:26–31 (KJV-style sample).
+The app bundles the **full Bible** in both languages (~31,100 verses each):
 
-## Full Bible import
+| Asset | Translation | Source |
+|-------|-------------|--------|
+| `assets/bible-full-en.json` | King James Version (EN) | `scripts/source-kjv-full.json` (public domain) |
+| `assets/bible-full-pl.json` | Biblia Gdańska 1881 (PL) | [midvash/bible-data](https://github.com/midvash/bible-data/tree/main/versions/pl/bg) |
+
+On **first launch**, SQLite imports both translations with a progress screen (`ScriptureImportScreen`). Expect **1–3 minutes** on a phone. The import runs once; flag `@biblia-ai/full-bible-imported-v1`.
+
+To rebuild assets locally:
+
+```bash
+node scripts/prepare-full-bible-seed.mjs
+```
+
+Legacy demo slices (`assets/bible-seed-en.json`, 94 verses) remain for tooling only — production seed uses `bible-full-*.json`.
+
+## Full Bible import (developers)
 
 1. Obtain or build a JSON export matching `assets/bible-seed.json` shape (`books[]` → `chapters[]` → `verses[]`).
 2. Validate: `node scripts/import-full-bible.mjs ./your-bible.json`
@@ -71,7 +86,7 @@ Raw KJV source for tooling may live at `scripts/source-kjv-full.json` (not bundl
 
 ## Languages / Języki
 
-Biblia AI supports **Polish (PL)** and **English (EN)** for all app UI strings (tabs, screens, settings, errors). Scripture text in SQLite remains in the bundled translation (KJV-style sample or your imported Bible JSON).
+Biblia AI supports **Polish (PL)** and **English (EN)** for all app UI strings (tabs, screens, settings, errors). Scripture text is available in **both KJV English and Biblia Gdańska Polish** (66 books, bundled in `assets/bible-full-*.json`).
 
 ### Switching language / Zmiana języka
 

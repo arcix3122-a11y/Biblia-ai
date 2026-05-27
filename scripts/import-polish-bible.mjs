@@ -50,14 +50,12 @@ function parseArgs(argv) {
 }
 
 async function fetchMidvashBook(fileStem) {
-  const url = `https://api.github.com/repos/midvash/bible-data/contents/versions/pl/bg/books/${fileStem}.json?ref=main`;
-  const response = await fetch(url);
+  const rawUrl = `https://raw.githubusercontent.com/midvash/bible-data/main/versions/pl/bg/books/${fileStem}.json`;
+  const response = await fetch(rawUrl);
   if (!response.ok) {
-    fail(`GitHub fetch failed for ${fileStem}: HTTP ${response.status}`);
+    fail(`Fetch failed for ${fileStem}: HTTP ${response.status} (${rawUrl})`);
   }
-  const payload = await response.json();
-  const raw = Buffer.from(payload.content, "base64").toString("utf8");
-  return JSON.parse(raw);
+  return response.json();
 }
 
 function midvashChapterToVerses(chapter) {

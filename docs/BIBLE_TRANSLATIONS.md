@@ -1,15 +1,15 @@
 # Bible translations in Biblia AI
 
-## Bundled mobile seed (demo)
+## Bundled full Bible (production)
 
-The app ships a **small dual-language sample** for offline demo (~94 verses × 2 languages, ~40 KB total):
+The app ships the **complete dual-language library** (~31k verses × 2 languages, ~11 MB total JSON):
 
-| Locale code | Translation | Label | Chapters |
-|-------------|-------------|-------|----------|
-| `en` | King James Version (1769) | KJV | Genesis 1, Psalms 23, John 1, Romans 8:26–31 |
-| `pl` | Biblia Gdańska (1881 revision) | Biblia Gdańska (1881) | Same slices |
+| Locale code | Translation | Label | Asset |
+|-------------|-------------|-------|-------|
+| `en` | King James Version (1769) | KJV | `assets/bible-full-en.json` (31,100 verses) |
+| `pl` | Biblia Gdańska (1881 revision) | Biblia Gdańska (1881) | `assets/bible-full-pl.json` (31,073 verses) |
 
-Assets: `assets/bible-seed-en.json`, `assets/bible-seed-pl.json`.
+Legacy demo slices (`assets/bible-seed-en.json`, 94 verses) remain for tooling only.
 
 ## Polish source — public domain
 
@@ -28,21 +28,20 @@ Assets: `assets/bible-seed-en.json`, `assets/bible-seed-pl.json`.
 ## Import scripts
 
 ```bash
-# Polish mobile seed from midvash GitHub (94 verses)
-node scripts/import-polish-bible.mjs --midvash
+# Full EN + PL assets (network for PL)
+node scripts/prepare-full-bible-seed.mjs
 
-# Full Polish Bible (all 66 books) — large; do not commit without approval
-node scripts/import-polish-bible.mjs --midvash --full --output assets/bible-seed-pl-full.json
+# Polish only from midvash raw GitHub
+node scripts/import-polish-bible.mjs --midvash --full --output assets/bible-full-pl.json
 
-# Build both EN + PL mobile seeds
+# English from bundled KJV source
+node scripts/convert-kjv-source.mjs --output assets/bible-full-en.json
+
+# Legacy mobile demo slices (94 verses)
 node scripts/prepare-bilingual-seed.mjs
-
-# Full KJV pipeline (existing)
-node scripts/prepare-bible-seed.mjs path/to/kjv-full.json
-node scripts/create-mobile-seed.mjs path/to/kjv-full.json
 ```
 
-After changing seed files, clear `@biblia-ai/db-seeded` in AsyncStorage or use **Settings → Advanced → Clear Scripture library data**.
+After changing seed files, clear `@biblia-ai/full-bible-imported-v1` or use **Settings → Advanced → Clear Scripture library data**.
 
 ## SQLite schema (v3)
 
