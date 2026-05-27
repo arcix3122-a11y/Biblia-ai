@@ -11,7 +11,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 | | |
 |---|---|
 | **Ścieżka projektu na dysku** | `C:\Users\arcix\Projects\biblia-ai` |
-| **Ostatni commit (HEAD)** | `14b0100` — *fix(i18n): e2e bilingual verification and StudyScreen* (2026-05-27) |
+| **Ostatni commit (HEAD)** | `5157d06` — *feat(bible): first-launch bulk seed with progress UI* (2026-05-27) |
 | **Push do GitHub** | **Nie** — gałąź `master` jest **13 commitów** przed `origin/master`. Aby opublikować: `git push origin master` |
 | **Cursor — jak zobaczyć** | **File → Open Folder…** → wybierz `C:\Users\arcix\Projects\biblia-ai` (nie inny katalog). Otwórz `AGENT_WORKLOG.md` — linia 1 powinna zaczynać się od `# Agent Worklog`. |
 | **Telefon / Expo Go** | Na tym PC: `npx expo start`. Jeśli kod był na innym komputerze: `git pull` **po** `git push` z tego PC. W Expo Go: wstrząśnij → **Reload**; ewentualnie wyczyść cache. W aplikacji: **Settings → Advanced → Wyczyść bibliotekę** (nowy seed PL/EN w SQLite). |
@@ -31,6 +31,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 |--------------|---------------|---------|---------|--------|-------|
 | 2026-05-27 16:00 | Cursor subagent | Śledzenie dostawy pełnej Biblii PL+EN — koordynacja | *(ten commit)* | done | Checklist deliverable; seed nadal demo 4 ks. — **w trakcie** |
 | 2026-05-27 15:45 | User (arcix) | Skarga: demo 4 ks. niewystarczające — wymagany pełny E2E | — | open | Numbers 20 / pusty rozdział; pełna Biblia PL+EN w SQLite |
+| 2026-05-27 13:45 | Cursor Agent (full-bible E2E) | Pełna Biblia PL+EN — 66 ks., seed + progress UI | `4e67a1f`, `5157d06` | done | 31100 EN / 31073 PL wersetów; ~11,8 MB assetów |
 | 2026-05-27 15:30 | Cursor subagent | Weryfikacja E2E PL+EN — pełny audyt i naprawy | `14b0100` | done | StudyScreen i18n, plany demo, locale 534 kl. |
 | 2026-05-27 14:15 | Cursor subagent | Weryfikacja widoczności zmian dla użytkownika | — | done | Sekcja „Gdzie są zmiany?”; 12 commitów niepushowanych |
 | 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | `8bf9c32` | done | Indeks + macierz + JSON |
@@ -200,6 +201,23 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-27 13:45 (local)
+- Agent: Cursor Agent (full-bible E2E)
+- Task: DONE - Pełna Biblia PL+EN end-to-end (66 ksiąg, seed z progressem, ScriptureImportScreen)
+- **EN KJV:** 66 ksiąg, **31 100 wersetów**, asset `bible-full-en.json` **5 197 078 B** (~4,96 MB)
+- **PL Biblia Gdańska (midvash):** 66 ksiąg, **31 073 wersetów**, asset `bible-full-pl.json` **6 614 983 B** (~6,31 MB)
+- **Razem assetów:** ~11,8 MB (poniżej limitu 15 MB/commit — bez gzip)
+- **Źródła:** `scripts/source-kjv-full.json` (Thayer KJV PD); PL: raw.githubusercontent.com/midvash/bible-data pl/bg
+- **Skrypty:** `convert-kjv-source.mjs`, `prepare-full-bible-seed.mjs`, rozszerzony `bible-slugs.mjs` (66 ksiąg), fix fetch PL (raw zamiast GitHub API 403)
+- **SQLite seed:** batch 750 wersetów/transakcja, PRAGMA WAL/cache/temp_store, progress 0–100% → `seedProgressStore`
+- **UX:** `ScriptureImportScreen` PL/EN, flag `@biblia-ai/full-bible-imported-v1`, `isFullBibleImported()`, timeout DB 5 min
+- **Commity:** `4e67a1f` feat(bible): full KJV + Biblia Gdańska import pipeline | `5157d06` feat(bible): first-launch bulk seed with progress UI
+- **Walidacja:** `npm run typecheck` 0 błędów; `npm run check:locales` 588 kluczy PL=EN
+- **Czas seedu (oczekiwany telefon):** ~1–3 min pierwsze uruchomienie (62k+ INSERTów); import skryptów PL ~17 s na PC
+- **Test telefon:** wymaga Expo Go — Settings → Wyczyść bibliotekę → Reload; potwierdź 66 ksiąg OT+NT i pasek postępu
+- **Home/plany:** `hasFullBibleTranslation()` / `useFullBibleAvailable()` — plan roczny odblokowany po pełnym seedzie
+- Result: done
 
 ## 2026-05-27 — START (Cursor subagent — bilingual PL/EN scripture)
 
