@@ -6,7 +6,7 @@
       "date": "2026-05-27 14:00",
       "agent": "Cursor subagent",
       "task": "Uporządkowanie rejestru agentów w worklogu",
-      "commits": [],
+      "commits": ["8bf9c32"],
       "status": "done",
       "notes": "Indeks changelog + macierz odpowiedzialności na górze AGENT_WORKLOG.md"
     },

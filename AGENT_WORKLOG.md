@@ -10,7 +10,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
-| 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | *(ta sesja)* | done | Indeks + macierz + JSON |
+| 2026-05-27 14:00 | Cursor subagent | Uporządkowanie rejestru agentów w worklogu | `8bf9c32` | done | Indeks + macierz + JSON |
 | 2026-05-27 13:03 | Cursor subagent | Dwujęzyczne Pismo PL/EN (SQLite v3, seed) | `a89fb9e`, `3822e60` | done | Biblia Gdańska + KJV; `translationStore` |
 | 2026-05-27 12:50 | Audit agent (Cursor subagent) | Audyt PL: luki, błędy, dwa języki | `d15dc68` | done | Mobile seed, AI chat po błędzie API |
 | 2026-05-23 19:18 | Cursor subagent | Audio onboarding 100-slajdowy karuzel | `42867a3` | done | Gates main tabs do ukończenia |
@@ -120,7 +120,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
   - Szablon START/DONE z metadanymi **Data / Agent / Cel**.
   - Plik `AGENT_WORKLOG.json` — 23 zdarzenia do automatyzacji.
   - Archiwum historyczne **bez usunięć** — pełna treść poniżej.
-- **Commity:** `PLACEHOLDER` — docs: AGENT_WORKLOG rejestr agentów i chronologia
+- **Commity:** `8bf9c32` — docs: AGENT_WORKLOG rejestr agentów i chronologia
 - **Walidacja:** `git log -1`; przegląd tabeli vs `git log --oneline -40`.
 
 ---
