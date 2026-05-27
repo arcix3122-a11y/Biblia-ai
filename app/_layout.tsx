@@ -25,7 +25,21 @@ import { useYearPlanStore } from "@/store/yearPlanStore";
 import { scheduleDailyReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
 import { colors } from "@/theme";
 
-LogBox.ignoreLogs(["Non-serializable values were found in the navigation state"]);
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+  "TypeError: Network request failed",
+  "Network request failed",
+  "AbortError",
+]);
+
+function isBenignNetworkError(error: Error): boolean {
+  const msg = error.message ?? "";
+  return (
+    msg.includes("Network request failed") ||
+    msg.includes("Failed to fetch") ||
+    msg.includes("AbortError")
+  );
+}
 
 function installGlobalErrorHandler(): void {
   const errorUtils = (
@@ -47,6 +61,9 @@ function installGlobalErrorHandler(): void {
       platform: Platform.OS,
       isFatal: Boolean(isFatal),
     });
+    if (isBenignNetworkError(error) && !isFatal) {
+      return;
+    }
     previous(error, isFatal);
   });
 }

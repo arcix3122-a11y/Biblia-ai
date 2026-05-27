@@ -1571,3 +1571,31 @@ npx expo start
 - **UI strings improved:** ~38 kluczy i18n (PL+EN pary, onboarding/home/reader/settings/AI/workspace/import/guided prayer/ecosystem)
 - **Walidacja:** `npm run typecheck` 0 błędów; `npm run check:locales` 658 kluczy OK; `node scripts/verify-scripture-sample.mjs` exit 0
 - Result: done
+
+## 2026-05-27 17:30 — START (Claude Opus 4.7 — real photo backgrounds + fix network error)
+
+**Feedback usera:**
+1. 'TypeError: Network request failed' toast widoczny na ekranie — musi byc cicho lapany
+2. Czarne tla kafelkow (Afirmacje, Asystent) — chce REAL PHOTOS jak na YouVersion (gora ze zdjeciem mglistych);  'nie gradienty - piekne grafiki'.
+
+**Plan:**
+- LogBox.ignoreLogs + dodatkowe try/catch w VotdFeedCard load social, zeby 'Network request failed' nie wycieklo
+- src/data/photoBackgrounds.ts — picsum.photos seeded URLs (per category + VOTD daily rotation). Photo backgrounds load remote, fallback gradient gdy offline
+- VotdFeedCard — full-bleed ImageBackground + scrim + text overlay (jak YouVersion VOTD)
+- ActionTile — opcjonalny imageUrl prop, kwadrat z foto na prawej (jak 'Pismo z przewodnikiem' card w YouVersion)
+- AffirmationCard — image na prawej kazdej kategorii
+
+**UWAGA:** picsum.photos to placeholder dla shippu. Przed produkcja: bundled licensed JPG (Unsplash+ / curated set) dla offline robustnosci.
+## 2026-05-27 19:00 (local)
+- Agent: Cursor subagent
+- Task: START - YouVersion-style photo backgrounds — dokończenie
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-27 13:53 (local)
+- Agent: Codex
+- Task: START - przebudowa asystenta AI end-to-end, zachowanie religijne, guardraile, UI, haptics i animacje
+- Changes: pending
+- Validation: pending
+- Result: in-progress

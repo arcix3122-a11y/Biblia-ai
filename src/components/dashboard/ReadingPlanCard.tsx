@@ -6,7 +6,8 @@ import { useTranslation } from "react-i18next";
 import { getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
-import { GlassCard } from "@/components/GlassCard";
+import { PhotoBackground } from "@/components/PhotoBackground";
+import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
 import {
   FOUNDATION_WEEK_PLAN,
   getActivePlanDay,
@@ -71,59 +72,74 @@ export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
   ]);
 
   return (
-    <GlassCard style={style}>
-      <View style={styles.header}>
-        <View style={styles.iconWrap}>
-          <Ionicons name="calendar-outline" size={18} color={colors.accent} />
+    <PhotoBackground
+      uri={getCategoryPhotoUrl("readingPlan", 900, 420)}
+      style={[styles.card, style]}
+      borderRadius={radii.xl}
+      scrimOpacity={0.58}
+    >
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <View style={styles.iconWrap}>
+            <Ionicons name="calendar-outline" size={18} color={colors.accent} />
+          </View>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>{t("readingPlan.foundationTitle")}</Text>
+            <Text style={styles.subtitle}>{t("readingPlan.foundationSubtitle")}</Text>
+          </View>
         </View>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{t("readingPlan.foundationTitle")}</Text>
-          <Text style={styles.subtitle}>{t("readingPlan.foundationSubtitle")}</Text>
-        </View>
-      </View>
 
-      <View style={styles.progressRow}>
-        <Text style={styles.progressLabel}>
-          {allComplete
-            ? t("readingPlan.planComplete")
-            : t("readingPlan.dayProgress", {
-                current: activeDay.day,
-                total: totalDays,
-              })}
-        </Text>
-        <Text style={styles.progressMeta}>
-          {t("readingPlan.completedCount", { count: completedCount, total: totalDays })}
-        </Text>
-      </View>
-
-      {!allComplete ? (
-        <>
-          <Text style={styles.readingLabel}>{t("readingPlan.todaysReading")}</Text>
-          <Text style={styles.readingRef}>
-            {t("readingPlan.chapterRef", {
-              book: bookLabel,
-              chapter: activeDay.chapter,
-            })}
+        <View style={styles.progressRow}>
+          <Text style={styles.progressLabel}>
+            {allComplete
+              ? t("readingPlan.planComplete")
+              : t("readingPlan.dayProgress", {
+                  current: activeDay.day,
+                  total: totalDays,
+                })}
           </Text>
-          <Pressable onPress={openReading} style={styles.readButton}>
-            <Ionicons
-              name={dayComplete ? "checkmark-circle" : "book-outline"}
-              size={16}
-              color={colors.accent}
-            />
-            <Text style={styles.readButtonText}>
-              {dayComplete ? t("readingPlan.readAgain") : t("readingPlan.readNow")}
+          <Text style={styles.progressMeta}>
+            {t("readingPlan.completedCount", { count: completedCount, total: totalDays })}
+          </Text>
+        </View>
+
+        {!allComplete ? (
+          <>
+            <Text style={styles.readingLabel}>{t("readingPlan.todaysReading")}</Text>
+            <Text style={styles.readingRef}>
+              {t("readingPlan.chapterRef", {
+                book: bookLabel,
+                chapter: activeDay.chapter,
+              })}
             </Text>
-          </Pressable>
-        </>
-      ) : (
-        <Text style={styles.completeMessage}>{t("readingPlan.planCompleteHint")}</Text>
-      )}
-    </GlassCard>
+            <Pressable onPress={openReading} style={styles.readButton}>
+              <Ionicons
+                name={dayComplete ? "checkmark-circle" : "book-outline"}
+                size={16}
+                color={colors.accent}
+              />
+              <Text style={styles.readButtonText}>
+                {dayComplete ? t("readingPlan.readAgain") : t("readingPlan.readNow")}
+              </Text>
+            </Pressable>
+          </>
+        ) : (
+          <Text style={styles.completeMessage}>{t("readingPlan.planCompleteHint")}</Text>
+        )}
+      </View>
+    </PhotoBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  card: {
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    minHeight: 220,
+  },
+  content: {
+    padding: spacing.lg,
+  },
   header: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -134,7 +150,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.md,
-    backgroundColor: colors.accentGlow,
+    backgroundColor: "rgba(0,0,0,0.35)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -147,7 +163,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.75)",
     marginTop: spacing.xs,
   },
   progressRow: {
@@ -183,11 +199,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
+    borderColor: "rgba(255,255,255,0.18)",
+    backgroundColor: "rgba(0,0,0,0.32)",
   },
   readButtonText: {
     ...typography.caption,
-    color: colors.textSecondary,
+    color: colors.textPrimary,
   },
   completeMessage: {
     ...typography.body,

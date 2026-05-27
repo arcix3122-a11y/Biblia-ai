@@ -4,6 +4,16 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 let client: SupabaseClient | null | undefined;
 let cachedUserId: string | null = null;
 
+function isNetworkFailure(error: unknown): boolean {
+  const message =
+    error instanceof Error ? error.message : typeof error === "string" ? error : String(error);
+  return (
+    message.includes("Network request failed") ||
+    message.includes("Failed to fetch") ||
+    message.includes("AbortError")
+  );
+}
+
 function updateCachedUserId(userId: string | null): void {
   cachedUserId = userId;
 }
@@ -30,9 +40,14 @@ export function getSupabaseClient(): SupabaseClient | null {
     },
   });
 
-  void client.auth.getSession().then(({ data }) => {
-    updateCachedUserId(data.session?.user.id ?? null);
-  });
+  void client.auth
+    .getSession()
+    .then(({ data }) => {
+      updateCachedUserId(data.session?.user.id ?? null);
+    })
+    .catch(() => {
+      // offline / network — session will retry on next call
+    });
 
   client.auth.onAuthStateChange((_event, session) => {
     updateCachedUserId(session?.user.id ?? null);
@@ -51,9 +66,13 @@ export async function getSessionUserIdAsync(): Promise<string | null> {
   if (!supabase) {
     return null;
   }
-  const { data } = await supabase.auth.getSession();
-  updateCachedUserId(data.session?.user.id ?? null);
-  return cachedUserId;
+  try {
+    const { data } = await supabase.auth.getSession();
+    updateCachedUserId(data.session?.user.id ?? null);
+    return cachedUserId;
+  } catch {
+    return cachedUserId;
+  }
 }
 
 export async function ensureAnonymousSession(): Promise<void> {
@@ -62,15 +81,24 @@ export async function ensureAnonymousSession(): Promise<void> {
     return;
   }
 
-  const { data: sessionData } = await supabase.auth.getSession();
-  if (sessionData.session) {
-    updateCachedUserId(sessionData.session.user.id);
-    return;
-  }
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData.session) {
+      updateCachedUserId(sessionData.session.user.id);
+      return;
+    }
 
-  const { data, error } = await supabase.auth.signInAnonymously();
-  if (error) {
-    throw error;
+    const { data, error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      if (!isNetworkFailure(error)) {
+        throw error;
+      }
+      return;
+    }
+    updateCachedUserId(data.user?.id ?? data.session?.user.id ?? null);
+  } catch (error) {
+    if (!isNetworkFailure(error)) {
+      throw error;
+    }
   }
-  updateCachedUserId(data.user?.id ?? data.session?.user.id ?? null);
 }

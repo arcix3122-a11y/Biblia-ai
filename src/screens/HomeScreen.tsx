@@ -12,60 +12,56 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Swipeable } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ActionTile } from "@/components/dashboard/ActionTile";
 import { BookTile } from "@/components/BookTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
+import { HeroCard } from "@/components/dashboard/HeroCard";
 import { LoadingState } from "@/components/layout/LoadingState";
 import { VotdFeedCard } from "@/components/dashboard/VotdFeedCard";
-import { GuidedReflectionCards } from "@/components/dashboard/GuidedReflectionCards";
-import { ReadingPlanCard } from "@/components/dashboard/ReadingPlanCard";
 import { TopicGrid } from "@/components/topics/TopicGrid";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
-import { useBooks, useDatabaseReady, useFullBibleAvailable, useVerseSearch } from "@/hooks/useScripture";
+import { useBooks, useDatabaseReady, useVerseSearch } from "@/hooks/useScripture";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHistoryStore } from "@/store/historyStore";
-import { useOnboardingStore } from "@/store/onboardingStore";
 import { useSelectionStore } from "@/store/selectionStore";
-import { useYearPlanStore } from "@/store/yearPlanStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import type { Book, Testament, VerseWithReference } from "@/types/scripture";
 import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
 import { getDeviceLocale } from "@/i18n";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
+import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
 import { HighlightedText } from "@/utils/highlightText";
 import { formatShortDate } from "@/utils/formatDate";
 import { colors, radii, spacing, typography } from "@/theme";
 
 const TESTAMENTS: readonly Testament[] = ["OT", "NT"];
 const MIN_SEARCH_LEN = 2;
-const EMOTION_MOODS = ["love", "anxiety", "healing", "anger"] as const;
 
-type EmotionMood = (typeof EMOTION_MOODS)[number];
-
-function dedupeRecent<T extends { book_slug?: string; chapter: number }>(entries: T[], max: number): T[] {
+function dedupeRecent<T extends { book_slug?: string; chapter: number }>(
+  entries: T[],
+  max: number
+): T[] {
   const seen = new Set<string>();
   const result: T[] = [];
   for (const entry of entries) {
     const key = `${entry.book_slug ?? ""}-${entry.chapter}`;
-    if (seen.has(key)) {
-      continue;
-    }
+    if (seen.has(key)) continue;
     seen.add(key);
     result.push(entry);
-    if (result.length >= max) {
-      break;
-    }
+    if (result.length >= max) break;
   }
   return result;
 }
 
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const locale = useLocaleStore((s) => s.locale) ?? getDeviceLocale();
   const translation = useActiveTranslation(locale);
-  const fullBibleAvailable = useFullBibleAvailable();
   const router = useRouter();
   const [testament, setTestament] = useState<Testament>("OT");
   const [query, setQuery] = useState("");
@@ -75,42 +71,28 @@ export default function HomeScreen() {
   const { books, loading, refresh: refreshBooks } = useBooks(testament);
   const { results, searching, search, clear } = useVerseSearch();
   const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
-  const hasSeenLanguageTip = useOnboardingStore((s) => s.hasSeenLanguageTip);
-  const dismissLanguageTip = useOnboardingStore((s) => s.dismissLanguageTip);
   const lastRead = useHistoryStore((s) => s.lastRead);
   const recent = useHistoryStore((s) => s.recent);
   const loadHistory = useHistoryStore((s) => s.loadHistory);
   const bookmarks = useBookmarksStore((s) => s.bookmarks);
   const loadBookmarks = useBookmarksStore((s) => s.loadBookmarks);
-  const yearPlanStartDate = useYearPlanStore((s) => s.startDate);
-  const yearPlanGetCurrentDay = useYearPlanStore((s) => s.getCurrentDay);
-  const yearPlanGetProgress = useYearPlanStore((s) => s.getProgress);
-  const yearPlanLoad = useYearPlanStore((s) => s.load);
   const [refreshing, setRefreshing] = useState(false);
-  const [votdText, setVotdText] = useState("");
-  const [votdRef, setVotdRef] = useState("");
-
-  const greeting = (() => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return t("viralFeed.greetingMorning");
-    if (hour < 18) return t("viralFeed.greetingAfternoon");
-    return t("viralFeed.greetingEvening");
-  })();
+  const [, setVotdText] = useState("");
+  const [, setVotdRef] = useState("");
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([loadHistory(), loadBookmarks(), refreshBooks(), yearPlanLoad()]);
+      await Promise.all([loadHistory(), loadBookmarks(), refreshBooks()]);
     } finally {
       setRefreshing(false);
     }
-  }, [loadBookmarks, loadHistory, refreshBooks, yearPlanLoad]);
+  }, [loadBookmarks, loadHistory, refreshBooks]);
 
   useEffect(() => {
     void loadHistory();
     void loadBookmarks();
-    void yearPlanLoad();
-  }, [loadHistory, loadBookmarks, yearPlanLoad]);
+  }, [loadHistory, loadBookmarks]);
 
   useEffect(() => {
     void loadBookmarks();
@@ -140,8 +122,9 @@ export default function HomeScreen() {
   const openReader = useCallback(
     async (bookSlug: string, chapter: number, verseNumber?: number, verseText?: string) => {
       if (verseNumber) {
-        const book = books.find((b) => b.slug === bookSlug) ||
-                     await scriptureRepo.getBookBySlug(bookSlug);
+        const book =
+          books.find((b) => b.slug === bookSlug) ||
+          (await scriptureRepo.getBookBySlug(bookSlug));
         if (book) {
           setSelectedVerse({
             bookId: book.id,
@@ -196,39 +179,6 @@ export default function HomeScreen() {
     [router]
   );
 
-  const emotionalChips = useMemo(
-    () => [
-      {
-        id: "love" as EmotionMood,
-        action: "ai" as const,
-      },
-      {
-        id: "anxiety" as EmotionMood,
-        action: "ai" as const,
-      },
-      {
-        id: "healing" as EmotionMood,
-        action: "plan" as const,
-      },
-      {
-        id: "anger" as EmotionMood,
-        action: "ai" as const,
-      },
-    ],
-    []
-  );
-
-  const openEmotion = useCallback(
-    (mood: EmotionMood, action: "ai" | "plan") => {
-      if (action === "plan") {
-        router.push({ pathname: "/reading-plan", params: { mood } });
-        return;
-      }
-      router.push({ pathname: "/ai", params: { starterMood: mood } });
-    },
-    [router]
-  );
-
   if (error) {
     return <ErrorFallback message={error} onRetry={retry} />;
   }
@@ -249,10 +199,26 @@ export default function HomeScreen() {
       : null;
   const showSearchHistory = isSearchFocused && history.length > 0;
 
+  const hasContinue = Boolean(lastRead?.book_slug);
+  const heroTitle = hasContinue
+    ? formatBookReference(
+        lastRead!.book_slug!,
+        lastRead!.chapter,
+        lastRead!.verse,
+        locale,
+        lastRead!.book_name ?? t("common.scripture")
+      )
+    : t("home.welcomeTitle");
+  const heroSubtitle = hasContinue
+    ? t("home.continueSubtitle")
+    : t("home.welcomeSubtitle");
+  const heroCta = hasContinue ? t("home.continueReading") : t("home.readNow");
+  const heroEyebrow = hasContinue ? t("home.continueReading") : t("common.appName");
+
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.sm }]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
@@ -264,69 +230,110 @@ export default function HomeScreen() {
           />
         }
       >
-        <View style={styles.brandRow}>
-          <View>
+        <View style={styles.header}>
+          <View style={styles.headerCopy}>
             <Text style={styles.brand}>{t("common.appName")}</Text>
-            <Text style={styles.greeting}>{greeting}</Text>
           </View>
           <Pressable
             onPress={() => router.push("/settings")}
             hitSlop={12}
+            style={styles.headerIcon}
             accessibilityLabel={t("home.openSettings")}
           >
-            <Ionicons name="settings-outline" size={22} color={colors.accent} />
+            <Ionicons name="settings-outline" size={20} color={colors.accent} />
           </Pressable>
         </View>
 
-        <Pressable
+        <HeroCard
+          eyebrow={heroEyebrow}
+          title={heroTitle}
+          subtitle={heroSubtitle}
+          ctaLabel={heroCta}
+          photoUrl={getCategoryPhotoUrl("continueReading", 900, 600)}
           onPress={startReading}
-          style={({ pressed }) => [styles.primaryCta, pressed && styles.primaryCtaPressed]}
+        />
+
+        <VotdFeedCard
+          onVerse={(text, ref) => {
+            setVotdText(text);
+            setVotdRef(ref);
+          }}
+        />
+
+        <Text style={styles.sectionHeading}>{t("home.exploreHeading")}</Text>
+        <View style={styles.tileRow}>
+          <ActionTile
+            icon="musical-notes-outline"
+            title={t("affirmations.homeTileTitle")}
+            subtitle={t("affirmations.homeTileSub")}
+            badge={t("common.new")}
+            imageUrl={getCategoryPhotoUrl("discoverAffirmations", 600, 600)}
+            onPress={() => router.push("/affirmations")}
+          />
+          <ActionTile
+            icon="sparkles-outline"
+            title={t("home.tileCompanion")}
+            subtitle={t("home.tileCompanionSub")}
+            imageUrl={getCategoryPhotoUrl("discoverCompanion", 600, 600)}
+            onPress={() => router.push("/(tabs)/ai")}
+          />
+        </View>
+        <View style={styles.tileRow}>
+          <ActionTile
+            icon="calendar-outline"
+            title={t("home.tilePlan")}
+            subtitle={t("home.tilePlanSub")}
+            imageUrl={getCategoryPhotoUrl("readingPlan", 600, 600)}
+            onPress={() => router.push("/reading-plan")}
+          />
+          <ActionTile
+            icon="heart-outline"
+            title={t("home.tilePrayer")}
+            subtitle={t("home.tilePrayerSub")}
+            imageUrl={getCategoryPhotoUrl("guidedPrayer", 600, 600)}
+            onPress={() => router.push("/guided-prayer")}
+          />
+        </View>
+        <Pressable
+          onPress={() => router.push("/stats")}
+          style={styles.statsLink}
           accessibilityRole="button"
-          accessibilityLabel={t("home.readScripture")}
+          accessibilityLabel={t("home.tileStats")}
         >
-          <Ionicons name="book-outline" size={20} color={colors.canvas} />
-          <Text style={styles.primaryCtaText}>
-            {lastRead?.book_slug ? t("home.continueReading") : t("home.readScripture")}
-          </Text>
+          <Ionicons name="stats-chart-outline" size={16} color={colors.accent} />
+          <Text style={styles.statsLinkText}>{t("home.tileStats")}</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
         </Pressable>
 
-        {lastRead?.book_slug ? (
-          <Pressable onPress={resumeReading}>
-            <GlassCard style={styles.sectionCard}>
-              <Text style={styles.sectionLabel}>{t("home.continueReading")}</Text>
-              <Text style={styles.sectionTitle}>
-                {formatBookReference(
-                  lastRead.book_slug,
-                  lastRead.chapter,
-                  lastRead.verse,
-                  locale,
-                  lastRead.book_name ?? t("common.scripture")
-                )}
-              </Text>
-            </GlassCard>
-          </Pressable>
-        ) : null}
-
-        <View style={styles.compactSearchPanel}>
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            placeholder={t("home.searchPlaceholder")}
-            placeholderTextColor={colors.textMuted}
-            style={styles.search}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-            accessibilityLabel={t("home.searchPlaceholder")}
-            onSubmitEditing={() => {
-              const trimmed = query.trim();
-              if (trimmed.length >= MIN_SEARCH_LEN) {
-                void addToHistory(trimmed);
-              }
-            }}
-          />
+        <Text style={styles.sectionHeading}>{t("home.libraryHeading")}</Text>
+        <View style={styles.libraryCard}>
+          <View style={styles.searchRow}>
+            <Ionicons
+              name="search-outline"
+              size={18}
+              color={colors.textMuted}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              placeholder={t("home.searchPlaceholder")}
+              placeholderTextColor={colors.textMuted}
+              style={styles.search}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="search"
+              accessibilityLabel={t("home.searchPlaceholder")}
+              onSubmitEditing={() => {
+                const trimmed = query.trim();
+                if (trimmed.length >= MIN_SEARCH_LEN) {
+                  void addToHistory(trimmed);
+                }
+              }}
+            />
+          </View>
           {searchHint ? <Text style={styles.searchHint}>{searchHint}</Text> : null}
 
           {showSearchHistory ? (
@@ -374,162 +381,85 @@ export default function HomeScreen() {
 
           {showSearch ? (
             <View>
-            {searching ? (
-              <LoadingState variant="inline" message={t("common.loading")} />
-            ) : null}
-            {!searching && results.length === 0 ? (
-              <View style={styles.emptySearchCompact}>
-                <Ionicons name="search-outline" size={32} color={colors.textMuted} />
-                <Text style={styles.empty}>
-                  {t("home.noResults", { query: debouncedQuery.trim() })}
-                </Text>
-                <Text style={styles.emptySub}>{t("home.noResultsHint")}</Text>
-              </View>
-            ) : null}
-            {results.map((item) => (
-              <Pressable key={item.id} onPress={() => openSearchHit(item)} style={styles.searchHit}>
-                <Text style={styles.searchRef}>
-                  {formatBookReference(
-                    item.book_slug,
-                    item.chapter_number,
-                    item.number,
-                    locale,
-                    item.book_name
-                  )}
-                </Text>
-                <HighlightedText
-                  text={item.text}
-                  query={debouncedQuery.trim()}
-                  style={styles.searchSnippet}
-                  numberOfLines={3}
-                />
-              </Pressable>
-            ))}
-            </View>
-          ) : (
-            <>
-            <View style={styles.tabs}>
-              {TESTAMENTS.map((testamentKey) => (
-                <Pressable
-                  key={testamentKey}
-                  onPress={() => setTestament(testamentKey)}
-                  style={[styles.tab, testament === testamentKey && styles.tabActive]}
-                >
-                  <Text style={[styles.tabText, testament === testamentKey && styles.tabTextActive]}>
-                    {testamentKey === "OT" ? t("home.oldTestament") : t("home.newTestament")}
+              {searching ? <LoadingState variant="inline" message={t("common.loading")} /> : null}
+              {!searching && results.length === 0 ? (
+                <View style={styles.emptySearchCompact}>
+                  <Ionicons name="search-outline" size={32} color={colors.textMuted} />
+                  <Text style={styles.empty}>
+                    {t("home.noResults", { query: debouncedQuery.trim() })}
                   </Text>
+                  <Text style={styles.emptySub}>{t("home.noResultsHint")}</Text>
+                </View>
+              ) : null}
+              {results.map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => openSearchHit(item)}
+                  style={styles.searchHit}
+                >
+                  <Text style={styles.searchRef}>
+                    {formatBookReference(
+                      item.book_slug,
+                      item.chapter_number,
+                      item.number,
+                      locale,
+                      item.book_name
+                    )}
+                  </Text>
+                  <HighlightedText
+                    text={item.text}
+                    query={debouncedQuery.trim()}
+                    style={styles.searchSnippet}
+                    numberOfLines={3}
+                  />
                 </Pressable>
               ))}
             </View>
-            <Text style={styles.verseTextNotice}>
-              {translation === "pl"
-                ? t("home.verseTextLocaleNoticePl")
-                : t("home.verseTextLocaleNoticeEn")}
-            </Text>
-
-            {loading ? (
-              <LoadingState variant="grid" message={t("common.loading")} />
-            ) : (
-              <View style={styles.bookGrid}>
-                {books.map((item) => (
-                  <View key={item.id} style={styles.bookCell}>
-                    <BookTile book={item} onPress={() => openBook(item)} />
-                  </View>
+          ) : (
+            <>
+              <View style={styles.tabs}>
+                {TESTAMENTS.map((testamentKey) => (
+                  <Pressable
+                    key={testamentKey}
+                    onPress={() => setTestament(testamentKey)}
+                    style={[styles.tab, testament === testamentKey && styles.tabActive]}
+                  >
+                    <Text
+                      style={[styles.tabText, testament === testamentKey && styles.tabTextActive]}
+                    >
+                      {testamentKey === "OT" ? t("home.oldTestament") : t("home.newTestament")}
+                    </Text>
+                  </Pressable>
                 ))}
               </View>
-            )}
+
+              {loading ? (
+                <LoadingState variant="grid" message={t("common.loading")} />
+              ) : (
+                <View style={styles.bookGrid}>
+                  {books.map((item) => (
+                    <View key={item.id} style={styles.bookCell}>
+                      <BookTile book={item} onPress={() => openBook(item)} />
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              <Text style={styles.verseTextNotice}>
+                {translation === "pl"
+                  ? t("home.verseTextLocaleNoticePl")
+                  : t("home.verseTextLocaleNoticeEn")}
+              </Text>
             </>
           )}
         </View>
 
-        <ReadingPlanCard style={styles.sectionCard} />
-
-        {yearPlanStartDate && fullBibleAvailable ? (
-          <Pressable onPress={() => router.push("/reading-plan")} style={styles.planLink}>
-            <Ionicons name="earth-outline" size={16} color={colors.accent} />
-            <Text style={styles.planLinkText}>
-              {t("plan.dayLabel", { day: yearPlanGetCurrentDay() })} · {t("plan.progressLabel", { percent: yearPlanGetProgress() })}
-            </Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-          </Pressable>
-        ) : null}
-
-        <VotdFeedCard onVerse={(text, ref) => { setVotdText(text); setVotdRef(ref); }} />
-        <GuidedReflectionCards verseText={votdText} verseReference={votdRef} />
-
-        <Pressable
-          onPress={() => router.push("/guided-prayer")}
-          style={({ pressed }) => [
-            styles.guidedPrayerCta,
-            pressed && styles.guidedPrayerCtaPressed,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={t("guidedPrayer.title")}
-        >
-          <View style={styles.guidedPrayerCtaHeader}>
-            <Ionicons name="sparkles" size={18} color={colors.accent} />
-            <Text style={styles.guidedPrayerCtaTitle}>
-              {t("guidedPrayer.title")}
-            </Text>
-          </View>
-          <Text style={styles.guidedPrayerCtaDesc}>
-            {t("guidedPrayer.welcomeSubtitle")}
-          </Text>
-          <Ionicons name="chevron-forward" size={16} color={colors.accent} style={styles.guidedPrayerCtaArrow} />
-        </Pressable>
-
-        <View style={styles.emotionHub}>
-          <Text style={styles.emotionHubTitle}>{t("home.emotionalHubTitle")}</Text>
-          <Text style={styles.emotionHubSubtitle}>{t("home.emotionalHubSubtitle")}</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.emotionChipsRow}
-          >
-            {emotionalChips.map((chip) => (
-              <Pressable
-                key={chip.id}
-                onPress={() => openEmotion(chip.id, chip.action)}
-                style={({ pressed }) => [styles.emotionChip, pressed && styles.emotionChipPressed]}
-              >
-                <Text style={styles.emotionChipLabel}>{t(`home.emotions.${chip.id}`)}</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        {!hasSeenLanguageTip ? (
-          <GlassCard style={styles.languageTip}>
-            <View style={styles.languageTipContent}>
-              <Ionicons name="language-outline" size={18} color={colors.accent} />
-              <Text style={styles.languageTipBody}>{t("home.languageTipBody")}</Text>
-            </View>
-            <View style={styles.languageTipActions}>
-              <Pressable
-                onPress={() => router.push("/settings")}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={t("home.languageTipOpenSettings")}
-              >
-                <Text style={styles.languageTipLink}>{t("home.languageTipOpenSettings")}</Text>
-              </Pressable>
-              <Pressable
-                onPress={dismissLanguageTip}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={t("home.languageTipDismiss")}
-              >
-                <Text style={styles.languageTipDismiss}>{t("home.languageTipDismiss")}</Text>
-              </Pressable>
-            </View>
-          </GlassCard>
-        ) : null}
-
-        {(recentUnique.length > 0 || bookmarkPreview.length > 0) ? (
-          <View style={styles.secondarySection}>
+        {recentUnique.length > 0 || bookmarkPreview.length > 0 ? (
+          <>
+            <Text style={styles.sectionHeading}>{t("home.discoveryHeading")}</Text>
             {recentUnique.length > 0 ? (
-              <View style={styles.section}>
-                <Text style={styles.compactSectionTitle}>{t("home.recentlyRead")}</Text>
+              <View style={styles.subSection}>
+                <Text style={styles.subSectionTitle}>{t("home.recentlyRead")}</Text>
                 {recentUnique.map((entry) => (
                   <Pressable
                     key={`${entry.id}-${entry.viewed_at}`}
@@ -559,11 +489,11 @@ export default function HomeScreen() {
             ) : null}
 
             {bookmarkPreview.length > 0 ? (
-              <View style={styles.section}>
-                <View style={styles.compactSectionRow}>
-                  <Text style={styles.compactSectionTitle}>{t("home.bookmarks")}</Text>
-                  <Pressable onPress={() => router.push("/(tabs)/workspace")}> 
-                    <Text style={styles.compactSectionAction}>{t("common.seeAll")}</Text>
+              <View style={styles.subSection}>
+                <View style={styles.subSectionRow}>
+                  <Text style={styles.subSectionTitle}>{t("home.bookmarks")}</Text>
+                  <Pressable onPress={() => router.push("/(tabs)/workspace")}>
+                    <Text style={styles.subSectionAction}>{t("common.seeAll")}</Text>
                   </Pressable>
                 </View>
                 {bookmarkPreview.map((item) => (
@@ -571,7 +501,12 @@ export default function HomeScreen() {
                     key={item.id}
                     onPress={() => {
                       if (item.book_slug) {
-                        void openReader(item.book_slug, item.chapter, item.verse, item.verse_text ?? "");
+                        void openReader(
+                          item.book_slug,
+                          item.chapter,
+                          item.verse,
+                          item.verse_text ?? ""
+                        );
                       }
                     }}
                   >
@@ -590,7 +525,7 @@ export default function HomeScreen() {
                 ))}
               </View>
             ) : null}
-          </View>
+          </>
         ) : null}
 
         <TopicGrid onTopicPress={openTopic} />
@@ -606,8 +541,8 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
     paddingBottom: spacing.xxl,
+    gap: spacing.md,
   },
   centered: {
     flex: 1,
@@ -616,177 +551,91 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: spacing.xl,
   },
-  brandRow: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: spacing.md,
+    paddingTop: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  headerCopy: {
+    flex: 1,
   },
   brand: {
     ...typography.label,
     color: colors.accent,
   },
-  greeting: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-    fontWeight: "700",
-    marginTop: 2,
-  },
-  primaryCta: {
-    flexDirection: "row",
+  headerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radii.pill,
+    backgroundColor: colors.backgroundElevated,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
     alignItems: "center",
     justifyContent: "center",
+  },
+  sectionHeading: {
+    ...typography.label,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+  },
+  tileRow: {
+    flexDirection: "row",
     gap: spacing.sm,
-    backgroundColor: colors.accent,
-    borderRadius: radii.lg,
-    paddingVertical: spacing.md,
-    marginBottom: spacing.md,
   },
-  primaryCtaPressed: {
-    opacity: 0.9,
-  },
-  primaryCtaText: {
-    ...typography.subtitle,
-    color: colors.canvas,
-    fontWeight: "700",
-  },
-  guidedPrayerCta: {
-    backgroundColor: colors.backgroundElevated,
-    borderWidth: 1.5,
-    borderColor: colors.accentMuted,
-    borderRadius: radii.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    position: "relative",
-  },
-  guidedPrayerCtaPressed: {
-    borderColor: colors.accent,
-    backgroundColor: colors.cardHover,
-  },
-  guidedPrayerCtaHeader: {
+  statsLink: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  guidedPrayerCtaTitle: {
-    ...typography.subtitle,
-    color: colors.accent,
-    fontWeight: "700",
-  },
-  guidedPrayerCtaDesc: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    paddingRight: spacing.lg,
-  },
-  guidedPrayerCtaArrow: {
-    position: "absolute",
-    right: spacing.md,
-    top: "50%",
-    marginTop: -8,
-  },
-  dashboard: {
-    marginBottom: spacing.md,
-  },
-  emotionHub: {
-    marginBottom: spacing.md,
-  },
-  emotionHubTitle: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-    marginBottom: 2,
-  },
-  emotionHubSubtitle: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginBottom: spacing.sm,
-  },
-  emotionChipsRow: {
     gap: spacing.sm,
-    paddingRight: spacing.md,
-  },
-  emotionChip: {
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.accentMuted,
-    backgroundColor: colors.backgroundElevated,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
-  },
-  emotionChipPressed: {
-    opacity: 0.85,
-  },
-  emotionChipLabel: {
-    ...typography.caption,
-    color: colors.accent,
-    letterSpacing: 0.7,
-    fontWeight: "700",
-  },
-  section: {
-    marginBottom: spacing.md,
-  },
-  secondarySection: {
-    marginTop: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.glassBorder,
-  },
-  sectionCard: {
-    marginBottom: spacing.md,
-  },
-  sectionLabel: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
-  },
-  sectionTitle: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-  },
-  listRow: {
-    marginBottom: spacing.sm,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
   },
-  listRowTitle: {
-    ...typography.subtitle,
-    color: colors.accent,
-    marginBottom: spacing.xs,
-  },
-  listRowMeta: {
+  statsLinkText: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: colors.textPrimary,
+    flex: 1,
+    fontWeight: "600",
   },
-  search: {
+  libraryCard: {
+    backgroundColor: colors.backgroundElevated,
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.inputBackground,
     borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    color: colors.textPrimary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginTop: 0,
-    marginBottom: spacing.xs,
-    ...typography.body,
+    paddingHorizontal: spacing.sm,
   },
-  compactSearchPanel: {
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    backgroundColor: colors.backgroundElevated,
-    padding: spacing.sm,
+  searchIcon: {
+    marginRight: spacing.xs,
+  },
+  search: {
+    flex: 1,
+    color: colors.textPrimary,
+    paddingVertical: spacing.sm,
+    ...typography.body,
   },
   searchHint: {
     ...typography.caption,
     color: colors.textMuted,
-    marginBottom: spacing.sm,
     marginLeft: spacing.xs,
   },
   tabs: {
     flexDirection: "row",
-    marginBottom: spacing.md,
     gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   tab: {
     flex: 1,
@@ -807,25 +656,25 @@ const styles = StyleSheet.create({
   tabTextActive: {
     color: colors.accent,
   },
-  verseTextNotice: {
-    ...typography.caption,
-    color: colors.textMuted,
-    textAlign: "center",
-    marginBottom: spacing.md,
-  },
   bookGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     marginHorizontal: -spacing.xs,
+    marginTop: spacing.xs,
   },
   bookCell: {
     width: "50%",
     padding: spacing.xs,
   },
+  verseTextNotice: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: "center",
+    marginTop: spacing.sm,
+  },
   emptySearchCompact: {
     alignItems: "center",
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
+    marginVertical: spacing.md,
     gap: spacing.sm,
   },
   empty: {
@@ -852,34 +701,6 @@ const styles = StyleSheet.create({
   searchSnippet: {
     ...typography.body,
     color: colors.textSecondary,
-  },
-  languageTip: {
-    marginBottom: spacing.md,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  languageTipContent: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  languageTipBody: {
-    ...typography.caption,
-    color: colors.textMuted,
-    flex: 1,
-  },
-  languageTipActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  languageTipLink: {
-    ...typography.caption,
-    color: colors.accent,
-  },
-  languageTipDismiss: {
-    ...typography.caption,
-    color: colors.textMuted,
   },
   searchHistory: {
     marginBottom: spacing.sm,
@@ -928,31 +749,36 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
   },
-  planLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
+  subSection: {
+    marginBottom: spacing.sm,
   },
-  planLinkText: {
+  subSectionTitle: {
     ...typography.caption,
-    color: colors.textSecondary,
-    flex: 1,
+    color: colors.textMuted,
+    marginBottom: spacing.sm,
+    letterSpacing: 0.4,
   },
-  compactSectionRow: {
+  subSectionRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: spacing.sm,
   },
-  compactSectionTitle: {
-    ...typography.caption,
-    color: colors.textMuted,
-    letterSpacing: 0.5,
-  },
-  compactSectionAction: {
+  subSectionAction: {
     ...typography.caption,
     color: colors.accent,
+  },
+  listRow: {
+    marginBottom: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  listRowTitle: {
+    ...typography.subtitle,
+    color: colors.accent,
+    marginBottom: spacing.xs,
+  },
+  listRowMeta: {
+    ...typography.caption,
+    color: colors.textMuted,
   },
 });

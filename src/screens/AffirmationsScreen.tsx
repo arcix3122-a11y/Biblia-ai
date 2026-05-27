@@ -6,6 +6,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
+import { PhotoBackground } from "@/components/PhotoBackground";
 import { Stack, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -49,41 +51,55 @@ function AffirmationCard({ entry, isActive, onPlay, onStop }: AffirmationCardPro
   const body = t(`${entry.i18nKey}.body`);
   const categoryLabel = t(`affirmations.categories.${entry.category}`);
   const Icon = CATEGORY_ICONS[entry.category];
+  const photoUrl = getCategoryPhotoUrl(entry.category, 480, 480);
 
   return (
     <View style={[styles.card, isActive && styles.cardActive]}>
-      <View style={styles.cardHeader}>
-        <View style={styles.categoryBadge}>
-          <Ionicons name={Icon} size={14} color={colors.accent} />
-          <Text style={styles.categoryLabel}>{categoryLabel}</Text>
-        </View>
-        <Text style={styles.referenceLabel}>{entry.reference}</Text>
-      </View>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardBody}>{body}</Text>
-      <View style={styles.cardFooter}>
-        <Text style={styles.durationLabel}>
-          {t("affirmations.duration", { sec: entry.durationSec })}
-        </Text>
-        <Pressable
-          onPress={() => (isActive ? onStop() : onPlay(entry))}
-          style={({ pressed }) => [
-            styles.playButton,
-            isActive && styles.playButtonActive,
-            pressed && styles.playButtonPressed,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={isActive ? t("affirmations.stop") : t("affirmations.listen")}
-        >
-          <Ionicons
-            name={isActive ? "pause" : "play"}
-            size={16}
-            color={isActive ? colors.canvas : colors.accent}
-          />
-          <Text style={[styles.playLabel, isActive && styles.playLabelActive]}>
-            {isActive ? t("affirmations.playing") : t("affirmations.listen")}
+      <View style={styles.cardRow}>
+        <View style={styles.cardBody}>
+          <View style={styles.cardHeader}>
+            <View style={styles.categoryBadge}>
+              <Ionicons name={Icon} size={14} color={colors.accent} />
+              <Text style={styles.categoryLabel}>{categoryLabel}</Text>
+            </View>
+            <Text style={styles.cardRef}>{entry.reference}</Text>
+          </View>
+          <Text style={styles.cardTitle}>{title}</Text>
+          <Text style={styles.cardText} numberOfLines={4}>
+            {body}
           </Text>
-        </Pressable>
+          <View style={styles.cardFooter}>
+            <Text style={styles.durationLabel}>
+              {t("affirmations.duration", { sec: entry.durationSec })}
+            </Text>
+            <Pressable
+              onPress={() => (isActive ? onStop() : onPlay(entry))}
+              style={({ pressed }) => [
+                styles.playButton,
+                isActive && styles.playButtonActive,
+                pressed && styles.playButtonPressed,
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={isActive ? t("affirmations.stop") : t("affirmations.listen")}
+            >
+              <Ionicons
+                name={isActive ? "pause" : "play"}
+                size={16}
+                color={isActive ? colors.canvas : colors.accent}
+              />
+              <Text style={[styles.playLabel, isActive && styles.playLabelActive]}>
+                {isActive ? t("affirmations.playing") : t("affirmations.listen")}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <PhotoBackground
+          uri={photoUrl}
+          style={styles.cardPhoto}
+          borderRadius={0}
+          scrimOpacity={0.28}
+        />
       </View>
     </View>
   );
@@ -336,17 +352,26 @@ const styles = StyleSheet.create({
     borderRadius: radii.xl,
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    padding: spacing.lg,
-    gap: spacing.sm,
+    overflow: "hidden",
   },
   cardActive: {
     borderColor: colors.accent,
-    backgroundColor: colors.cardHover,
+  },
+  cardRow: {
+    flexDirection: "row",
+    minHeight: 168,
+  },
+  cardBody: {
+    flex: 1,
+    padding: spacing.md,
+    justifyContent: "space-between",
+    gap: spacing.xs,
   },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: spacing.sm,
   },
   categoryBadge: {
     flexDirection: "row",
@@ -356,7 +381,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: radii.pill,
     backgroundColor: colors.accentGlow,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.accentMuted,
   },
   categoryLabel: {
@@ -366,19 +391,29 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.4,
   },
-  referenceLabel: {
+  cardRef: {
     ...typography.caption,
     color: colors.textMuted,
     fontWeight: "700",
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  cardPhoto: {
+    width: 120,
+    minHeight: 168,
+    borderTopRightRadius: radii.xl,
+    borderBottomRightRadius: radii.xl,
   },
   cardTitle: {
-    ...typography.title,
+    ...typography.subtitle,
     color: colors.textPrimary,
+    fontWeight: "700",
   },
-  cardBody: {
-    ...typography.body,
+  cardText: {
+    ...typography.caption,
     color: colors.textSecondary,
-    lineHeight: 24,
+    lineHeight: 20,
+    flex: 1,
   },
   cardFooter: {
     flexDirection: "row",

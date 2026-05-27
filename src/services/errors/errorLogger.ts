@@ -53,14 +53,18 @@ async function flushQueue(): Promise<void> {
   const remaining: QueuedErrorLog[] = [];
 
   for (const item of queue) {
-    const { error } = await supabase.from("error_logs").insert({
-      app_name: item.app_name,
-      error_message: item.error_message,
-      error_stack: item.error_stack,
-      device_info: item.device_info,
-    });
+    try {
+      const { error } = await supabase.from("error_logs").insert({
+        app_name: item.app_name,
+        error_message: item.error_message,
+        error_stack: item.error_stack,
+        device_info: item.device_info,
+      });
 
-    if (error) {
+      if (error) {
+        remaining.push(item);
+      }
+    } catch {
       remaining.push(item);
     }
   }
@@ -123,8 +127,12 @@ export function logError(
 }
 
 export function initializeErrorLogger(): void {
-  void flushQueue();
+  void flushQueue().catch(() => {
+    // never surface to RN bridge
+  });
   setInterval(() => {
-    void flushQueue();
+    void flushQueue().catch(() => {
+      // never surface to RN bridge
+    });
   }, 30_000);
 }
