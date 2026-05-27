@@ -25,10 +25,22 @@ export async function captureVerseStory(
   return uri;
 }
 
-export async function shareVerseImage(uri: string): Promise<boolean> {
+export async function shareVerseImage(uri: string, message?: string): Promise<boolean> {
   const available = await Sharing.isAvailableAsync();
   if (!available) {
     return false;
+  }
+
+  if (message) {
+    const { Share, Platform } = await import("react-native");
+    if (Platform.OS === "ios") {
+      await Share.share({
+        message,
+        url: uri,
+        title: i18n.t("share.dialogTitle"),
+      });
+      return true;
+    }
   }
 
   await Sharing.shareAsync(uri, {
@@ -36,6 +48,11 @@ export async function shareVerseImage(uri: string): Promise<boolean> {
     dialogTitle: i18n.t("share.dialogTitle"),
     UTI: "public.png",
   });
+
+  if (message) {
+    const { Share } = await import("react-native");
+    await Share.share({ message, title: i18n.t("share.dialogTitle") });
+  }
 
   return true;
 }

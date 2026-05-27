@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   Platform,
   Pressable,
-  Share,
   StyleSheet,
   Text,
   View,
@@ -14,7 +13,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { captureRef } from "react-native-view-shot";
-import * as Sharing from "expo-sharing";
+import { shareVerse } from "@/services/share/shareVerse";
 import { getVerseOfTheDay } from "@/services/db/scriptureRepository";
 import { getUserStats, recordDailyRead } from "@/services/stats/userStats";
 import {
@@ -172,15 +171,31 @@ export function VotdFeedCard({ onVerse }: VotdFeedCardProps) {
     if (!verse || sharing) return;
     setSharing(true);
     try {
-      const available = await Sharing.isAvailableAsync();
-      if (available && cardRef.current) {
-        const uri = await captureRef(cardRef, { format: "png", quality: 0.95 });
-        await Sharing.shareAsync(uri, { mimeType: "image/png" });
-      } else {
-        await Share.share({
-          message: `${formatBookReference(verse.book_slug, verse.chapter_number, verse.number, locale, verse.book_name)} — "${verse.text}"`,
-        });
+      const reference = formatBookReference(
+        verse.book_slug,
+        verse.chapter_number,
+        verse.number,
+        locale,
+        verse.book_name
+      );
+      let imageUri: string | null = null;
+      try {
+        if (cardRef.current) {
+          imageUri = await captureRef(cardRef, { format: "png", quality: 0.95 });
+        }
+      } catch {
+        // image optional — text share still works offline
       }
+      await shareVerse(
+        {
+          reference,
+          text: verse.text,
+          bookSlug: verse.book_slug,
+          chapter: verse.chapter_number,
+          verse: verse.number,
+        },
+        imageUri
+      );
     } catch {
       // share cancelled
     } finally {

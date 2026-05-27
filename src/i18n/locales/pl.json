@@ -456,7 +456,10 @@
   },
   "share": {
     "brand": "Biblia AI",
-    "dialogTitle": "Udostępnij werset"
+    "dialogTitle": "Udostępnij werset",
+    "verseMessage": "{{reference}}\n\n„{{excerpt}}”\n\n{{link}}",
+    "openInApp": "Otwórz w Biblia AI: {{link}}",
+    "openInAppWithWeb": "Czytaj online: {{webUrl}}\nOtwórz w aplikacji: {{deepLink}}"
   },
   "plan": {
     "title": "Plan czytania",

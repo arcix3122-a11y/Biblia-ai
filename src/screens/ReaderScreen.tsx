@@ -22,12 +22,14 @@ import { VerseRow } from "@/components/VerseRow";
 import { useChrome } from "@/context/ChromeContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useBook, useChapterVerses, useDatabaseReady } from "@/hooks/useScripture";
+import { useChapterTTS } from "@/hooks/useChapterTTS";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
 import { HighlightColorPicker } from "@/components/reader/HighlightColorPicker";
 import { useHighlights } from "@/hooks/useHighlights";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { captureVerseStory, shareVerseImage } from "@/services/share/verseImageExporter";
+import { captureVerseStory } from "@/services/share/verseImageExporter";
+import { shareVerse } from "@/services/share/shareVerse";
 import { recordChapterRead } from "@/services/stats/userStats";
 import { useHistoryStore } from "@/store/historyStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -71,6 +73,9 @@ export default function ReaderScreen() {
   const flatListRef = useRef<FlatList>(null);
   const shareRef = useRef<View>(null);
   const [sharing, setSharing] = useState(false);
+
+  const chapterKey = `${slug}-${chapterNumber}`;
+  const tts = useChapterTTS(verses, translation, chapterKey);
 
   useEffect(() => {
     setTabBarHidden(immersiveMode);
@@ -162,19 +167,40 @@ export default function ReaderScreen() {
     : undefined;
 
   const onShareSelectedVerse = useCallback(async () => {
-    if (!selectedVerse || sharing) {
+    if (!selectedVerse || sharing || !book) {
       return;
     }
     setSharing(true);
     try {
-      const uri = await captureVerseStory(shareRef);
-      if (uri) {
-        await shareVerseImage(uri);
+      const reference = formatBookReference(
+        book.slug,
+        chapterNumber,
+        selectedVerse.verse,
+        locale,
+        book.name
+      );
+      let imageUri: string | null = null;
+      try {
+        imageUri = await captureVerseStory(shareRef);
+      } catch {
+        // image optional
       }
+      await shareVerse(
+        {
+          reference,
+          text: selectedVerse.text,
+          bookSlug: book.slug,
+          chapter: chapterNumber,
+          verse: selectedVerse.verse,
+        },
+        imageUri
+      );
+    } catch {
+      // share cancelled
     } finally {
       setSharing(false);
     }
-  }, [selectedVerse, sharing]);
+  }, [book, chapterNumber, locale, selectedVerse, sharing]);
 
   const renderVerse = useCallback(
     ({ item }: { item: Verse }) => (
@@ -250,11 +276,33 @@ export default function ReaderScreen() {
             <Ionicons name="chevron-back" size={16} color={colors.accent} />
             <Text style={styles.back}>{t("common.back")}</Text>
           </Pressable>
-          <FontControls
-            fontSize={fontSize}
-            onIncrease={increaseFont}
-            onDecrease={decreaseFont}
-          />
+          <View style={styles.topBarRight}>
+            <Pressable
+              onPress={tts.toggle}
+              hitSlop={10}
+              style={[styles.ttsButton, tts.isPlaying && styles.ttsButtonActive]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                tts.isPlaying ? t("reader.stopReading") : t("reader.readAloud")
+              }
+            >
+              <Ionicons
+                name={tts.isPlaying ? "pause" : "volume-high-outline"}
+                size={14}
+                color={tts.isPlaying ? colors.canvas : colors.accent}
+              />
+              <Text
+                style={[styles.ttsButtonText, tts.isPlaying && styles.ttsButtonTextActive]}
+              >
+                {tts.isPlaying ? t("reader.stopReading") : t("reader.readAloud")}
+              </Text>
+            </Pressable>
+            <FontControls
+              fontSize={fontSize}
+              onIncrease={increaseFont}
+              onDecrease={decreaseFont}
+            />
+          </View>
         </Animated.View>
       ) : null}
 
@@ -448,6 +496,35 @@ const styles = StyleSheet.create({
   back: {
     ...typography.caption,
     color: colors.accent,
+  },
+  topBarRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  ttsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    borderRadius: radii.pill,
+    backgroundColor: colors.backgroundElevated,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+  },
+  ttsButtonActive: {
+    backgroundColor: colors.accent,
+  },
+  ttsButtonText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "700",
+    fontSize: 11,
+    letterSpacing: 0.3,
+  },
+  ttsButtonTextActive: {
+    color: colors.canvas,
   },
   verseList: {
     paddingTop: spacing.xl * 2,
