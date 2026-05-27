@@ -25,12 +25,14 @@ import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { colors, radii, spacing, typography } from "@/theme";
 import { GlassCard } from "@/components/GlassCard";
 import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { formatNoteDate, formatSavedDate } from "@/utils/formatDate";
 
 export default function WorkspaceScreen() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   
@@ -158,7 +160,7 @@ export default function WorkspaceScreen() {
           const chapterObj = await scriptureRepo.getChapter(book.id, chapter);
           let verseText = "";
           if (chapterObj) {
-            const verses = await scriptureRepo.getVersesByChapterId(chapterObj.id);
+            const verses = await scriptureRepo.getVersesByChapterId(chapterObj.id, translation);
             const matchVerse = verses.find((v) => v.number === verse);
             if (matchVerse) {
               verseText = matchVerse.text;
@@ -180,7 +182,7 @@ export default function WorkspaceScreen() {
         console.warn("Failed to parse linked verse:", err);
       }
     },
-    [locale, router, setSelectedVerse]
+    [locale, router, setSelectedVerse, translation]
   );
 
   const handleDeleteBookmark = useCallback((item: any) => {

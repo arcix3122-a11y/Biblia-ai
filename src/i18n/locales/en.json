@@ -79,7 +79,23 @@
     "searchHint_many": "Type {{count}} more characters to search.",
     "plansHeading": "Plans",
     "verseTextLocaleNotice": "Verse text: English (KJV)",
-    "readScripture": "Read Scripture"
+    "verseTextLocaleNoticeEn": "Verse text: English (KJV)",
+    "verseTextLocaleNoticePl": "Verse text: Polish (Biblia Gdańska 1881)",
+    "readScripture": "Read Scripture",
+    "emotionalHubTitle": "How is your heart today?",
+    "emotionalHubSubtitle": "Choose a state to open a guided path.",
+    "emotions": {
+      "love": "LOVE",
+      "anxiety": "ANXIETY",
+      "healing": "HEALING",
+      "anger": "ANGER"
+    },
+    "emotionPrompts": {
+      "love": "Guide me through Scriptures about love, faithfulness, and serving others today.",
+      "anxiety": "I feel anxious. Give me calm, grounding Scriptures and a short prayer for this moment.",
+      "healing": "I need healing. Help me with passages about restoration and hope, plus one practical step.",
+      "anger": "I am struggling with anger. Show me verses that lead me toward wisdom, restraint, and grace."
+    }
   },
   "dashboard": {
     "dayStreak": "day streak",
@@ -95,6 +111,28 @@
     "tapToRead": "Tap to read in the reader",
     "dayStreak_few": "day streak",
     "dayStreak_many": "day streak"
+  },
+  "viralFeed": {
+    "verseOfDay": "Verse of the day",
+    "tapToRead": "Tap to read in the reader",
+    "likes": "Likes",
+    "comments": "Comments",
+    "share": "Share",
+    "more": "More",
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "guidedSection": "Spiritual guide",
+    "reflectionTitle": "AI reflection time",
+    "reflectionSub": "Guided 2–5 min meditation",
+    "silenceTitle": "Moment of silence with assistant",
+    "silenceSub": "Personalized spiritual alignment",
+    "readTime": "{{min}} min",
+    "generatingReflection": "Preparing your reflection…",
+    "reflectionError": "Could not generate reflection. Please try again.",
+    "closeSheet": "Close",
+    "offlineMeditation": "Take a quiet moment to sit with this verse. Let its words settle into your heart. What does it say to you today? Rest in the truth that God's word is alive, and He speaks through it to your specific situation.",
+    "offlineSilence": "Breathe slowly. Read the verse once more. Ask yourself: what is one thing God may be inviting you to trust, release, or embrace today? Sit in that question."
   },
   "readingPlan": {
     "foundationTitle": "Foundation week",
@@ -202,7 +240,10 @@
       "rose": "Rose highlight"
     },
     "scriptureTranslationNotice": "Scripture text is in English (KJV).",
+    "scriptureTranslationNoticeShort": "You chose English (KJV) for verse text. Switch translation in Settings for Polish.",
     "scriptureTranslationNoticeLong": "Scripture text is in English (KJV). The app interface follows your language setting.",
+    "translationLabel": "Translation: {{name}}",
+    "flowSubtitle": "Read slowly. Let the text breathe.",
     "dismissTranslationNotice": "Dismiss KJV notice",
     "crossReferences": "Related passages",
     "crossRefTheme": "{{theme}}",
@@ -316,7 +357,16 @@
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
     "scriptureTranslation": "Scripture translation",
-    "scriptureTranslationHint": "Verse text in the local database is English (KJV). Only app labels and navigation are localized.",
+    "scriptureTranslationHint": "Import a full Bible with scripts/import-polish-bible.mjs or prepare-bible-seed.mjs. The bundled app includes a 94-verse demo in both languages.",
+    "translation": {
+      "title": "Scripture translation",
+      "hint": "Follows app language by default. Override to always read KJV or Biblia Gdańska.",
+      "auto": "Auto",
+      "pl": "PL",
+      "en": "EN",
+      "plName": "Biblia Gdańska (1881)",
+      "enName": "King James Version"
+    },
     "resetQuotaTitle": "Reset quota and clear chat?",
     "resetQuotaMessage": "This clears your Companion chat history and restores the daily message limit.",
     "resetQuotaSuccess": "Chat cleared and daily limit restored.",

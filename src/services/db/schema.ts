@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const CREATE_TABLES_SQL = `
 PRAGMA foreign_keys = ON;
@@ -28,8 +28,9 @@ CREATE TABLE IF NOT EXISTS verses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   chapter_id INTEGER NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
   number INTEGER NOT NULL,
+  translation TEXT NOT NULL DEFAULT 'en' CHECK (translation IN ('en', 'pl')),
   text TEXT NOT NULL,
-  UNIQUE (chapter_id, number)
+  UNIQUE (chapter_id, number, translation)
 );
 
 CREATE TABLE IF NOT EXISTS bookmarks (
@@ -52,9 +53,28 @@ CREATE TABLE IF NOT EXISTS reading_history (
 
 CREATE INDEX IF NOT EXISTS idx_books_testament ON books (testament, order_index);
 CREATE INDEX IF NOT EXISTS idx_chapters_book ON chapters (book_id, number);
-CREATE INDEX IF NOT EXISTS idx_verses_chapter ON verses (chapter_id, number);
+CREATE INDEX IF NOT EXISTS idx_verses_chapter_translation ON verses (chapter_id, number, translation);
 CREATE INDEX IF NOT EXISTS idx_bookmarks_verse ON bookmarks (verse_id);
 CREATE INDEX IF NOT EXISTS idx_history_viewed ON reading_history (viewed_at DESC);
+`;
+
+export const MIGRATION_V3_SQL = `
+CREATE TABLE verses_v3 (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  chapter_id INTEGER NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
+  number INTEGER NOT NULL,
+  translation TEXT NOT NULL DEFAULT 'en' CHECK (translation IN ('en', 'pl')),
+  text TEXT NOT NULL,
+  UNIQUE (chapter_id, number, translation)
+);
+
+INSERT INTO verses_v3 (id, chapter_id, number, translation, text)
+SELECT id, chapter_id, number, 'en', text FROM verses;
+
+DROP TABLE verses;
+ALTER TABLE verses_v3 RENAME TO verses;
+
+CREATE INDEX IF NOT EXISTS idx_verses_chapter_translation ON verses (chapter_id, number, translation);
 `;
 
 export const MIGRATION_V2_SQL = `

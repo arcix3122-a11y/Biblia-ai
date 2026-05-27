@@ -1,15 +1,21 @@
 import { getDatabase } from "./database";
-import type { Bookmark } from "@/types/scripture";
+import type { Bookmark, ScriptureTranslation } from "@/types/scripture";
 
-export async function listBookmarks(): Promise<Bookmark[]> {
+export async function listBookmarks(
+  translation: ScriptureTranslation = "en"
+): Promise<Bookmark[]> {
   const db = await getDatabase();
   return db.getAllAsync<Bookmark>(
     `SELECT b.id, b.verse_id, b.book_id, b.chapter, b.verse, b.created_at, b.note,
-            bk.name AS book_name, bk.slug AS book_slug, v.text AS verse_text
+            bk.name AS book_name, bk.slug AS book_slug,
+            COALESCE(vt.text, v.text) AS verse_text
      FROM bookmarks b
      INNER JOIN books bk ON bk.id = b.book_id
      INNER JOIN verses v ON v.id = b.verse_id
-     ORDER BY b.created_at DESC`
+     LEFT JOIN chapters c ON c.book_id = b.book_id AND c.number = b.chapter
+     LEFT JOIN verses vt ON vt.chapter_id = c.id AND vt.number = b.verse AND vt.translation = ?
+     ORDER BY b.created_at DESC`,
+    translation
   );
 }
 

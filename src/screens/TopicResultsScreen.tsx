@@ -11,6 +11,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { formatBookReference } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
 import { getTopicBySlug } from "@/data/semanticTopics";
 import { useLocalizedTopic } from "@/hooks/useLocalizedTopic";
 import { searchTopicVerses } from "@/services/db/semanticSearch";
@@ -20,6 +21,7 @@ import type { VerseWithReference } from "@/types/scripture";
 export default function TopicResultsScreen() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const topicSlug = typeof slug === "string" ? slug : "";
   const topic = useLocalizedTopic(getTopicBySlug(topicSlug));
@@ -35,10 +37,10 @@ export default function TopicResultsScreen() {
       return;
     }
     setLoading(true);
-    const hits = await searchTopicVerses(rawTopic);
+    const hits = await searchTopicVerses(rawTopic, translation);
     setResults(hits);
     setLoading(false);
-  }, [topicSlug]);
+  }, [topicSlug, translation]);
 
   useEffect(() => {
     void load();

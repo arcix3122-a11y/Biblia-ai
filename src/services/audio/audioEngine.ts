@@ -2,6 +2,8 @@ import * as Speech from "expo-speech";
 import type { AudioTrack } from "@/store/audioStore";
 import { useAudioStore } from "@/store/audioStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
+import { useLocaleStore } from "@/store/localeStore";
+import { resolveScriptureTranslation, useTranslationStore } from "@/store/translationStore";
 
 export interface AudioEngine {
   load(track: AudioTrack): Promise<void>;
@@ -29,7 +31,14 @@ class SpeechAudioEngine implements AudioEngine {
     store.setStatus("loading");
 
     try {
-      const verses = await scriptureRepo.getVersesByBookAndChapter(track.bookId, track.chapter);
+      const locale = useLocaleStore.getState().locale;
+      const preference = useTranslationStore.getState().preference;
+      const translation = resolveScriptureTranslation(preference, locale);
+      const verses = await scriptureRepo.getVersesByBookAndChapter(
+        track.bookId,
+        track.chapter,
+        translation
+      );
       this.verseTexts = verses.map((v) => `Verse ${v.number}. ${v.text}`);
       // Estimate duration: ~150 words per minute, avg 20 words per verse
       const estimatedMs = verses.length * 8_000;
@@ -59,7 +68,12 @@ class SpeechAudioEngine implements AudioEngine {
       store.setPosition(Math.round((index / this.verseTexts.length) * store.durationMs));
 
       Speech.speak(this.verseTexts[index] ?? "", {
-        language: "en-US",
+        language: resolveScriptureTranslation(
+          useTranslationStore.getState().preference,
+          useLocaleStore.getState().locale
+        ) === "pl"
+          ? "pl-PL"
+          : "en-US",
         rate: 0.9,
         onDone: () => speakNext(index + 1),
         onStopped: () => {

@@ -3,6 +3,16 @@
 This file is used by all agents/subagents working in this repository.
 Add one short entry per completed task.
 
+## 2026-05-27 — START (Cursor subagent — bilingual PL/EN scripture)
+
+- **Agent:** Cursor subagent
+- **Cel:** Pełne dwujęzyczne Pismo — polski tekst wersetów (Biblia Gdańska 1881, PD) + angielski KJV; migracja SQLite v3; seed mobilny 94×2; toggle tłumaczenia w Settings.
+- **Zakres:** schema v3 (`verses.translation`), `bible-seed-en.json` / `bible-seed-pl.json`, skrypty importu, `scriptureRepository`, Reader/search/VOTD/share, i18n, `docs/BIBLE_TRANSLATIONS.md`, ukrycie planu rocznego bez pełnej Biblii.
+- **Postęp planowany:** ~100% w tej sesji (mobile seed + architektura full import).
+- **Pliki:** `schema.ts`, `database.ts`, `seed.ts`, `scriptureRepository.ts`, `translationStore.ts`, `localeStore.ts`, `SettingsScreen.tsx`, `ReaderScreen.tsx`, `useScripture.ts`, `HomeScreen.tsx`, `VotdFeedCard.tsx`, assety seed, skrypty `import-polish-bible.mjs` / `prepare-bilingual-seed.mjs`, locale JSON, docs.
+- **Walidacja:** `npm run typecheck`, `npm run check:locales`, commit `feat(bible): bilingual PL/EN scripture in SQLite`.
+- **Poza zakresem:** onboarding 100 slajdów (notatka tylko).
+
 ## 2026-05-23 — START (Claude Code — viral feed overhaul)
 
 **Cel:** Przeprojektowanie głównego ekranu aplikacji na wzór angażującego feeda (YouVersion). Nowe elementy: premium karta VOTD z social barem (like/share/komentarz), powitanie zależne od pory dnia, dwie karty "Przewodnika duchowego" otwierające streaming AI. Pełna i18n PL+EN pod przestrzenią `viralFeed.*`.

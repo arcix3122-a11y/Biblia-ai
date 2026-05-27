@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CREATE_TABLES_SQL, MIGRATION_V2_SQL, SCHEMA_VERSION } from "./schema";
-import { runSeedIfNeeded } from "./seed";
+import { CREATE_TABLES_SQL, MIGRATION_V2_SQL, MIGRATION_V3_SQL, SCHEMA_VERSION } from "./schema";
+import { runPolishSeedIfNeeded, runSeedIfNeeded } from "./seed";
 
 const DB_NAME = "biblia.db";
 const SEED_FLAG_KEY = "@biblia-ai/db-seeded";
@@ -40,6 +40,10 @@ async function applyMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   if (row.version < SCHEMA_VERSION) {
     if (row.version < 2) {
       await db.execAsync(MIGRATION_V2_SQL);
+    }
+    if (row.version < 3) {
+      await db.execAsync(MIGRATION_V3_SQL);
+      await runPolishSeedIfNeeded(db);
     }
     await db.runAsync(
       "INSERT INTO schema_migrations (version) VALUES (?)",

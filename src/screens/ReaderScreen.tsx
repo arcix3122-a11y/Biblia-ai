@@ -13,13 +13,11 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
 import { ErrorFallback } from "@/components/ErrorFallback";
-import { GlassChrome } from "@/components/GlassChrome";
 import { LoadingState } from "@/components/layout/LoadingState";
-import { ImmersiveModeToggle } from "@/components/reader/ImmersiveModeToggle";
 import { FontControls } from "@/components/reader/FontControls";
 import { ReadingCanvas } from "@/components/reader/ReadingCanvas";
-import { CrossReferencesPanel } from "@/components/reader/CrossReferencesPanel";
 import { VerseRow } from "@/components/VerseRow";
 import { useChrome } from "@/context/ChromeContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
@@ -42,6 +40,7 @@ import type { Verse } from "@/types/scripture";
 export default function ReaderScreen() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { setTabBarHidden } = useChrome();
@@ -231,27 +230,32 @@ export default function ReaderScreen() {
   }
 
   const bookDisplayName = getBookDisplayName(book.slug, locale, book.name);
+  const showEnglishNotice = translation === "en" && locale === "pl" && !hasDismissedKjvBanner;
 
   return (
     <View style={[styles.container, { paddingTop: immersiveMode ? insets.top : 0 }]}>
       <Stack.Screen options={{ headerShown: false }} />
 
       {!immersiveMode ? (
-        <GlassChrome sticky style={{ paddingTop: insets.top }}>
-          <Animated.View style={[styles.toolbar, { opacity: chromeOpacity }]}>
-            <Pressable onPress={() => router.back()} hitSlop={12}>
-              <Text style={styles.back}>← {t("common.back")}</Text>
-            </Pressable>
-            <Text style={styles.heading}>
-              {bookDisplayName} {chapterNumber}
-            </Text>
-            <FontControls
-              fontSize={fontSize}
-              onIncrease={increaseFont}
-              onDecrease={decreaseFont}
-            />
-          </Animated.View>
-        </GlassChrome>
+        <Animated.View
+          style={[
+            styles.topBar,
+            {
+              opacity: chromeOpacity,
+              paddingTop: insets.top + spacing.xs,
+            },
+          ]}
+        >
+          <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backButton}>
+            <Ionicons name="chevron-back" size={16} color={colors.accent} />
+            <Text style={styles.back}>{t("common.back")}</Text>
+          </Pressable>
+          <FontControls
+            fontSize={fontSize}
+            onIncrease={increaseFont}
+            onDecrease={decreaseFont}
+          />
+        </Animated.View>
       ) : null}
 
       <ReadingCanvas fontSize={fontSize} style={styles.canvas}>
@@ -267,21 +271,36 @@ export default function ReaderScreen() {
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
           ListHeaderComponent={
-            !immersiveMode && !hasDismissedKjvBanner ? (
-              <View style={styles.translationNotice}>
-                <Text style={styles.translationNoticeText} numberOfLines={1}>
-                  {t("reader.scriptureTranslationNotice")}
-                </Text>
-                <Pressable
-                  onPress={dismissKjvBanner}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("reader.dismissTranslationNotice")}
-                >
-                  <Ionicons name="close" size={16} color={colors.textMuted} />
-                </Pressable>
-              </View>
-            ) : null
+            <View style={styles.flowHeader}>
+              <Text style={styles.flowTitle}>
+                {bookDisplayName} {chapterNumber}
+              </Text>
+              <Text style={styles.flowSubtitle}>{t("reader.flowSubtitle")}</Text>
+              <Text style={styles.translationLabel}>
+                {t("reader.translationLabel", {
+                  name:
+                    translation === "pl"
+                      ? t("settings.translation.plName")
+                      : t("settings.translation.enName"),
+                })}
+              </Text>
+              {!immersiveMode && showEnglishNotice ? (
+                <View style={styles.translationNotice}>
+                  <Text style={styles.translationNoticeText} numberOfLines={2}>
+                    {t("reader.scriptureTranslationNoticeShort")}
+                  </Text>
+                  <Pressable
+                    onPress={dismissKjvBanner}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("reader.dismissTranslationNotice")}
+                  >
+                    <Ionicons name="close" size={16} color={colors.textMuted} />
+                  </Pressable>
+                </View>
+              ) : null}
+              <View style={styles.flowDivider} />
+            </View>
           }
           onScrollToIndexFailed={(info) => {
             setTimeout(() => {
@@ -295,18 +314,13 @@ export default function ReaderScreen() {
           ListEmptyComponent={
             <Text style={styles.empty}>{t("reader.chapterUnavailable")}</Text>
           }
-          ListFooterComponent={
-            !immersiveMode ? (
-              <CrossReferencesPanel bookSlug={book.slug} chapter={chapterNumber} />
-            ) : null
-          }
         />
       </ReadingCanvas>
 
       {!immersiveMode ? (
         <Animated.View
           style={[
-            styles.bottomChrome,
+            styles.floatingBottom,
             {
               opacity: chromeOpacity,
               paddingBottom: insets.bottom + spacing.sm,
@@ -314,21 +328,16 @@ export default function ReaderScreen() {
           ]}
         >
           {selectedVerse ? (
-            <View style={styles.selectionBar}>
-              <View style={styles.selectionTextRow}>
-                <Ionicons name="sparkles" size={14} color={colors.accent} style={{ marginRight: 6 }} />
-                <Text style={styles.selectionRef} numberOfLines={1}>
-                  {t("reader.selected", {
-                    reference: formatBookReference(
-                      selectedVerse.bookSlug,
-                      selectedVerse.chapter,
-                      selectedVerse.verse,
-                      locale,
-                      selectedVerse.bookName
-                    ),
-                  })}
-                </Text>
-              </View>
+            <View style={styles.selectionDock}>
+              <Text style={styles.selectionRef} numberOfLines={1}>
+                {formatBookReference(
+                  selectedVerse.bookSlug,
+                  selectedVerse.chapter,
+                  selectedVerse.verse,
+                  locale,
+                  selectedVerse.bookName
+                )}
+              </Text>
               {selectedVerseId ? (
                 <HighlightColorPicker
                   activeColor={getHighlightColor(selectedVerseId)}
@@ -336,50 +345,25 @@ export default function ReaderScreen() {
                   onClear={() => void clearHighlight(selectedVerseId)}
                 />
               ) : null}
-
-              <Pressable
-                onPress={() => router.push("/study")}
-                style={styles.selectionBtnPrimary}
-              >
-                <Ionicons name="school-outline" size={16} color={colors.canvas} style={{ marginRight: 6 }} />
-                <Text style={styles.selectionBtnTextPrimary}>
-                  {t("reader.deepStudy")}
-                </Text>
-              </Pressable>
-
-              <View style={styles.selectionActions}>
-                <Pressable
-                  onPress={() => router.push("/ai")}
-                  style={styles.selectionBtn}
-                >
-                  <Ionicons name="chatbubble-ellipses" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>{t("reader.aiAssistant")}</Text>
+              <View style={styles.selectionActionsCompact}>
+                <Pressable onPress={() => router.push("/study")} style={styles.selectionIconBtn}>
+                  <Ionicons name="school-outline" size={15} color={colors.accent} />
                 </Pressable>
-                <Pressable
-                  onPress={() => router.push("/workspace")}
-                  style={styles.selectionBtn}
-                >
-                  <Ionicons name="journal" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>{t("reader.notebook")}</Text>
+                <Pressable onPress={() => router.push("/ai")} style={styles.selectionIconBtn}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={15} color={colors.accent} />
+                </Pressable>
+                <Pressable onPress={() => router.push("/workspace")} style={styles.selectionIconBtn}>
+                  <Ionicons name="journal-outline" size={15} color={colors.accent} />
                 </Pressable>
                 <Pressable
                   onPress={() => void onShareSelectedVerse()}
                   disabled={sharing}
-                  style={styles.selectionBtn}
+                  style={styles.selectionIconBtn}
                 >
-                  <Ionicons name="share-outline" size={16} color={colors.accent} />
-                  <Text style={styles.selectionBtnText}>
-                    {sharing ? t("common.preparing") : t("reader.shareVerse")}
-                  </Text>
+                  <Ionicons name="share-outline" size={15} color={colors.accent} />
                 </Pressable>
-                <Pressable
-                  onPress={() => setSelectedVerse(null)}
-                  style={[styles.selectionBtn, styles.selectionBtnCancel]}
-                >
-                  <Ionicons name="close-circle" size={16} color={colors.danger} />
-                  <Text style={[styles.selectionBtnText, styles.selectionBtnTextCancel]}>
-                    {t("common.cancel")}
-                  </Text>
+                <Pressable onPress={() => setSelectedVerse(null)} style={styles.selectionIconBtn}>
+                  <Ionicons name="close-outline" size={15} color={colors.textMuted} />
                 </Pressable>
               </View>
               <View style={styles.offscreen} pointerEvents="none">
@@ -396,21 +380,21 @@ export default function ReaderScreen() {
                 />
               </View>
             </View>
-          ) : (
-            <View style={styles.nav}>
-              <Pressable onPress={() => void navigateChapter("prev")} style={styles.navButton}>
-                <Text style={styles.navText}>{t("reader.previous")}</Text>
-              </Pressable>
-              <ImmersiveModeToggle
-                immersive={immersiveMode}
-                onToggle={toggleImmersiveMode}
-                chromeOpacity={chromeOpacity}
-              />
-              <Pressable onPress={() => void navigateChapter("next")} style={styles.navButton}>
-                <Text style={styles.navText}>{t("reader.next")}</Text>
-              </Pressable>
-            </View>
-          )}
+          ) : null}
+
+          <View style={styles.navPill}>
+            <Pressable onPress={() => void navigateChapter("prev")} style={styles.navIconButton}>
+              <Ionicons name="chevron-back" size={15} color={colors.textSecondary} />
+            </Pressable>
+            <Pressable onLongPress={toggleImmersiveMode} style={styles.navCenter}>
+              <Text style={styles.navPillText} numberOfLines={1}>
+                {bookDisplayName} {chapterNumber}
+                </Text>
+            </Pressable>
+            <Pressable onPress={() => void navigateChapter("next")} style={styles.navIconButton}>
+              <Ionicons name="chevron-forward" size={15} color={colors.textSecondary} />
+            </Pressable>
+          </View>
         </Animated.View>
       ) : (
         <Pressable
@@ -438,45 +422,101 @@ const styles = StyleSheet.create({
   canvas: {
     flex: 1,
   },
-  toolbar: {
+  topBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 5,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingBottom: spacing.xs,
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    borderRadius: radii.pill,
+    backgroundColor: colors.backgroundElevated,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
   },
   back: {
     ...typography.caption,
     color: colors.accent,
-    minWidth: 56,
-  },
-  heading: {
-    ...typography.subtitle,
-    color: colors.textPrimary,
-    flex: 1,
-    textAlign: "center",
   },
   verseList: {
-    paddingBottom: spacing.xxl * 2,
+    paddingTop: spacing.xl * 2,
+    paddingBottom: spacing.xxl * 2.2,
+    paddingHorizontal: spacing.sm,
   },
-  bottomChrome: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.glassBorder,
-    backgroundColor: colors.backgroundElevated,
-    paddingTop: spacing.sm,
-    paddingHorizontal: spacing.md,
+  flowHeader: {
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.md,
   },
-  nav: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  flowTitle: {
+    ...typography.title,
+    color: colors.textPrimary,
+    marginBottom: 2,
+    textAlign: "center",
   },
-  navButton: {
-    padding: spacing.sm,
+  flowSubtitle: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: "center",
+    marginBottom: spacing.xs,
   },
-  navText: {
-    ...typography.subtitle,
+  translationLabel: {
+    ...typography.caption,
     color: colors.accent,
+    textAlign: "center",
+    marginBottom: spacing.sm,
+  },
+  flowDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.glassBorder,
+    marginTop: spacing.sm,
+  },
+  floatingBottom: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    paddingHorizontal: spacing.md,
+    zIndex: 4,
+  },
+  navPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 4,
+    minWidth: 210,
+  },
+  navIconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navCenter: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navPillText: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    fontWeight: "700",
   },
   empty: {
     ...typography.body,
@@ -502,68 +542,37 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
   },
-  selectionBar: {
+  selectionDock: {
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
+    paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-  },
-  selectionTextRow: {
-    flexDirection: "row",
-    alignItems: "center",
     marginBottom: spacing.sm,
-    justifyContent: "center",
+    minWidth: 230,
+    alignItems: "center",
   },
   selectionRef: {
     ...typography.caption,
     color: colors.accent,
     fontWeight: "700",
+    marginBottom: spacing.xs,
   },
-  selectionActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  selectionBtn: {
-    flexGrow: 1,
-    flexBasis: "47%",
+  selectionActionsCompact: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     gap: spacing.xs,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
+  },
+  selectionIconBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    backgroundColor: colors.bubbleUser,
-  },
-  selectionBtnCancel: {
-    borderColor: "rgba(239, 68, 68, 0.2)",
-  },
-  selectionBtnText: {
-    ...typography.caption,
-    color: colors.textPrimary,
-    fontWeight: "600",
-  },
-  selectionBtnTextCancel: {
-    color: colors.danger,
-  },
-  selectionBtnPrimary: {
-    flexDirection: "row",
+    backgroundColor: colors.canvas,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.accent,
-    borderRadius: radii.md,
-    paddingVertical: spacing.sm + 2,
-    marginBottom: spacing.xs,
-    shadowColor: colors.accent,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  selectionBtnTextPrimary: {
-    ...typography.caption,
-    color: colors.canvas,
-    fontWeight: "700",
-    letterSpacing: 0.5,
   },
   translationNotice: {
     flexDirection: "row",

@@ -1,5 +1,14 @@
 import { getDatabase } from "./database";
-import type { Book, Chapter, Testament, Verse, VerseWithReference } from "@/types/scripture";
+import type {
+  Book,
+  Chapter,
+  ScriptureTranslation,
+  Testament,
+  Verse,
+  VerseWithReference,
+} from "@/types/scripture";
+
+const FULL_BIBLE_BOOK_COUNT = 66;
 
 export async function getBooksByTestament(testament: Testament): Promise<Book[]> {
   const db = await getDatabase();
@@ -48,17 +57,25 @@ export async function getChapter(
   );
 }
 
-export async function getVersesByChapterId(chapterId: number): Promise<Verse[]> {
+export async function getVersesByChapterId(
+  chapterId: number,
+  translation: ScriptureTranslation = "en"
+): Promise<Verse[]> {
   const db = await getDatabase();
   return db.getAllAsync<Verse>(
-    `SELECT id, chapter_id, number, text FROM verses WHERE chapter_id = ? ORDER BY number ASC`,
-    chapterId
+    `SELECT id, chapter_id, number, translation, text
+     FROM verses
+     WHERE chapter_id = ? AND translation = ?
+     ORDER BY number ASC`,
+    chapterId,
+    translation
   );
 }
 
 export async function getVersesByBookAndChapter(
   bookId: number,
-  chapterNumber: number
+  chapterNumber: number,
+  translation: ScriptureTranslation = "en"
 ): Promise<Verse[]> {
   const db = await getDatabase();
   const chapter = await db.getFirstAsync<Chapter>(
@@ -69,13 +86,14 @@ export async function getVersesByBookAndChapter(
   if (!chapter) {
     return [];
   }
-  return db.getAllAsync<Verse>(
-    `SELECT id, chapter_id, number, text FROM verses WHERE chapter_id = ? ORDER BY number ASC`,
-    chapter.id
-  );
+  return getVersesByChapterId(chapter.id, translation);
 }
 
-export async function searchVerses(query: string, limit = 50): Promise<VerseWithReference[]> {
+export async function searchVerses(
+  query: string,
+  translation: ScriptureTranslation = "en",
+  limit = 50
+): Promise<VerseWithReference[]> {
   const trimmed = query.trim();
   if (!trimmed) {
     return [];
@@ -85,24 +103,28 @@ export async function searchVerses(query: string, limit = 50): Promise<VerseWith
   const pattern = `%${trimmed.replace(/%/g, "\\%")}%`;
 
   return db.getAllAsync<VerseWithReference>(
-    `SELECT v.id, v.chapter_id, v.number, v.text,
+    `SELECT v.id, v.chapter_id, v.number, v.translation, v.text,
             b.id AS book_id, b.name AS book_name, b.slug AS book_slug,
             c.number AS chapter_number
      FROM verses v
      INNER JOIN chapters c ON c.id = v.chapter_id
      INNER JOIN books b ON b.id = c.book_id
-     WHERE v.text LIKE ? ESCAPE '\\'
+     WHERE v.translation = ? AND v.text LIKE ? ESCAPE '\\'
      ORDER BY b.order_index, c.number, v.number
      LIMIT ?`,
+    translation,
     pattern,
     limit
   );
 }
 
-export async function getVerseOfTheDay(): Promise<VerseWithReference | null> {
+export async function getVerseOfTheDay(
+  translation: ScriptureTranslation = "en"
+): Promise<VerseWithReference | null> {
   const db = await getDatabase();
   const countRow = await db.getFirstAsync<{ total: number }>(
-    "SELECT COUNT(*) AS total FROM verses"
+    "SELECT COUNT(*) AS total FROM verses WHERE translation = ?",
+    translation
   );
   const total = countRow?.total ?? 0;
   if (total === 0) {
@@ -114,16 +136,32 @@ export async function getVerseOfTheDay(): Promise<VerseWithReference | null> {
   const offset = dayOfYear % total;
 
   return db.getFirstAsync<VerseWithReference>(
-    `SELECT v.id, v.chapter_id, v.number, v.text,
+    `SELECT v.id, v.chapter_id, v.number, v.translation, v.text,
             b.id AS book_id, b.name AS book_name, b.slug AS book_slug,
             c.number AS chapter_number
      FROM verses v
      INNER JOIN chapters c ON c.id = v.chapter_id
      INNER JOIN books b ON b.id = c.book_id
+     WHERE v.translation = ?
      ORDER BY v.id ASC
      LIMIT 1 OFFSET ?`,
+    translation,
     offset
   );
+}
+
+export async function hasFullBibleTranslation(
+  translation: ScriptureTranslation
+): Promise<boolean> {
+  const db = await getDatabase();
+  const bookCount = await db.getFirstAsync<{ count: number }>(
+    `SELECT COUNT(DISTINCT b.id) AS count
+     FROM books b
+     INNER JOIN chapters c ON c.book_id = b.id
+     INNER JOIN verses v ON v.chapter_id = c.id AND v.translation = ?`,
+    translation
+  );
+  return (bookCount?.count ?? 0) >= FULL_BIBLE_BOOK_COUNT;
 }
 
 export async function getAdjacentChapter(

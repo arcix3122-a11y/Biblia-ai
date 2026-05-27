@@ -19,6 +19,8 @@ import { getLastSyncAt } from "@/services/sync/syncEngine";
 import { getSupabaseClient } from "@/services/supabase/supabaseClient";
 import { formatNoteDate } from "@/utils/formatDate";
 import { useLocaleStore } from "@/store/localeStore";
+import { useTranslationStore } from "@/store/translationStore";
+import type { TranslationPreference } from "@/types/scripture";
 import { resetDatabaseForDev, resetDatabaseInit } from "@/services/db/database";
 import { colors, radii, spacing, typography } from "@/theme";
 import { useReminderStore } from "@/store/reminderStore";
@@ -28,6 +30,8 @@ import { EcosystemModal } from "@/components/EcosystemModal";
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const translationPreference = useTranslationStore((s) => s.preference);
+  const setTranslationPreference = useTranslationStore((s) => s.setPreference);
   const supabaseConfigured = Boolean(getSupabaseClient());
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
     useReaderStore();
@@ -175,6 +179,35 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
         <Text style={styles.hint}>{t("settings.languageHint")}</Text>
         <LanguageSwitcher />
+      </GlassCard>
+
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.translation.title")}</Text>
+        <Text style={styles.hint}>{t("settings.translation.hint")}</Text>
+        <View style={styles.translationRow}>
+          {(["auto", "pl", "en"] as TranslationPreference[]).map((option) => {
+            const active = translationPreference === option;
+            const labelKey =
+              option === "auto"
+                ? "settings.translation.auto"
+                : option === "pl"
+                  ? "settings.translation.pl"
+                  : "settings.translation.en";
+            return (
+              <Pressable
+                key={option}
+                onPress={() => setTranslationPreference(option)}
+                style={[styles.translationChip, active && styles.translationChipActive]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+              >
+                <Text style={[styles.translationChipText, active && styles.translationChipTextActive]}>
+                  {t(labelKey)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </GlassCard>
 
       <GlassCard style={styles.card}>
@@ -346,11 +379,6 @@ export default function SettingsScreen() {
           ) : null}
 
           <GlassCard style={styles.nestedCard}>
-            <Text style={styles.sectionTitle}>{t("settings.scriptureTranslation")}</Text>
-            <Text style={styles.note}>{t("settings.scriptureTranslationHint")}</Text>
-          </GlassCard>
-
-          <GlassCard style={styles.nestedCard}>
             <Text style={styles.sectionTitle}>{t("settings.ecosystem")}</Text>
             <Text style={styles.hint}>{t("settings.ecosystemHint")}</Text>
             <Pressable
@@ -429,6 +457,31 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     marginBottom: spacing.md,
+  },
+  translationRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  translationChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.inputBackground,
+  },
+  translationChipActive: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accentGlow,
+  },
+  translationChipText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+  },
+  translationChipTextActive: {
+    color: colors.accent,
+    fontWeight: "600",
   },
   fontRow: {
     alignItems: "center",

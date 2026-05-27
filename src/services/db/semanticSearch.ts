@@ -1,20 +1,26 @@
 import { getDatabase } from "./database";
-import type { VerseWithReference } from "@/types/scripture";
+import type { ScriptureTranslation, VerseWithReference } from "@/types/scripture";
 import type { SemanticTopic, TopicVerseRef } from "@/data/semanticTopics";
 
 const RESULT_LIMIT = 40;
 
-export async function searchTopicVerses(topic: SemanticTopic): Promise<VerseWithReference[]> {
-  const byRef = await searchByVerseRefs(topic.verseRefs ?? []);
+export async function searchTopicVerses(
+  topic: SemanticTopic,
+  translation: ScriptureTranslation = "en"
+): Promise<VerseWithReference[]> {
+  const byRef = await searchByVerseRefs(topic.verseRefs ?? [], translation);
   if (byRef.length >= 8) {
     return dedupeVerses(byRef).slice(0, RESULT_LIMIT);
   }
 
-  const keywordHits = await searchByKeywords(topic.keywords);
+  const keywordHits = await searchByKeywords(topic.keywords, translation);
   return dedupeVerses([...byRef, ...keywordHits]).slice(0, RESULT_LIMIT);
 }
 
-async function searchByVerseRefs(refs: TopicVerseRef[]): Promise<VerseWithReference[]> {
+async function searchByVerseRefs(
+  refs: TopicVerseRef[],
+  translation: ScriptureTranslation
+): Promise<VerseWithReference[]> {
   if (refs.length === 0) {
     return [];
   }
@@ -24,17 +30,18 @@ async function searchByVerseRefs(refs: TopicVerseRef[]): Promise<VerseWithRefere
 
   for (const ref of refs) {
     const rows = await db.getAllAsync<VerseWithReference>(
-      `SELECT v.id, v.chapter_id, v.number, v.text,
+      `SELECT v.id, v.chapter_id, v.number, v.translation, v.text,
               b.id AS book_id, b.name AS book_name, b.slug AS book_slug,
               c.number AS chapter_number
        FROM verses v
        INNER JOIN chapters c ON c.id = v.chapter_id
        INNER JOIN books b ON b.id = c.book_id
-       WHERE b.slug = ? AND c.number = ?
+       WHERE b.slug = ? AND c.number = ? AND v.translation = ?
        ORDER BY v.number ASC
        LIMIT 12`,
       ref.bookSlug,
-      ref.chapter
+      ref.chapter,
+      translation
     );
     results.push(...rows);
   }
@@ -42,7 +49,10 @@ async function searchByVerseRefs(refs: TopicVerseRef[]): Promise<VerseWithRefere
   return results;
 }
 
-async function searchByKeywords(keywords: string[]): Promise<VerseWithReference[]> {
+async function searchByKeywords(
+  keywords: string[],
+  translation: ScriptureTranslation
+): Promise<VerseWithReference[]> {
   if (keywords.length === 0) {
     return [];
   }
@@ -52,15 +62,16 @@ async function searchByKeywords(keywords: string[]): Promise<VerseWithReference[
   const patterns = keywords.map((k) => `%${k.replace(/%/g, "\\%")}%`);
 
   return db.getAllAsync<VerseWithReference>(
-    `SELECT v.id, v.chapter_id, v.number, v.text,
+    `SELECT v.id, v.chapter_id, v.number, v.translation, v.text,
             b.id AS book_id, b.name AS book_name, b.slug AS book_slug,
             c.number AS chapter_number
      FROM verses v
      INNER JOIN chapters c ON c.id = v.chapter_id
      INNER JOIN books b ON b.id = c.book_id
-     WHERE ${clauses}
+     WHERE v.translation = ? AND (${clauses})
      ORDER BY b.order_index, c.number, v.number
      LIMIT ?`,
+    translation,
     ...patterns,
     RESULT_LIMIT
   );

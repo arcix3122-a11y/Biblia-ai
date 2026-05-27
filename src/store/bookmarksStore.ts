@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { Bookmark } from "@/types/scripture";
 import * as bookmarksRepo from "@/services/db/bookmarksRepository";
+import { useLocaleStore } from "@/store/localeStore";
+import { resolveScriptureTranslation, useTranslationStore } from "@/store/translationStore";
 
 interface BookmarksState {
   bookmarks: Bookmark[];
@@ -24,7 +26,10 @@ export const useBookmarksStore = create<BookmarksState>((set, get) => ({
   loadBookmarks: async () => {
     set({ isLoading: true });
     try {
-      const bookmarks = await bookmarksRepo.listBookmarks();
+      const locale = useLocaleStore.getState().locale;
+      const preference = useTranslationStore.getState().preference;
+      const translation = resolveScriptureTranslation(preference, locale);
+      const bookmarks = await bookmarksRepo.listBookmarks(translation);
       set({
         bookmarks,
         bookmarkedVerseIds: new Set(bookmarks.map((b) => b.verse_id)),

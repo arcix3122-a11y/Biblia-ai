@@ -1,0 +1,441 @@
+{
+  "version": 2,
+  "translation": "en",
+  "translationLabel": "King James Version",
+  "license": "public-domain",
+  "source": "KJV",
+  "books": [
+    {
+      "testament": "OT",
+      "name": "Genesis",
+      "slug": "genesis",
+      "order_index": 1,
+      "chapter_count": 50,
+      "chapters": [
+        {
+          "number": 1,
+          "verses": [
+            {
+              "number": 1,
+              "text": "In the beginning God created the heaven and the earth."
+            },
+            {
+              "number": 2,
+              "text": "And the earth was without form, and void; and darkness {was} upon the face of the deep. And the Spirit of God moved upon the face of the waters."
+            },
+            {
+              "number": 3,
+              "text": "And God said, Let there be light: and there was light."
+            },
+            {
+              "number": 4,
+              "text": "And God saw the light, that {it was} good: and God divided the light from the darkness. {the light from...: Heb. between the light and between the darkness}"
+            },
+            {
+              "number": 5,
+              "text": "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day. {And the evening...: Heb. And the evening was, and the morning was etc.}"
+            },
+            {
+              "number": 6,
+              "text": "And God said, Let there be a firmament in the midst of the waters, and let it divide the waters from the waters. {firmament: Heb. expansion}"
+            },
+            {
+              "number": 7,
+              "text": "And God made the firmament, and divided the waters which {were} under the firmament from the waters which {were} above the firmament: and it was so."
+            },
+            {
+              "number": 8,
+              "text": "And God called the firmament Heaven. And the evening and the morning were the second day. {And the evening...: Heb. And the evening was, and the morning was etc.}"
+            },
+            {
+              "number": 9,
+              "text": "And God said, Let the waters under the heaven be gathered together unto one place, and let the dry {land} appear: and it was so."
+            },
+            {
+              "number": 10,
+              "text": "And God called the dry {land} Earth; and the gathering together of the waters called he Seas: and God saw that {it was} good."
+            },
+            {
+              "number": 11,
+              "text": "And God said, Let the earth bring forth grass, the herb yielding seed, {and} the fruit tree yielding fruit after his kind, whose seed {is} in itself, upon the earth: and it was so. {grass: Heb. tender grass}"
+            },
+            {
+              "number": 12,
+              "text": "And the earth brought forth grass, {and} herb yielding seed after his kind, and the tree yielding fruit, whose seed {was} in itself, after his kind: and God saw that {it was} good."
+            },
+            {
+              "number": 13,
+              "text": "And the evening and the morning were the third day. {And the evening...: Heb. And the evening was, and the morning was etc.}"
+            },
+            {
+              "number": 14,
+              "text": "And God said, Let there be lights in the firmament of the heaven to divide the day from the night; and let them be for signs, and for seasons, and for days, and years: {the day...: Heb. between the day and between the night}"
+            },
+            {
+              "number": 15,
+              "text": "And let them be for lights in the firmament of the heaven to give light upon the earth: and it was so."
+            },
+            {
+              "number": 16,
+              "text": "And God made two great lights; the greater light to rule the day, and the lesser light to rule the night: {he made} the stars also. {to rule the day...: Heb. for the rule of the day, etc.}"
+            },
+            {
+              "number": 17,
+              "text": "And God set them in the firmament of the heaven to give light upon the earth,"
+            },
+            {
+              "number": 18,
+              "text": "And to rule over the day and over the night, and to divide the light from the darkness: and God saw that {it was} good."
+            },
+            {
+              "number": 19,
+              "text": "And the evening and the morning were the fourth day. {And the evening...: Heb. And the evening was, and the morning was etc.}"
+            },
+            {
+              "number": 20,
+              "text": "And God said, Let the waters bring forth abundantly the moving creature that hath life, and fowl {that} may fly above the earth in the open firmament of heaven. {moving: or, creeping} {life: Heb. soul} {fowl...: Heb. let fowl fly} {open...: Heb. face of the firmament of heaven}"
+            },
+            {
+              "number": 21,
+              "text": "And God created great whales, and every living creature that moveth, which the waters brought forth abundantly, after their kind, and every winged fowl after his kind: and God saw that {it was} good."
+            },
+            {
+              "number": 22,
+              "text": "And God blessed them, saying, Be fruitful, and multiply, and fill the waters in the seas, and let fowl multiply in the earth."
+            },
+            {
+              "number": 23,
+              "text": "And the evening and the morning were the fifth day. {And the evening...: Heb. And the evening was, and the morning was etc.}"
+            },
+            {
+              "number": 24,
+              "text": "And God said, Let the earth bring forth the living creature after his kind, cattle, and creeping thing, and beast of the earth after his kind: and it was so."
+            },
+            {
+              "number": 25,
+              "text": "And God made the beast of the earth after his kind, and cattle after their kind, and every thing that creepeth upon the earth after his kind: and God saw that {it was} good."
+            },
+            {
+              "number": 26,
+              "text": "And God said, Let us make man in our image, after our likeness: and let them have dominion over the fish of the sea, and over the fowl of the air, and over the cattle, and over all the earth, and over every creeping thing that creepeth upon the earth."
+            },
+            {
+              "number": 27,
+              "text": "So God created man in his {own} image, in the image of God created he him; male and female created he them."
+            },
+            {
+              "number": 28,
+              "text": "And God blessed them, and God said unto them, Be fruitful, and multiply, and replenish the earth, and subdue it: and have dominion over the fish of the sea, and over the fowl of the air, and over every living thing that moveth upon the earth. {moveth: Heb. creepeth}"
+            },
+            {
+              "number": 29,
+              "text": "And God said, Behold, I have given you every herb bearing seed, which {is} upon the face of all the earth, and every tree, in the which {is} the fruit of a tree yielding seed; to you it shall be for meat. {bearing...: Heb. seeding seed} {yielding...: Heb. seeding seed}"
+            },
+            {
+              "number": 30,
+              "text": "And to every beast of the earth, and to every fowl of the air, and to every thing that creepeth upon the earth, wherein {there is} life, {I have given} every green herb for meat: and it was so. {life: Heb. a living soul}"
+            },
+            {
+              "number": 31,
+              "text": "And God saw every thing that he had made, and, behold, {it was} very good. And the evening and the morning were the sixth day. {And the evening...: Heb. And the evening was, and the morning was etc.}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "testament": "OT",
+      "name": "Psalms",
+      "slug": "psalms",
+      "order_index": 19,
+      "chapter_count": 150,
+      "chapters": [
+        {
+          "number": 23,
+          "verses": [
+            {
+              "number": 1,
+              "text": "[A Psalm of David.] The LORD {is} my shepherd; I shall not want."
+            },
+            {
+              "number": 2,
+              "text": "He maketh me to lie down in green pastures: he leadeth me beside the still waters. {green...: Heb. pastures of tender grass} {still...: Heb. waters of quietness}"
+            },
+            {
+              "number": 3,
+              "text": "He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake."
+            },
+            {
+              "number": 4,
+              "text": "Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou {art} with me; thy rod and thy staff they comfort me."
+            },
+            {
+              "number": 5,
+              "text": "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over. {anointest: Heb. makest fat}"
+            },
+            {
+              "number": 6,
+              "text": "Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the LORD for ever. {for ever: Heb. to length of days}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "testament": "NT",
+      "name": "John",
+      "slug": "john",
+      "order_index": 43,
+      "chapter_count": 21,
+      "chapters": [
+        {
+          "number": 1,
+          "verses": [
+            {
+              "number": 1,
+              "text": "In the beginning was the Word, and the Word was with God, and the Word was God."
+            },
+            {
+              "number": 2,
+              "text": "The same was in the beginning with God."
+            },
+            {
+              "number": 3,
+              "text": "All things were made by him; and without him was not any thing made that was made."
+            },
+            {
+              "number": 4,
+              "text": "In him was life; and the life was the light of men."
+            },
+            {
+              "number": 5,
+              "text": "And the light shineth in darkness; and the darkness comprehended it not. {comprehended: or, did not admit, or, receive}"
+            },
+            {
+              "number": 6,
+              "text": "There was a man sent from God, whose name {was} John."
+            },
+            {
+              "number": 7,
+              "text": "The same came for a witness, to bear witness of the Light, that all {men} through him might believe."
+            },
+            {
+              "number": 8,
+              "text": "He was not that Light, but {was sent} to bear witness of that Light."
+            },
+            {
+              "number": 9,
+              "text": "{That} was the true Light, which lighteth every man that cometh into the world."
+            },
+            {
+              "number": 10,
+              "text": "He was in the world, and the world was made by him, and the world knew him not."
+            },
+            {
+              "number": 11,
+              "text": "He came unto his own, and his own received him not."
+            },
+            {
+              "number": 12,
+              "text": "But as many as received him, to them gave he power to become the sons of God, {even} to them that believe on his name: {power: or, the right, or, privilege}"
+            },
+            {
+              "number": 13,
+              "text": "Which were born, not of blood, nor of the will of the flesh, nor of the will of man, but of God."
+            },
+            {
+              "number": 14,
+              "text": "And the Word was made flesh, and dwelt among us, (and we beheld his glory, the glory as of the only begotten of the Father,) full of grace and truth."
+            },
+            {
+              "number": 15,
+              "text": "John bare witness of him, and cried, saying, This was he of whom I spake, He that cometh after me is preferred before me: for he was before me."
+            },
+            {
+              "number": 16,
+              "text": "And of his fulness have all we received, and grace for grace."
+            },
+            {
+              "number": 17,
+              "text": "For the law was given by Moses, {but} grace and truth came by Jesus Christ."
+            },
+            {
+              "number": 18,
+              "text": "No man hath seen God at any time; the only begotten Son, which is in the bosom of the Father, he hath declared {him}."
+            },
+            {
+              "number": 19,
+              "text": "And this is the record of John, when the Jews sent priests and Levites from Jerusalem to ask him, Who art thou?"
+            },
+            {
+              "number": 20,
+              "text": "And he confessed, and denied not; but confessed, I am not the Christ."
+            },
+            {
+              "number": 21,
+              "text": "And they asked him, What then? Art thou Elias? And he saith, I am not. Art thou that prophet? And he answered, No. {that prophet: or, a prophet?}"
+            },
+            {
+              "number": 22,
+              "text": "Then said they unto him, Who art thou? that we may give an answer to them that sent us. What sayest thou of thyself?"
+            },
+            {
+              "number": 23,
+              "text": "He said, I {am} the voice of one crying in the wilderness, Make straight the way of the Lord, as said the prophet Esaias."
+            },
+            {
+              "number": 24,
+              "text": "And they which were sent were of the Pharisees."
+            },
+            {
+              "number": 25,
+              "text": "And they asked him, and said unto him, Why baptizest thou then, if thou be not that Christ, nor Elias, neither that prophet?"
+            },
+            {
+              "number": 26,
+              "text": "John answered them, saying, I baptize with water: but there standeth one among you, whom ye know not;"
+            },
+            {
+              "number": 27,
+              "text": "He it is, who coming after me is preferred before me, whose shoe's latchet I am not worthy to unloose."
+            },
+            {
+              "number": 28,
+              "text": "These things were done in Bethabara beyond Jordan, where John was baptizing."
+            },
+            {
+              "number": 29,
+              "text": "The next day John seeth Jesus coming unto him, and saith, Behold the Lamb of God, which taketh away the sin of the world. {taketh away: or, beareth}"
+            },
+            {
+              "number": 30,
+              "text": "This is he of whom I said, After me cometh a man which is preferred before me: for he was before me."
+            },
+            {
+              "number": 31,
+              "text": "And I knew him not: but that he should be made manifest to Israel, therefore am I come baptizing with water."
+            },
+            {
+              "number": 32,
+              "text": "And John bare record, saying, I saw the Spirit descending from heaven like a dove, and it abode upon him."
+            },
+            {
+              "number": 33,
+              "text": "And I knew him not: but he that sent me to baptize with water, the same said unto me, Upon whom thou shalt see the Spirit descending, and remaining on him, the same is he which baptizeth with the Holy Ghost."
+            },
+            {
+              "number": 34,
+              "text": "And I saw, and bare record that this is the Son of God."
+            },
+            {
+              "number": 35,
+              "text": "Again the next day after John stood, and two of his disciples;"
+            },
+            {
+              "number": 36,
+              "text": "And looking upon Jesus as he walked, he saith, Behold the Lamb of God!"
+            },
+            {
+              "number": 37,
+              "text": "And the two disciples heard him speak, and they followed Jesus."
+            },
+            {
+              "number": 38,
+              "text": "Then Jesus turned, and saw them following, and saith unto them, What seek ye? They said unto him, Rabbi, (which is to say, being interpreted, Master,) where dwellest thou? {dwellest: or, abidest}"
+            },
+            {
+              "number": 39,
+              "text": "He saith unto them, Come and see. They came and saw where he dwelt, and abode with him that day: for it was about the tenth hour. {about...: that was two hours before night}"
+            },
+            {
+              "number": 40,
+              "text": "One of the two which heard John {speak}, and followed him, was Andrew, Simon Peter's brother."
+            },
+            {
+              "number": 41,
+              "text": "He first findeth his own brother Simon, and saith unto him, We have found the Messias, which is, being interpreted, the Christ. {the Christ: or, the Anointed}"
+            },
+            {
+              "number": 42,
+              "text": "And he brought him to Jesus. And when Jesus beheld him, he said, Thou art Simon the son of Jona: thou shalt be called Cephas, which is by interpretation, A stone."
+            },
+            {
+              "number": 43,
+              "text": "The day following Jesus would go forth into Galilee, and findeth Philip, and saith unto him, Follow me."
+            },
+            {
+              "number": 44,
+              "text": "Now Philip was of Bethsaida, the city of Andrew and Peter."
+            },
+            {
+              "number": 45,
+              "text": "Philip findeth Nathanael, and saith unto him, We have found him, of whom Moses in the law, and the prophets, did write, Jesus of Nazareth, the son of Joseph."
+            },
+            {
+              "number": 46,
+              "text": "And Nathanael said unto him, Can there any good thing come out of Nazareth? Philip saith unto him, Come and see."
+            },
+            {
+              "number": 47,
+              "text": "Jesus saw Nathanael coming to him, and saith of him, Behold an Israelite indeed, in whom is no guile!"
+            },
+            {
+              "number": 48,
+              "text": "Nathanael saith unto him, Whence knowest thou me? Jesus answered and said unto him, Before that Philip called thee, when thou wast under the fig tree, I saw thee."
+            },
+            {
+              "number": 49,
+              "text": "Nathanael answered and saith unto him, Rabbi, thou art the Son of God; thou art the King of Israel."
+            },
+            {
+              "number": 50,
+              "text": "Jesus answered and said unto him, Because I said unto thee, I saw thee under the fig tree, believest thou? thou shalt see greater things than these."
+            },
+            {
+              "number": 51,
+              "text": "And he saith unto him, Verily, verily, I say unto you, Hereafter ye shall see heaven open, and the angels of God ascending and descending upon the Son of man."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "testament": "NT",
+      "name": "Romans",
+      "slug": "romans",
+      "order_index": 45,
+      "chapter_count": 16,
+      "chapters": [
+        {
+          "number": 8,
+          "verses": [
+            {
+              "number": 26,
+              "text": "Likewise the Spirit also helpeth our infirmities: for we know not what we should pray for as we ought: but the Spirit itself maketh intercession for us with groanings which cannot be uttered."
+            },
+            {
+              "number": 27,
+              "text": "And he that searcheth the hearts knoweth what {is} the mind of the Spirit, because he maketh intercession for the saints according to {the will of} God. {because: or, that}"
+            },
+            {
+              "number": 28,
+              "text": "And we know that all things work together for good to them that love God, to them who are the called according to {his} purpose."
+            },
+            {
+              "number": 29,
+              "text": "For whom he did foreknow, he also did predestinate {to be} conformed to the image of his Son, that he might be the firstborn among many brethren."
+            },
+            {
+              "number": 30,
+              "text": "Moreover whom he did predestinate, them he also called: and whom he called, them he also justified: and whom he justified, them he also glorified."
+            },
+            {
+              "number": 31,
+              "text": "What shall we then say to these things? If God {be} for us, who {can be} against us?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

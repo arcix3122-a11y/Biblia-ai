@@ -1,5 +1,9 @@
 export type Testament = "OT" | "NT";
 
+export type ScriptureTranslation = "en" | "pl";
+
+export type TranslationPreference = ScriptureTranslation | "auto";
+
 export interface Book {
   id: number;
   testament: Testament;
@@ -19,6 +23,7 @@ export interface Verse {
   id: number;
   chapter_id: number;
   number: number;
+  translation: ScriptureTranslation;
   text: string;
 }
 
@@ -82,6 +87,9 @@ export interface BibleSeedVerse {
 
 export interface BibleSeedFile {
   version: number;
-  translation: string;
+  translation: ScriptureTranslation | string;
+  translationLabel?: string;
+  license?: string;
+  source?: string;
   books: BibleSeedBook[];
 }

@@ -4,7 +4,7 @@ import type { AppLocale } from "@/i18n/types";
 /**
  * Localized book label for UI chrome (grid tiles, headers, bookmarks, search).
  * Polish uses genitive forms as in traditional "Księga …" headings (e.g. Rodzaju, Mateusza).
- * Verse text in SQLite stays KJV English; only labels are localized.
+ * Verse text comes from SQLite in the active scripture translation (KJV / Biblia Gdańska).
  */
 export function getBookDisplayName(
   slug: string | undefined | null,

@@ -79,7 +79,23 @@
     "pullToRefresh": "Przeciągnij w dół, aby odświeżyć bibliotekę i dane czytania",
     "plansHeading": "Plany",
     "verseTextLocaleNotice": "Tekst wersetów: angielski (KJV)",
-    "readScripture": "Czytaj Pismo"
+    "verseTextLocaleNoticeEn": "Tekst wersetów: angielski (KJV)",
+    "verseTextLocaleNoticePl": "Tekst wersetów: polski (Biblia Gdańska 1881)",
+    "readScripture": "Czytaj Pismo",
+    "emotionalHubTitle": "W jakim stanie jest dziś Twoje serce?",
+    "emotionalHubSubtitle": "Wybierz stan, aby otworzyć dopasowaną ścieżkę.",
+    "emotions": {
+      "love": "MIŁOŚĆ",
+      "anxiety": "NIEPOKÓJ",
+      "healing": "UZDROWIENIE",
+      "anger": "GNIEW"
+    },
+    "emotionPrompts": {
+      "love": "Poprowadź mnie przez wersety o miłości, wierności i służbie innym na dziś.",
+      "anxiety": "Czuję niepokój. Daj mi uspokajające fragmenty Pisma i krótką modlitwę na ten moment.",
+      "healing": "Potrzebuję uzdrowienia. Pomóż mi fragmentami o odnowie i nadziei oraz jednym praktycznym krokiem.",
+      "anger": "Zmagam się z gniewem. Pokaż mi wersety, które prowadzą do mądrości, opanowania i łaski."
+    }
   },
   "dashboard": {
     "dayStreak": "dni z rzędu",
@@ -95,6 +111,28 @@
     "preparing": "Przygotowywanie…",
     "dailyGoal": "Cel dzienny",
     "tapToRead": "Stuknij, aby otworzyć w czytniku"
+  },
+  "viralFeed": {
+    "verseOfDay": "Werset dnia",
+    "tapToRead": "Stuknij, aby otworzyć w czytniku",
+    "likes": "Polubienia",
+    "comments": "Komentarze",
+    "share": "Udostępnij",
+    "more": "Więcej",
+    "greetingMorning": "Dzień dobry",
+    "greetingAfternoon": "Dzień dobry",
+    "greetingEvening": "Dobry wieczór",
+    "guidedSection": "Przewodnik duchowy",
+    "reflectionTitle": "Czas na refleksję AI",
+    "reflectionSub": "Skupienie 2–5 min",
+    "silenceTitle": "Chwila wyciszenia z Asystentem",
+    "silenceSub": "Duchowe dopasowanie dnia",
+    "readTime": "{{min}} min",
+    "generatingReflection": "Przygotowuję refleksję…",
+    "reflectionError": "Nie udało się wygenerować refleksji. Spróbuj ponownie.",
+    "closeSheet": "Zamknij",
+    "offlineMeditation": "Zatrzymaj się na chwilę i daj temu wersetowi czas, by osiadł w sercu. Co mówi ci dziś? Odpocznij w prawdzie, że Słowo Boże jest żywe i przemawia do twojej konkretnej sytuacji.",
+    "offlineSilence": "Oddychaj spokojnie. Przeczytaj werset jeszcze raz. Zadaj sobie pytanie: do czego Bóg może zapraszać cię dziś — do zaufania, uwolnienia lub przyjęcia? Pozostań w tym pytaniu."
   },
   "readingPlan": {
     "foundationTitle": "Tydzień fundamentów",
@@ -202,7 +240,10 @@
       "rose": "Różowe podświetlenie"
     },
     "scriptureTranslationNotice": "Tekst Pisma jest po angielsku (KJV).",
+    "scriptureTranslationNoticeShort": "Wybrałeś angielski (KJV). W Ustawieniach możesz przełączyć na polski tekst Pisma.",
     "scriptureTranslationNoticeLong": "Tekst Pisma jest po angielsku (KJV). Interfejs aplikacji jest w wybranym języku.",
+    "translationLabel": "Tłumaczenie: {{name}}",
+    "flowSubtitle": "Czytaj wolno. Pozwól tekstowi oddychać.",
     "dismissTranslationNotice": "Ukryj informację o KJV",
     "crossReferences": "Powiązane fragmenty",
     "crossRefTheme": "{{theme}}",
@@ -316,7 +357,16 @@
     "aiModelValue": "Model: {{value}}",
     "aiEndpointValue": "Endpoint: {{value}}",
     "scriptureTranslation": "Tłumaczenie Pisma",
-    "scriptureTranslationHint": "Tekst wersetów w lokalnej bazie jest po angielsku (KJV). Lokalizowany jest tylko interfejs aplikacji.",
+    "scriptureTranslationHint": "Pełną Biblię zaimportujesz skryptem scripts/import-polish-bible.mjs. W paczce jest demo 94 wersetów w obu językach.",
+    "translation": {
+      "title": "Tłumaczenie Pisma",
+      "hint": "Domyślnie zgodnie z językiem aplikacji. Możesz wymusić KJV lub Biblię Gdańską.",
+      "auto": "Auto",
+      "pl": "PL",
+      "en": "EN",
+      "plName": "Biblia Gdańska (1881)",
+      "enName": "King James Version"
+    },
     "resetQuotaTitle": "Zresetować limit i wyczyścić czat?",
     "resetQuotaMessage": "To wyczyści historię czatu w Towarzyszu i przywróci dzienny limit wiadomości.",
     "resetQuotaSuccess": "Czat wyczyszczony, dzienny limit przywrócony.",

@@ -3,6 +3,8 @@ import i18n from "@/i18n";
 import type { Book, Chapter, Testament, Verse, VerseWithReference } from "@/types/scripture";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { getDatabase, resetDatabaseInit } from "@/services/db/database";
+import { useLocaleStore } from "@/store/localeStore";
+import { useActiveTranslation } from "@/store/translationStore";
 
 const DB_INIT_TIMEOUT_MS = 30_000;
 
@@ -140,6 +142,8 @@ export function useChapters(bookId: number | undefined) {
 }
 
 export function useChapterVerses(bookId: number | undefined, chapterNumber: number) {
+  const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
   const [verses, setVerses] = useState<Verse[]>([]);
   const [chapterId, setChapterId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,7 +166,7 @@ export function useChapterVerses(bookId: number | undefined, chapterNumber: numb
         }
         return;
       }
-      const result = await scriptureRepo.getVersesByChapterId(chapter.id);
+      const result = await scriptureRepo.getVersesByChapterId(chapter.id, translation);
       if (mounted) {
         setChapterId(chapter.id);
         setVerses(result);
@@ -172,23 +176,48 @@ export function useChapterVerses(bookId: number | undefined, chapterNumber: numb
     return () => {
       mounted = false;
     };
-  }, [bookId, chapterNumber]);
+  }, [bookId, chapterNumber, translation]);
 
-  return { verses, chapterId, loading };
+  return { verses, chapterId, loading, translation };
 }
 
 export function useVerseSearch() {
+  const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
   const [results, setResults] = useState<VerseWithReference[]>([]);
   const [searching, setSearching] = useState(false);
 
-  const search = useCallback(async (query: string) => {
-    setSearching(true);
-    const hits = await scriptureRepo.searchVerses(query);
-    setResults(hits);
-    setSearching(false);
-  }, []);
+  const search = useCallback(
+    async (query: string) => {
+      setSearching(true);
+      const hits = await scriptureRepo.searchVerses(query, translation);
+      setResults(hits);
+      setSearching(false);
+    },
+    [translation]
+  );
 
   const clear = useCallback(() => setResults([]), []);
 
-  return { results, searching, search, clear };
+  return { results, searching, search, clear, translation };
+}
+
+export function useFullBibleAvailable() {
+  const locale = useLocaleStore((s) => s.locale);
+  const translation = useActiveTranslation(locale);
+  const [available, setAvailable] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    void scriptureRepo.hasFullBibleTranslation(translation).then((result) => {
+      if (mounted) {
+        setAvailable(result);
+      }
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [translation]);
+
+  return available;
 }
