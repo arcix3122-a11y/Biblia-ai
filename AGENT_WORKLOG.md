@@ -2187,3 +2187,31 @@ npx expo start
 - Changes: src/utils/haptics.ts, src/types/ui.ts, src/components/ai/AnimatedSacredBackdrop.tsx, src/hooks/useChapterTTS.ts, src/data/spiritualFirstAidKit.ts, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass), npm run check:locales (pass, 1223 kl.)
 - Result: done — commit fix: restore typecheck green
+
+## 2026-05-28 15:59
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - atomowy reset Expo i restart Expo Go do przeladowania zmian.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 16:01
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - atomowy reset Expo i restart Expo Go do przeladowania zmian.
+- Changes: AGENT_WORKLOG.md
+- Validation: ubito procesy Expo/Metro na portach 8081/8082/19000/19001/19002; 
+px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.168.101.30:8082.
+- Result: done
+## 2026-05-28 16:41 (local)
+- Agent: Cursor subagent
+- Task: START - mechanika darowizn 10/30/50 PLN z rangami Wspierający/Patron/Mecenas
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 16:38 (local)
+- Agent: Codex
+- Task: START - naprawa faktycznego ekranu modlitwy i usunięcie SoundHelix
+- Changes: pending
+- Validation: pending
+- Result: in-progress

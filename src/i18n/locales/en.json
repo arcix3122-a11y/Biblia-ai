@@ -62,7 +62,8 @@
     "reader": "Reader",
     "topic": "Topic",
     "settings": "Settings",
-    "spiritualCompanion": "Spiritual Companion"
+    "spiritualCompanion": "Spiritual Companion",
+    "donate": "Support"
   },
   "stack": {
     "chapters": "Chapters",
@@ -1541,5 +1542,31 @@
     "aiSystemPrompt": "You are a reverent Christian prayer guide inside a contemplative Bible app. Generate a deep, comforting, short adoration prayer based on the scripture of the day. Language: {{language}}. Tone: peaceful, warm, sacred, and simple. Do not use markdown, section headers, or introductory greetings; return only the prayer text.",
     "aiUserPrompt": "Verse context: \"{{text}}\" ({{reference}})",
     "aiFallbackAdoration": "Lord God, in the light of Your word from {{reference}} (\"{{text}}\"), we praise Your holiness. You are the quiet sanctuary for our restless souls. In this moment of prayer, teach us to rest in Your faithful love. Amen."
+  },
+  "donation": {
+    "supportSection": "Support",
+    "rowTitle": "Donation",
+    "rowHint": "Help keep Biblia AI free for everyone. Choose a one-time gift and unlock a supporter badge.",
+    "title": "Support Biblia AI",
+    "subtitle": "Your gift helps us build Scripture tools for Polish and English readers.",
+    "chooseAmount": "Choose an amount",
+    "chooseAmountHint": "Each tier unlocks a donor rank badge on your profile.",
+    "amountPln": "{{amount}} PLN",
+    "impactCopy": "Gifts fund hosting, AI companion costs, and new devotional features.",
+    "secureRedirect": "You will be redirected to a secure payment page.",
+    "donateNow": "Give now",
+    "confirmTitle": "Confirm your gift",
+    "confirmBody": "If you completed payment for {{amount}}, confirm below to unlock your donor rank.",
+    "confirmPaid": "I completed payment",
+    "thankYouTitle": "Thank you!",
+    "thankYouBody": "Your generosity keeps Biblia AI growing. May God bless your gift.",
+    "yourRank": "Your donor rank",
+    "done": "Done",
+    "totalDonated": "Total gifted: {{amount}} PLN"
+  },
+  "donorTier": {
+    "supporter": "Supporter",
+    "patron": "Patron",
+    "mecenas": "Benefactor"
   }
 }

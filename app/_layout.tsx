@@ -129,6 +129,7 @@ function RootStack() {
         }}
       />
       <Stack.Screen name="affirmations" options={{ headerShown: false }} />
+      <Stack.Screen name="donate" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -148,6 +149,8 @@ export default function RootLayout() {
     const bootstrapI18n = async () => {
       await useLocaleStore.persist.rehydrate();
       await useAudioOnboardingStore.persist.rehydrate();
+      const { useDonorStore } = await import("@/store/donorStore");
+      await useDonorStore.persist.rehydrate();
       const initialLocale = useLocaleStore.getState().resolveInitialLocale();
       await initI18n(initialLocale);
       if (mounted) {

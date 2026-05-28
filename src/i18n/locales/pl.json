@@ -62,7 +62,8 @@
     "reader": "Czytnik",
     "topic": "Temat",
     "settings": "Ustawienia",
-    "spiritualCompanion": "Duchowy towarzysz"
+    "spiritualCompanion": "Duchowy towarzysz",
+    "donate": "Wsparcie"
   },
   "stack": {
     "chapters": "Rozdziały",
@@ -1541,5 +1542,31 @@
     "aiSystemPrompt": "Jesteś pełnym szacunku chrześcijańskim przewodnikiem modlitwy w kontemplacyjnej aplikacji biblijnej. Wygeneruj głęboką, kojącą, krótką modlitwę uwielbienia opartą na wersecie dnia. Język: {{language}}. Ton: spokojny, ciepły, święty i prosty. Nie używaj markdown, nagłówków sekcji ani powitań; zwróć wyłącznie tekst modlitwy.",
     "aiUserPrompt": "Kontekst wersetu: „{{text}}” ({{reference}})",
     "aiFallbackAdoration": "Wszechmogący Boże, w świetle słów z {{reference}} („{{text}}”) uwielbiamy Twoją świętość. Ty jesteś cichym schronieniem naszych niespokojnych serc. W tej chwili modlitwy ucz nas odpoczywać w Twojej wiernej miłości. Amen."
+  },
+  "donation": {
+    "supportSection": "Wsparcie",
+    "rowTitle": "Darowizna",
+    "rowHint": "Pomóż utrzymać Biblia AI bezpłatnie dla wszystkich. Wybierz jednorazowy datek i odblokuj odznakę wspierającego.",
+    "title": "Wesprzyj Biblia AI",
+    "subtitle": "Twój datek pomaga rozwijać narzędzia do Pisma po polsku i po angielsku.",
+    "chooseAmount": "Wybierz kwotę",
+    "chooseAmountHint": "Każdy próg odblokowuje rangę darczyńcy na Twoim profilu.",
+    "amountPln": "{{amount}} zł",
+    "impactCopy": "Datki finansują hosting, koszty asystenta AI i nowe funkcje duchowe.",
+    "secureRedirect": "Przekierowanie do bezpiecznej płatności.",
+    "donateNow": "Ofiaruj teraz",
+    "confirmTitle": "Potwierdź datek",
+    "confirmBody": "Jeśli ukończyłeś płatność {{amount}}, potwierdź poniżej, aby odblokować rangę darczyńcy.",
+    "confirmPaid": "Zapłaciłem / zapłaciłam",
+    "thankYouTitle": "Dziękujemy!",
+    "thankYouBody": "Twoja hojność pomaga rozwijać Biblia AI. Niech Bóg błogosławi Twój datek.",
+    "yourRank": "Twoja ranga darczyńcy",
+    "done": "Gotowe",
+    "totalDonated": "Suma datków: {{amount}} zł"
+  },
+  "donorTier": {
+    "supporter": "Wspierający",
+    "patron": "Patron",
+    "mecenas": "Mecenas"
   }
 }

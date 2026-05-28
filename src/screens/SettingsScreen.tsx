@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -28,10 +29,15 @@ import { useDailyReminderSchedule } from "@/hooks/useDailyReminderSchedule";
 import { ReminderTimePicker } from "@/components/notifications/ReminderTimePicker";
 import { EcosystemModal } from "@/components/EcosystemModal";
 import { InviteFriendsCard } from "@/components/InviteFriendsCard";
+import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
+import { useDonorStore } from "@/store/donorStore";
 
 export default function SettingsScreen() {
   const { t } = useAppTranslation();
+  const router = useRouter();
   const locale = useLocaleStore((s) => s.locale);
+  const donorTier = useDonorStore((s) => s.donorTier);
+  const totalDonatedPln = useDonorStore((s) => s.totalDonatedPln);
   const translationPreference = useTranslationStore((s) => s.preference);
   const setTranslationPreference = useTranslationStore((s) => s.setPreference);
   const supabaseConfigured = Boolean(getSupabaseClient());
@@ -212,6 +218,30 @@ export default function SettingsScreen() {
       <Text style={styles.groupHeading}>{t("settings.basic")}</Text>
 
       <InviteFriendsCard style={styles.card} />
+
+      <Text style={styles.groupHeading}>{t("donation.supportSection")}</Text>
+
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("donation.rowTitle")}</Text>
+        <Text style={styles.hint}>{t("donation.rowHint")}</Text>
+        {donorTier ? (
+          <View style={styles.donorSummary}>
+            <DonorTierBadge tierId={donorTier} />
+            <Text style={styles.meta}>
+              {t("donation.totalDonated", { amount: totalDonatedPln })}
+            </Text>
+          </View>
+        ) : null}
+        <Pressable
+          onPress={() => router.push("/donate")}
+          style={styles.supportCta}
+          accessibilityRole="button"
+          accessibilityLabel={t("donation.donateNow")}
+        >
+          <Ionicons name="heart-outline" size={18} color={colors.canvas} />
+          <Text style={styles.supportCtaText}>{t("donation.donateNow")}</Text>
+        </Pressable>
+      </GlassCard>
 
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
@@ -790,5 +820,25 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.danger,
     fontWeight: "600",
+  },
+  donorSummary: {
+    alignItems: "flex-start",
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  supportCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.accent,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  supportCtaText: {
+    ...typography.caption,
+    color: colors.canvas,
+    fontWeight: "700",
   },
 });
