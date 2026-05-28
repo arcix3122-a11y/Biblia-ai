@@ -4,9 +4,10 @@ import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useChrome } from "@/context/ChromeContext";
 import { useLocaleStore } from "@/store/localeStore";
-import { colors, glass } from "@/theme";
+import { colors, glass, spacing } from "@/theme";
 
 function TabBarBackground() {
   if (Platform.OS === "web") {
@@ -25,10 +26,12 @@ export default function TabsLayout() {
   const { tabBarHidden } = useChrome();
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       key={locale}
+      safeAreaInsets={insets}
       screenOptions={{
         headerStyle: { backgroundColor: colors.backgroundElevated },
         headerTintColor: colors.accent,
@@ -36,8 +39,13 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.canvas },
         tabBarStyle: {
           position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
           backgroundColor: Platform.OS === "ios" ? "transparent" : colors.backgroundElevated,
           borderTopColor: colors.glassBorder,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          paddingTop: spacing.xs,
           display: tabBarHidden ? "none" : "flex",
         },
         tabBarBackground: () => <TabBarBackground />,

@@ -20,6 +20,7 @@ import { ChatBubble } from "@/components/ChatBubble";
 import { GlassChrome } from "@/components/GlassChrome";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { useTabBarInset } from "@/hooks/useTabBarInset";
 import { getAssistantRequestTrace } from "@/services/ai/assistantRequestTrace";
 import { useSpiritualAssistant } from "@/hooks/useSpiritualAssistant";
 import {
@@ -35,6 +36,7 @@ import type { ContextPillTemplateId } from "@/types/ui";
 export default function AiChatScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { paddingBottom: tabBarScrollPadding, tabBarHeight } = useTabBarInset();
   const { t, locale } = useAppTranslation();
   const translate = (key: string) => t(key as never);
   const { starterMood } = useLocalSearchParams<{ starterMood?: string }>();
@@ -208,7 +210,7 @@ export default function AiChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: tabBarScrollPadding + 120 }]}
           renderItem={({ item }) => <ChatBubble message={item} />}
           ListHeaderComponent={
             <View style={styles.headerStack}>
@@ -369,7 +371,9 @@ export default function AiChatScreen() {
           }
         />
 
-        <GlassChrome style={[styles.composerChrome, { paddingBottom: insets.bottom + 49 }]}>
+        <GlassChrome
+          style={[styles.composerChrome, { paddingBottom: Math.max(tabBarHeight, insets.bottom) + spacing.sm }]}
+        >
           <View style={styles.composerMeta}>
             <View>
               <Text style={styles.quotaText}>
@@ -454,9 +458,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  listContent: {
-    paddingBottom: 180,
-  },
+  listContent: {},
   headerStack: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,

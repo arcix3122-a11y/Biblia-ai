@@ -2278,3 +2278,182 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Changes: iapService (errors, pending, recovery), donorStore (token-only tier), DonationScreen (IAP-only), useDonationIap, app.json BILLING, eas.json, docs/GOOGLE_PLAY_IAP.md, i18n PL/EN
 - Validation: npm run typecheck (pass), npm run check:locales (pass, 1273 keys)
 - Result: done
+
+## 2026-05-28 17:25 (local)
+- Agent: Antigravity
+- Task: START - Audyt widoczności i integracji Ekosystemu aplikacji (EcosystemModal) w Biblia AI
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:35 (local)
+- Agent: Antigravity
+- Task: DONE - Audyt widoczności i integracji Ekosystemu aplikacji (EcosystemModal) w Biblia AI
+- Changes: none
+- Validation: Wykonano pełny audyt plików src/components/EcosystemModal.tsx, src/screens/SettingsScreen.tsx, src/screens/HomeScreen.tsx, src/screens/LibraryScreen.tsx i struktury tras tabów pod kątem optymalnej i spójnej z zasadami UX integracji ekosystemu aplikacji.
+- Result: done
+
+
+
+## 2026-05-28 17:27
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - bezpieczny silnik popupu oceny (rated guard + nieinwazyjny harmonogram).
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:40 (local)
+- Agent: Antigravity
+- Task: DONE - Implementacja widoczności Ekosystemu aplikacji w Ustawieniach oraz zakładce Biblioteka (Koncepcja 2 - Wsparcie w codziennej drodze)
+- Changes: src/screens/SettingsScreen.tsx, src/screens/LibraryScreen.tsx, src/i18n/locales/pl.json, src/i18n/locales/en.json
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1277 kl.)
+- Result: done
+
+
+
+## 2026-05-28 17:32
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - bezpieczny silnik popupu oceny (rated guard + nieinwazyjny harmonogram).
+- Changes: src/store/ratingPromptStore.ts, src/services/review/reviewService.ts, src/components/feedback/RatingPrompt.tsx, src/screens/HomeScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, .expo/types/router.d.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass); npm run check:locales (pass, 1277 keys).
+- Result: done
+
+## 2026-05-28 17:38
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - dostrojenie progow popupu oceny na mniej inwazyjne.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:45 (local)
+- Agent: Antigravity
+- Task: DONE - Usunięcie żargonu technicznego/deweloperskiego (Supabase, API key, .env) z interfejsu użytkownika na rzecz języka pastoralnego i naturalnego
+- Changes: src/i18n/locales/pl.json, src/i18n/locales/en.json
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1277 kl.)
+- Result: done
+
+
+## 2026-05-28 17:38
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - dostrojenie progow popupu oceny na mniej inwazyjne.
+- Changes: src/store/ratingPromptStore.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass); npm run check:locales (pass, 1277 keys).
+- Result: done
+
+## 2026-05-28 17:58 (local)
+- Agent: Antigravity
+- Task: DONE - Budowa pierwszej wersji produkcyjnej aplikacji (.aab) pod sklep Play na testy wewnętrzne przez EAS i lokalny Gradle
+- Changes: app.json, package.json, android/local.properties, android/gradle.properties, android/app/build.gradle, android/app/my-upload-key.keystore
+- Validation: Wygenerowano pomyślnie podpisany produkcyjny plik AAB o rozmiarze ~84.5 MB lokalnie pod ścieżką `android/app/build/outputs/bundle/release/app-release.aab` po usunięciu błędu dynamicznego importu telemetrycznego Supabase w Hermes oraz skonfigurowaniu Java 17 i lokalnego SDK Androida.
+- Result: done
+
+
+
+## 2026-05-28 18:21
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - naprawa crasha Metro ENOENT na android/app/.cxx.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 18:23
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - naprawa crasha Metro ENOENT na android/app/.cxx.
+- Changes: metro.config.js, AGENT_WORKLOG.md
+- Validation: npm exec expo start -- --lan --clear --port 8082 (start OK); port 8082 listening confirmed (Get-NetTCPConnection).
+- Result: done
+
+## 2026-05-28 19:40 (local)
+- Agent: Antigravity
+- Task: DONE - Budowa pliku AAB o nazwie pakietu com.solidcodesoftware.bibliaasystent
+- Changes: com.solidcodesoftware.bibliaasystent.aab, android/app/build/outputs/bundle/release/com.solidcodesoftware.bibliaasystent.aab
+- Validation: Pomyślna kompilacja `./gradlew bundleRelease` z JDK 17, weryfikacja rozmiaru pliku (~88.6 MB) oraz konfiguracji pakietu com.solidcodesoftware.bibliaasystent
+- Result: done
+
+
+## 2026-05-28 18:30
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - atomowy reset Expo i ponowny start do testow po aktualizacjach.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 20:37
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - atomowy reset Expo i ponowny start do testow po aktualizacjach.
+- Changes: AGENT_WORKLOG.md
+- Validation: ubito procesy port holder (8082), npm exec expo start -- --lan --clear --port 8082, port 8082 listening confirmed.
+- Result: done
+
+## 2026-05-28 20:53 (local)
+- Agent: Antigravity
+- Task: DONE - Kompleksowa wdrożenie optymalizacji: P1 powiadomienia/audio, Enhanced TTS, werset dnia w pushach + deep-linking, konsolidacja stats oraz reklama natywna
+- Changes: src/services/notifications/reminderService.ts, src/hooks/useAppDeepLinks.ts, src/utils/deepLinks.ts, src/screens/GuidedPrayerScreen.tsx, src/screens/PracticeDetailScreen.tsx, src/store/dailyRhythmStore.ts, src/hooks/useChapterTTS.ts, app/_layout.tsx, src/store/userStatsStore.ts, src/components/dashboard/HeroCard.tsx, src/components/dashboard/NativeAdCard.tsx, src/components/dashboard/MomentumDashboard.tsx, src/components/dashboard/DailyMissionHub.tsx, src/screens/HomeScreen.tsx
+- Validation: pomyślne wykonanie `npm run typecheck` (pass) oraz `npm run check:locales` (pass, 1277 kl.)
+- Result: done
+
+## 2026-05-28 21:55 (local)
+- Agent: Antigravity
+- Task: DONE - Kompleksowa przebudowa Guided Prayer (naprawa ambientu audio, wzbogacenie interfejsu o grafiki, pulsing halos i usunięcie SoundHelix)
+- Changes: src/screens/GuidedPrayerScreen.tsx, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass, 0 errors), npm run check:locales (pass, 1277 keys OK), verified local WAV resolution and safe reminder routing
+- Result: done
+
+
+
+
+## 2026-05-28 21:56
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - diagnostyka cichych crashy w Expo Go (unclean shutdown + stabilizacja error loggera).
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 21:57
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - diagnostyka cichych crashy w Expo Go (unclean shutdown + stabilizacja error loggera).
+- Changes: src/services/errors/crashDiagnostics.ts, src/services/errors/errorLogger.ts, app/_layout.tsx, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass); npm run check:locales (pass, 1277 keys).
+- Result: done
+
+## 2026-05-28 22:00
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - audyt aktualnego systemu reklam/monetyzacji w aplikacji.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 22:00
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - audyt aktualnego systemu reklam/monetyzacji w aplikacji.
+- Changes: AGENT_WORKLOG.md
+- Validation: przeglad package.json + modulow donation/IAP (SupportCard, DonationScreen, useDonationIap, iapService, donorStore, donationProducts, donationRepository).
+- Result: done
+
+## 2026-05-28 22:15
+- Agent: Composer
+- Task: START - dolny safe inset pod tab bar na ekranach z przewijaniem
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 22:18
+- Agent: Composer
+- Task: DONE - dolny safe inset pod tab bar na ekranach z przewijaniem
+- Changes: src/hooks/useTabBarInset.ts, src/components/layout/ScreenContainer.tsx, app/(tabs)/_layout.tsx, HomeScreen, LibraryScreen, AiChatScreen, WorkspaceScreen, SettingsScreen, DonationScreen, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass)
+- Result: done — brak in-app floating debug pill w repo (prawdopodobnie menu Expo Go); OfflineBadge nieuzywany
+
+## 2026-05-28 22:03
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - wdrozenie AdMob end-to-end (banner + interstitial + konfiguracja build).
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 22:05
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - wdrozenie AdMob end-to-end (banner + interstitial + konfiguracja build).
+- Changes: package.json, package-lock.json, app.json, .env.example, src/services/ads/adConfig.ts, src/services/ads/interstitialAdService.ts, src/components/dashboard/AdMobBannerCard.tsx, src/screens/HomeScreen.tsx, app/_layout.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass); npm run check:locales (pass, 1278 keys); npm exec expo config -- --json (EXPO_CONFIG_OK).
+- Result: done

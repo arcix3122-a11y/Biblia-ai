@@ -3,7 +3,8 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
-  Dimensions,
+  ImageBackground,
+  type ImageSourcePropType,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,29 +16,50 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from "react-i18next";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, radii, spacing, typography } from "@/theme";
 import { GlassCard } from "@/components/GlassCard";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { callLiveChatCompletion, hasLlmApiKey, type ChatCompletionMessage } from "@/services/ai/llmClient";
 import { useNotesStore } from "@/store/notesStore";
 import { useReminderStore } from "@/store/reminderStore";
-import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
 import { scheduleDailyReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
 import type { VerseWithReference } from "@/types/scripture";
 import { formatBookReference } from "@/i18n/bookNames";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const AUDIO_STREAM_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
+const PRAYER_AMBIENT_LOOP = require("../../assets/audio/prayer-ambient-loop.wav");
+
+type PrayerVisual = {
+  image: ImageSourcePropType;
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+};
+
+const PRAYER_STEP_VISUALS: PrayerVisual[] = [
+  {
+    image: require("../../assets/guided-prayer/welcome-chapel.png"),
+    icon: "heart",
+  },
+  {
+    image: require("../../assets/guided-prayer/adoration-scripture.png"),
+    icon: "sparkles",
+  },
+  {
+    image: require("../../assets/guided-prayer/reflection-window.png"),
+    icon: "create-outline",
+  },
+  {
+    image: require("../../assets/guided-prayer/habit-nightstand.png"),
+    icon: "alarm-outline",
+  },
+];
 
 export default function GuidedPrayerScreen() {
-  const { t, i18n } = useTranslation();
-  const locale = useLocaleStore((s) => s.locale);
+  const { t, i18n, locale } = useAppTranslation();
   const translation = useActiveTranslation(locale);
   const router = useRouter();
 
@@ -67,6 +89,8 @@ export default function GuidedPrayerScreen() {
 
   // Pulse animation for Welcome (Breathing)
   const breathAnim = useRef(new Animated.Value(1)).current;
+  const localeTag = locale === "pl" ? "pl-PL" : "en-US";
+  const activeVisual = PRAYER_STEP_VISUALS[step] ?? PRAYER_STEP_VISUALS[0];
 
   // 1. Ambient Background Audio Loop Setup
   useEffect(() => {
@@ -82,8 +106,8 @@ export default function GuidedPrayerScreen() {
         });
 
         const { sound } = await Audio.Sound.createAsync(
-          { uri: AUDIO_STREAM_URL },
-          { shouldPlay: true, isLooping: true, volume: 0.20 }
+          PRAYER_AMBIENT_LOOP,
+          { shouldPlay: true, isLooping: true, volume: 0.16 }
         );
         soundInstance = sound;
 
@@ -139,11 +163,9 @@ export default function GuidedPrayerScreen() {
 
       setIsGenerating(true);
       const hasKey = hasLlmApiKey();
-      const lang = i18n.language || "pl";
-      const systemPrompt = `You are an elite, modern spiritual guide inside a digital Cyber-Monastery. Generate a premium, deep, comforting, short adoration prayer (3 sentences max) based on the scripture of the day.
-Language: ${lang === "pl" ? "Polish" : "English"}.
-Tone: Luxuriously poetic, peaceful, contemplative.
-Do NOT use markdown styles (bold, italics) or introductory greetings; return ONLY the raw prayer text.`;
+      const lang = i18n.language || locale;
+      const languageName = t(lang.startsWith("pl") ? "guidedPrayer.aiLanguagePolish" : "guidedPrayer.aiLanguageEnglish");
+      const systemPrompt = t("guidedPrayer.aiSystemPrompt", { language: languageName });
 
       const verseRef = formatBookReference(
         activeVerse.book_slug,
@@ -152,7 +174,10 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
         locale,
         activeVerse.book_name
       );
-      const userPrompt = `Verse context: "${activeVerse.text}" (${verseRef})`;
+      const userPrompt = t("guidedPrayer.aiUserPrompt", {
+        reference: verseRef,
+        text: activeVerse.text,
+      });
 
       try {
         if (hasKey) {
@@ -170,10 +195,10 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
       } catch (err) {
         // High-fidelity fallback based on localized language
         if (isMounted) {
-          const fallback = lang === "pl"
-            ? `Wszechmogący Boże, w świetle słów z ${verseRef} („${activeVerse.text}”), uwielbiamy Twoją nieskończoną świętość. Ty jesteś cichym schronieniem naszych niespokojnych serc. W tej świętej przestrzeni oddajemy Ci chwałę za Twoją bezwarunkową miłość, która rozświetla wszelką ciemność. Amen.`
-            : `Lord God, in the light of Your word from ${verseRef} ("${activeVerse.text}"), we praise Your infinite holiness. You are the quiet sanctuary for our restless souls. In this sacred space, we glorify You for Your unconditional love that illuminates all darkness. Amen.`;
-          setAdorationText(fallback);
+          setAdorationText(t("guidedPrayer.aiFallbackAdoration", {
+            reference: verseRef,
+            text: activeVerse.text,
+          }));
         }
       } finally {
         if (isMounted) {
@@ -186,7 +211,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
     return () => {
       isMounted = false;
     };
-  }, [dailyVerse, i18n.language, locale]);
+  }, [dailyVerse, i18n.language, locale, t]);
 
   // 4. Breath Animation Loop (Welcome step)
   useEffect(() => {
@@ -218,7 +243,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
       t("guidedPrayer.exitAlertTitle"),
       t("guidedPrayer.exitAlertMessage"),
       [
-        { text: t("common.cancel", "Anuluj"), style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
           text: t("guidedPrayer.exitAlertConfirm"),
           style: "destructive",
@@ -271,7 +296,9 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
 
     try {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      const title = `${t("guidedPrayer.reflection")} — ${new Date().toLocaleDateString()}`;
+      const title = t("guidedPrayer.reflectionNoteTitle", {
+        date: new Intl.DateTimeFormat(localeTag).format(new Date()),
+      });
       await useNotesStore.getState().saveNote(null, title, reflectionText.trim());
       setIsReflectionSaved(true);
     } catch (err) {
@@ -315,9 +342,9 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
 
   // Habit Options List helper
   const reminderOptions = [
-    { hour: 8, minute: 0, label: i18n.language === "pl" ? "Modlitwa poranna (08:00)" : "Morning Prayer (08:00)" },
-    { hour: 20, minute: 0, label: i18n.language === "pl" ? "Modlitwa wieczorna (20:00)" : "Evening Prayer (20:00)" },
-    { hour: 21, minute: 30, label: i18n.language === "pl" ? "Przed snem (21:30)" : "Before Sleep (21:30)" },
+    { hour: 8, minute: 0, label: t("guidedPrayer.reminderMorning") },
+    { hour: 20, minute: 0, label: t("guidedPrayer.reminderEvening") },
+    { hour: 21, minute: 30, label: t("guidedPrayer.reminderBeforeSleep") },
   ];
 
   const verse = dailyVerse;
@@ -335,8 +362,41 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
     [locale, verse]
   );
 
+  const renderStepHero = (title: string, subtitle: string) => (
+    <View style={styles.stageHeroFrame}>
+      <ImageBackground
+        source={activeVisual.image}
+        resizeMode="cover"
+        style={styles.stageHeroImage}
+        imageStyle={styles.stageHeroImageRadius}
+      >
+        <View style={styles.stageHeroShade} />
+        <View style={styles.stageHeroContent}>
+          <View style={styles.stepIconBadge}>
+            <Ionicons name={activeVisual.icon} size={24} color={colors.accent} />
+          </View>
+          <Text style={[styles.goldHeading, styles.stageHeroTitle]}>{title}</Text>
+          <Text style={[styles.subtitle, styles.stageHeroSubtitle]}>{subtitle}</Text>
+        </View>
+      </ImageBackground>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+      <View pointerEvents="none" style={styles.visualBackground}>
+        <ImageBackground
+          source={activeVisual.image}
+          resizeMode="cover"
+          style={styles.visualBackgroundFill}
+          imageStyle={styles.visualBackgroundImage}
+        >
+          <View style={styles.backgroundVeil} />
+          <View style={styles.backgroundTopShade} />
+          <View style={styles.backgroundBottomShade} />
+        </ImageBackground>
+      </View>
+
       {/* Header bar */}
       <View style={styles.header}>
         <Pressable
@@ -368,20 +428,34 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
             {/* Step 1: Welcome ("Witaj") */}
             {step === 0 && (
               <View style={styles.stepBox}>
-                <Text style={styles.goldHeading}>{t("guidedPrayer.welcome")}</Text>
-                <Text style={styles.subtitle}>{t("guidedPrayer.welcomeSubtitle")}</Text>
+                {renderStepHero(t("guidedPrayer.welcome"), t("guidedPrayer.welcomeSubtitle"))}
 
-                {/* Ambient Breathing Circle Ring */}
-                <View style={styles.pulseContainer}>
+                <View style={styles.breathWaveContainer}>
                   <Animated.View
                     style={[
-                      styles.breathCircleRing,
+                      styles.breathWaveHalo,
                       { transform: [{ scale: breathAnim }] },
                     ]}
                   />
-                  <View style={styles.breathCircleCenter}>
-                    <Ionicons name="heart" size={32} color={colors.accent} />
-                  </View>
+                  {[0, 1, 2, 3, 4].map((idx) => (
+                    <Animated.View
+                      key={idx}
+                      style={[
+                        styles.breathWaveBar,
+                        {
+                          height: 34 + (4 - Math.abs(2 - idx)) * 11,
+                          transform: [
+                            {
+                              scaleY: breathAnim.interpolate({
+                                inputRange: [0.95, 1.25],
+                                outputRange: [0.72, 1.16],
+                              }),
+                            },
+                          ],
+                        },
+                      ]}
+                    />
+                  ))}
                 </View>
 
                 <Text style={styles.welcomeText}>
@@ -393,8 +467,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
             {/* Step 2: Adoration ("Uhonoruj Boga") */}
             {step === 1 && (
               <View style={styles.stepBox}>
-                <Text style={styles.goldHeading}>{t("guidedPrayer.adoration")}</Text>
-                <Text style={styles.subtitle}>{t("guidedPrayer.adorationSubtitle")}</Text>
+                {renderStepHero(t("guidedPrayer.adoration"), t("guidedPrayer.adorationSubtitle"))}
 
                 {isGenerating ? (
                   <View style={styles.loadingBox}>
@@ -410,7 +483,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
                     </Text>
                     {verse && (
                       <Text style={styles.scriptureBaseRef}>
-                        — {verseReference}
+                        {t("guidedPrayer.referenceLabel", { reference: verseReference })}
                       </Text>
                     )}
                   </GlassCard>
@@ -421,17 +494,16 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
             {/* Step 3: Reflection & Action ("Moje Troski") */}
             {step === 2 && (
               <View style={styles.stepBox}>
-                <Text style={styles.goldHeading}>{t("guidedPrayer.reflection")}</Text>
-                <Text style={styles.subtitle}>{t("guidedPrayer.reflectionSubtitle")}</Text>
+                {renderStepHero(t("guidedPrayer.reflection"), t("guidedPrayer.reflectionSubtitle"))}
 
                 {verse && (
                   <GlassCard style={styles.verseReflectionCard}>
                     <Ionicons name="bookmark" size={16} color={colors.accent} style={styles.verseIcon} />
                     <Text style={styles.verseText}>
-                      „{verse.text}”
+                      {t("guidedPrayer.verseQuote", { verse: verse.text })}
                     </Text>
                     <Text style={styles.verseRefLabel}>
-                      — {verseReference}
+                      {t("guidedPrayer.referenceLabel", { reference: verseReference })}
                     </Text>
                   </GlassCard>
                 )}
@@ -474,7 +546,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
                     <View style={styles.successRow}>
                       <Ionicons name="checkmark-circle" size={18} color={colors.success} />
                       <Text style={styles.successText}>
-                        {i18n.language === "pl" ? "Dodano do Twoich modlitewnych intencji" : "Saved to your prayer reflections"}
+                        {t("guidedPrayer.reflectionSaved")}
                       </Text>
                     </View>
                   )}
@@ -485,8 +557,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
             {/* Step 4: Habit Loop ("Nawyk") */}
             {step === 3 && (
               <View style={styles.stepBox}>
-                <Text style={styles.goldHeading}>{t("guidedPrayer.habit")}</Text>
-                <Text style={styles.subtitle}>{t("guidedPrayer.habitSubtitle")}</Text>
+                {renderStepHero(t("guidedPrayer.habit"), t("guidedPrayer.habitSubtitle"))}
 
                 <Text style={styles.habitMessageText}>
                   {t("guidedPrayer.habitMessage")}
@@ -494,7 +565,7 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
 
                 <View style={styles.reminderScheduleSection}>
                   <Text style={styles.reminderSectionHeader}>
-                    {i18n.language === "pl" ? "Skonfiguruj codzienne przypomnienie:" : "Configure daily reminder:"}
+                    {t("guidedPrayer.reminderSectionHeader")}
                   </Text>
 
                   {reminderOptions.map((opt) => {
@@ -593,6 +664,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  visualBackground: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  visualBackgroundFill: {
+    flex: 1,
+  },
+  visualBackgroundImage: {
+    opacity: 0.86,
+  },
+  backgroundVeil: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.56)",
+  },
+  backgroundTopShade: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 220,
+    backgroundColor: "rgba(0, 0, 0, 0.58)",
+  },
+  backgroundBottomShade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 360,
+    backgroundColor: "rgba(0, 0, 0, 0.72)",
+  },
   keyboardView: {
     flex: 1,
   },
@@ -604,6 +704,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.glassBorder,
+    backgroundColor: "rgba(3, 4, 8, 0.72)",
   },
   headerTitle: {
     ...typography.subtitle,
@@ -631,12 +732,65 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
   },
+  stageHeroFrame: {
+    width: "100%",
+    height: 245,
+    marginBottom: spacing.xl,
+    borderRadius: radii.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(229, 169, 60, 0.3)",
+    backgroundColor: colors.backgroundElevated,
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    elevation: 6,
+  },
+  stageHeroImage: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  stageHeroImageRadius: {
+    borderRadius: radii.lg,
+  },
+  stageHeroShade: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.32)",
+  },
+  stageHeroContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: "rgba(0, 0, 0, 0.14)",
+  },
+  stepIconBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
+    backgroundColor: "rgba(8, 10, 16, 0.72)",
+    borderWidth: 1,
+    borderColor: "rgba(229, 169, 60, 0.42)",
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 4,
+  },
   goldHeading: {
     ...typography.hero,
     color: colors.accent,
     textAlign: "center",
     fontWeight: "800",
     marginBottom: spacing.xs,
+    textShadowColor: "rgba(0, 0, 0, 0.65)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 10,
   },
   subtitle: {
     ...typography.subtitle,
@@ -644,45 +798,62 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: spacing.xl,
     fontWeight: "500",
+    textShadowColor: "rgba(0, 0, 0, 0.72)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 8,
+  },
+  stageHeroTitle: {
+    marginBottom: spacing.xs,
+  },
+  stageHeroSubtitle: {
+    color: colors.textPrimary,
+    marginBottom: 0,
   },
   welcomeText: {
     ...typography.body,
-    color: colors.textSecondary,
+    color: colors.textPrimary,
     textAlign: "center",
     lineHeight: 26,
-    paddingHorizontal: spacing.sm,
+    width: "100%",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
     marginTop: spacing.xl,
-  },
-  pulseContainer: {
-    height: 180,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: spacing.lg,
-  },
-  breathCircleRing: {
-    position: "absolute",
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    backgroundColor: colors.accentGlow,
-    borderWidth: 1.5,
-    borderColor: colors.accent,
-    opacity: 0.75,
-  },
-  breathCircleCenter: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.backgroundElevated,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
+    borderColor: "rgba(255, 255, 255, 0.09)",
+    backgroundColor: "rgba(6, 8, 13, 0.62)",
+  },
+  breathWaveContainer: {
+    width: "100%",
+    height: 112,
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.09)",
+    backgroundColor: "rgba(6, 8, 13, 0.58)",
+  },
+  breathWaveHalo: {
+    position: "absolute",
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: colors.accentGlow,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    opacity: 0.34,
+  },
+  breathWaveBar: {
+    width: 8,
+    borderRadius: radii.pill,
+    backgroundColor: colors.accent,
     shadowColor: colors.accent,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.42,
+    shadowRadius: 9,
   },
   loadingBox: {
     paddingVertical: spacing.xxl,
@@ -700,7 +871,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.accent,
     padding: spacing.lg,
-    backgroundColor: "rgba(229,169,60,0.03)",
+    backgroundColor: "rgba(5, 7, 11, 0.72)",
     shadowColor: colors.accent,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
@@ -725,6 +896,7 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: spacing.md,
     marginBottom: spacing.lg,
+    backgroundColor: "rgba(5, 7, 11, 0.7)",
   },
   verseIcon: {
     alignSelf: "center",
@@ -748,8 +920,8 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
-    backgroundColor: colors.backgroundElevated,
+    borderColor: "rgba(255, 255, 255, 0.12)",
+    backgroundColor: "rgba(5, 7, 11, 0.72)",
     padding: spacing.sm,
   },
   inputWrapperFocused: {
@@ -875,7 +1047,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.glassBorder,
-    backgroundColor: colors.background,
+    backgroundColor: "rgba(3, 4, 8, 0.88)",
   },
   primaryButton: {
     flexDirection: "row",

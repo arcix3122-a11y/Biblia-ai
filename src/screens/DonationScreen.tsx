@@ -10,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTabBarInset } from "@/hooks/useTabBarInset";
 import { useTranslation } from "react-i18next";
 import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
 import { GlassCard } from "@/components/GlassCard";
@@ -29,6 +30,7 @@ export default function DonationScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { contentContainerStyle: scrollBottomInset } = useTabBarInset();
   const donorTier = useDonorStore((s) => s.donorTier);
 
   const [step, setStep] = useState<DonationStep>("select");
@@ -69,7 +71,8 @@ export default function DonationScreen() {
       style={styles.container}
       contentContainerStyle={[
         styles.content,
-        { paddingBottom: insets.bottom + spacing.xxl, paddingTop: insets.top + spacing.sm },
+        scrollBottomInset,
+        { paddingTop: insets.top + spacing.sm },
       ]}
     >
       <View style={styles.header}>

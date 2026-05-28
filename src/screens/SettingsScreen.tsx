@@ -6,6 +6,7 @@ import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Accordion } from "@/components/layout/Accordion";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { useTabBarInset } from "@/hooks/useTabBarInset";
 import { useReaderStore } from "@/store/readerStore";
 import { useAiChatStore } from "@/store/aiChatStore";
 import {
@@ -34,6 +35,7 @@ import { useDonorStore } from "@/store/donorStore";
 
 export default function SettingsScreen() {
   const { t } = useAppTranslation();
+  const { contentContainerStyle: scrollBottomInset } = useTabBarInset();
   const router = useRouter();
   const locale = useLocaleStore((s) => s.locale);
   const donorTier = useDonorStore((s) => s.donorTier);
@@ -229,10 +231,28 @@ export default function SettingsScreen() {
   const buildNumber = Constants.nativeBuildVersion ?? null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.content, scrollBottomInset]}
+    >
       <Text style={styles.groupHeading}>{t("settings.basic")}</Text>
 
       <InviteFriendsCard style={styles.card} />
+
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.ecosystem")}</Text>
+        <Text style={styles.hint}>{t("settings.ecosystemHint")}</Text>
+        <Pressable
+          onPress={() => setEcosystemVisible(true)}
+          style={styles.ecosystemButton}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.ecosystemView")}
+        >
+          <Ionicons name="apps-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
+          <Text style={styles.ecosystemButtonText}>{t("settings.ecosystemView")}</Text>
+        </Pressable>
+      </GlassCard>
+
 
       <Text style={styles.groupHeading}>{t("donation.supportSection")}</Text>
 
@@ -480,18 +500,6 @@ export default function SettingsScreen() {
           ) : null}
 
           <GlassCard style={styles.nestedCard}>
-            <Text style={styles.sectionTitle}>{t("settings.ecosystem")}</Text>
-            <Text style={styles.hint}>{t("settings.ecosystemHint")}</Text>
-            <Pressable
-              onPress={() => setEcosystemVisible(true)}
-              style={styles.ecosystemButton}
-            >
-              <Ionicons name="apps-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
-              <Text style={styles.ecosystemButtonText}>{t("settings.ecosystemView")}</Text>
-            </Pressable>
-          </GlassCard>
-
-          <GlassCard style={styles.nestedCard}>
             <Text style={styles.sectionTitle}>{t("settings.about")}</Text>
             <Text style={styles.meta}>{t("settings.appVersion", { version: appVersion })}</Text>
             {buildNumber ? (
@@ -538,7 +546,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.md,
-    paddingBottom: spacing.xxl,
     gap: spacing.md,
   },
   groupHeading: {

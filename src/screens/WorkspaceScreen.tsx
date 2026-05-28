@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTabBarInset } from "@/hooks/useTabBarInset";
 import * as Sharing from "expo-sharing";
 import { useNotesStore, Note } from "@/store/notesStore";
 import { useBookmarksStore } from "@/store/bookmarksStore";
@@ -35,7 +36,8 @@ export default function WorkspaceScreen() {
   const translation = useActiveTranslation(locale);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  
+  const { contentContainerStyle: tabBarScrollInset } = useTabBarInset();
+
   // Note Store
   const { notes, isLoading: isNotesLoading, loadNotes, saveNote, deleteNote } = useNotesStore();
   
@@ -351,7 +353,10 @@ export default function WorkspaceScreen() {
         </View>
 
         {activeSubTab === "edit" ? (
-          <ScrollView contentContainerStyle={styles.editorContent} keyboardShouldPersistTaps="handled">
+          <ScrollView
+            contentContainerStyle={[styles.editorContent, tabBarScrollInset]}
+            keyboardShouldPersistTaps="handled"
+          >
             <TextInput
               value={title}
               onChangeText={setTitle}
@@ -372,7 +377,7 @@ export default function WorkspaceScreen() {
             />
           </ScrollView>
         ) : (
-          <ScrollView contentContainerStyle={styles.previewContent}>
+          <ScrollView contentContainerStyle={[styles.previewContent, tabBarScrollInset]}>
             <Text style={styles.previewTitle}>{title || t("common.untitled")}</Text>
             {renderPreviewContent()}
           </ScrollView>
@@ -451,7 +456,7 @@ export default function WorkspaceScreen() {
             <FlatList
               data={filteredNotes}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.listContainer}
+              contentContainerStyle={[styles.listContainer, tabBarScrollInset]}
               renderItem={({ item }) => (
                 <Pressable onPress={() => handleEditNote(item)}>
                   <GlassCard style={styles.noteCard}>
@@ -489,7 +494,7 @@ export default function WorkspaceScreen() {
             <FlatList
               data={bookmarks}
               keyExtractor={(item) => String(item.id)}
-              contentContainerStyle={styles.listContainer}
+              contentContainerStyle={[styles.listContainer, tabBarScrollInset]}
               renderItem={({ item }) => (
                 <GlassCard style={styles.bookmarkCard}>
                   <View style={styles.bookmarkCardHeader}>
@@ -655,7 +660,6 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.xxl * 2,
     gap: spacing.sm,
   },
   noteCard: {

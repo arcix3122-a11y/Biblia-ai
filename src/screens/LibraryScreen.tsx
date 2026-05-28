@@ -13,9 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Swipeable } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTabBarInset } from "@/hooks/useTabBarInset";
 import { BookTile } from "@/components/BookTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { LoadingState } from "@/components/layout/LoadingState";
+import { GlassCard } from "@/components/GlassCard";
+import { EcosystemModal } from "@/components/EcosystemModal";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useBooks, useDatabaseReady, useVerseSearch } from "@/hooks/useScripture";
@@ -35,6 +38,7 @@ const MIN_SEARCH_LEN = 2;
 export default function LibraryScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { contentContainerStyle: tabBarScrollInset } = useTabBarInset();
   const locale = useLocaleStore((s) => s.locale) ?? getDeviceLocale();
   const translation = useActiveTranslation(locale);
   const router = useRouter();
@@ -48,6 +52,7 @@ export default function LibraryScreen() {
   const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
   const [refreshing, setRefreshing] = useState(false);
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
+  const [ecosystemVisible, setEcosystemVisible] = useState(false);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -131,7 +136,11 @@ export default function LibraryScreen() {
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.sm }]}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: insets.top + spacing.sm },
+          tabBarScrollInset,
+        ]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
@@ -290,7 +299,32 @@ export default function LibraryScreen() {
             </>
           )}
         </View>
+
+        {!showSearch && (
+          <GlassCard style={styles.ecosystemCard}>
+            <View style={styles.ecosystemHeaderRow}>
+              <View style={styles.ecosystemIconWrap}>
+                <Ionicons name="apps-outline" size={22} color={colors.accent} />
+              </View>
+              <View style={styles.ecosystemCopy}>
+                <Text style={styles.ecosystemTitle}>{t("settings.ecosystem")}</Text>
+                <Text style={styles.ecosystemBody}>{t("settings.ecosystemHint")}</Text>
+              </View>
+            </View>
+            <Pressable
+              onPress={() => setEcosystemVisible(true)}
+              style={styles.ecosystemCta}
+              accessibilityRole="button"
+              accessibilityLabel={t("settings.ecosystemView")}
+            >
+              <Ionicons name="apps-outline" size={18} color={colors.canvas} />
+              <Text style={styles.ecosystemCtaText}>{t("settings.ecosystemView")}</Text>
+            </Pressable>
+          </GlassCard>
+        )}
       </ScrollView>
+
+      <EcosystemModal visible={ecosystemVisible} onClose={() => setEcosystemVisible(false)} />
     </View>
   );
 }
@@ -302,7 +336,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xxl,
     gap: spacing.md,
   },
   centered: {
@@ -459,5 +492,53 @@ const styles = StyleSheet.create({
   searchHistoryText: {
     ...typography.caption,
     color: colors.textSecondary,
+  },
+  ecosystemCard: {
+    gap: spacing.md,
+    marginTop: spacing.md,
+  },
+  ecosystemHeaderRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.md,
+  },
+  ecosystemIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ecosystemCopy: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  ecosystemTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+    fontWeight: "700",
+  },
+  ecosystemBody: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    lineHeight: 18,
+  },
+  ecosystemCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.accent,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  ecosystemCtaText: {
+    ...typography.caption,
+    color: colors.canvas,
+    fontWeight: "700",
   },
 });

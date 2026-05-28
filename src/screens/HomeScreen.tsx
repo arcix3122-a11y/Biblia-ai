@@ -11,6 +11,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTabBarInset } from "@/hooks/useTabBarInset";
 import { ActionTile } from "@/components/dashboard/ActionTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
@@ -34,10 +35,16 @@ import { getDeviceLocale } from "@/i18n";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { getBookPhotoUrl, getCategoryPhotoUrl, HOME_TILE_PHOTOS } from "@/data/photoBackgrounds";
 import { formatShortDate } from "@/utils/formatDate";
-import { getUserStats } from "@/services/stats/userStats";
+import { useUserStatsStore } from "@/store/userStatsStore";
+import { AdMobBannerCard } from "@/components/dashboard/AdMobBannerCard";
 import { ReminderFunnelPrompt } from "@/components/notifications/ReminderFunnelPrompt";
+import { RatingPrompt } from "@/components/feedback/RatingPrompt";
 import { SupportCard } from "@/components/dashboard/SupportCard";
+import { tryShowCoreInterstitial } from "@/services/ads/interstitialAdService";
+import { useDonorStore } from "@/store/donorStore";
 import { useReminderStore } from "@/store/reminderStore";
+import { useRatingPromptStore } from "@/store/ratingPromptStore";
+import { openStoreReviewPage } from "@/services/review/reviewService";
 import { colors, radii, spacing, typography } from "@/theme";
 
 function dedupeRecent<T extends { book_slug?: string; chapter: number }>(
@@ -66,6 +73,7 @@ function getGreetingKey(): "viralFeed.greetingMorning" | "viralFeed.greetingAfte
 export default function HomeScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { contentContainerStyle: tabBarScrollInset } = useTabBarInset();
   const locale = useLocaleStore((s) => s.locale) ?? getDeviceLocale();
   const router = useRouter();
   const { ready, error, retry } = useDatabaseReady();
@@ -79,14 +87,48 @@ export default function HomeScreen() {
   const [votdRef, setVotdRef] = useState("");
   const [pendingReflection, setPendingReflection] = useState<ReflectionVariant | null>(null);
   const [reminderFunnelVisible, setReminderFunnelVisible] = useState(false);
+  const [ratingPromptVisible, setRatingPromptVisible] = useState(false);
+  const donorTier = useDonorStore((s) => s.donorTier);
   const reminderEnabled = useReminderStore((s) => s.enabled);
   const reminderFunnelPromptSeen = useReminderStore((s) => s.reminderFunnelPromptSeen);
   const loadReminderPrefs = useReminderStore((s) => s.load);
+  const ratingPromptLoaded = useRatingPromptStore((s) => s.loaded);
+  const loadRatingPromptState = useRatingPromptStore((s) => s.load);
+  const canShowRatingPrompt = useRatingPromptStore((s) => s.canShowPrompt);
+  const markRatingPromptShown = useRatingPromptStore((s) => s.markPromptShown);
+  const markRatingPromptDismissed = useRatingPromptStore((s) => s.markDismissed);
+  const markRatingPromptRated = useRatingPromptStore((s) => s.markRated);
   const prevMissionCountRef = useRef<number | null>(null);
+  const ratingPromptShownInSessionRef = useRef(false);
+
+  const [chapterCount, setChapterCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (lastRead?.book_slug) {
+      scriptureRepo.getBookBySlug(lastRead.book_slug).then((book) => {
+        if (book) {
+          setChapterCount(book.chapter_count);
+        }
+      });
+    } else {
+      setChapterCount(null);
+    }
+  }, [lastRead]);
+
+  const progressPercent = useMemo(() => {
+    if (chapterCount && lastRead) {
+      return Math.round((lastRead.chapter / chapterCount) * 100);
+    }
+    return undefined;
+  }, [chapterCount, lastRead]);
 
   useEffect(() => {
     void loadReminderPrefs();
   }, [loadReminderPrefs]);
+
+  useEffect(() => {
+    void loadRatingPromptState();
+  }, [loadRatingPromptState]);
 
   const tryShowReminderFunnel = useCallback(() => {
     if (!reminderEnabled && !reminderFunnelPromptSeen) {
@@ -94,23 +136,73 @@ export default function HomeScreen() {
     }
   }, [reminderEnabled, reminderFunnelPromptSeen]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (reminderEnabled || reminderFunnelPromptSeen) {
+  const maybeShowRatingPrompt = useCallback(
+    (activityCount: number) => {
+      if (!ratingPromptLoaded) {
         return;
       }
-      void getUserStats().then((stats) => {
+      if (ratingPromptShownInSessionRef.current || ratingPromptVisible || reminderFunnelVisible) {
+        return;
+      }
+      if (!canShowRatingPrompt(activityCount)) {
+        return;
+      }
+      ratingPromptShownInSessionRef.current = true;
+      markRatingPromptShown(activityCount);
+      setRatingPromptVisible(true);
+    },
+    [
+      canShowRatingPrompt,
+      markRatingPromptShown,
+      ratingPromptLoaded,
+      ratingPromptVisible,
+      reminderFunnelVisible,
+    ]
+  );
+
+  const handleRatingLater = useCallback(() => {
+    markRatingPromptDismissed();
+    setRatingPromptVisible(false);
+  }, [markRatingPromptDismissed]);
+
+  const handleRateNow = useCallback(async () => {
+    markRatingPromptRated();
+    setRatingPromptVisible(false);
+    await openStoreReviewPage();
+  }, [markRatingPromptRated]);
+
+  const handleFirstMissionCompleted = useCallback(() => {
+    tryShowReminderFunnel();
+    void useUserStatsStore.getState().load().then(() => {
+      const stats = useUserStatsStore.getState().stats;
+      if (stats) {
+        maybeShowRatingPrompt(stats.activitiesCompletedCount);
+      }
+    });
+  }, [maybeShowRatingPrompt, tryShowReminderFunnel]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void useUserStatsStore.getState().load().then(() => {
+        const stats = useUserStatsStore.getState().stats;
+        if (!stats) return;
         const count = stats.activitiesCompletedCount;
         const prev = prevMissionCountRef.current;
         prevMissionCountRef.current = count;
-        if (prev === null) {
-          return;
+        if (!reminderEnabled && !reminderFunnelPromptSeen) {
+          if (prev !== null && prev === 0 && count >= 1) {
+            tryShowReminderFunnel();
+          }
         }
-        if (prev === 0 && count >= 1) {
-          tryShowReminderFunnel();
-        }
+
+        maybeShowRatingPrompt(count);
       });
-    }, [reminderEnabled, reminderFunnelPromptSeen, tryShowReminderFunnel])
+    }, [
+      maybeShowRatingPrompt,
+      reminderEnabled,
+      reminderFunnelPromptSeen,
+      tryShowReminderFunnel,
+    ])
   );
 
   const onRefresh = useCallback(async () => {
@@ -167,12 +259,13 @@ export default function HomeScreen() {
   }, [lastRead, openReader]);
 
   const startReading = useCallback(() => {
+    void tryShowCoreInterstitial({ isAdFree: donorTier !== null });
     if (lastRead?.book_slug) {
       resumeReading();
       return;
     }
     router.push("/(tabs)/library");
-  }, [lastRead, resumeReading, router]);
+  }, [donorTier, lastRead, resumeReading, router]);
 
   const openTopic = useCallback(
     (slug: string) => {
@@ -217,7 +310,11 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.sm }]}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: insets.top + spacing.sm },
+          tabBarScrollInset,
+        ]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
@@ -252,6 +349,7 @@ export default function HomeScreen() {
           subtitle={heroSubtitle}
           ctaLabel={heroCta}
           photoUrl={heroPhotoUrl}
+          progressPercent={progressPercent}
           onPress={startReading}
         />
 
@@ -262,8 +360,10 @@ export default function HomeScreen() {
         <DailyMissionHub
           reflectionAvailable={Boolean(votdText && votdRef)}
           onOpenReflection={() => setPendingReflection("meditation")}
-          onFirstMissionCompleted={tryShowReminderFunnel}
+          onFirstMissionCompleted={handleFirstMissionCompleted}
         />
+
+        <AdMobBannerCard />
 
         <ReadingPlanCard />
 
@@ -425,6 +525,11 @@ export default function HomeScreen() {
         visible={reminderFunnelVisible}
         onClose={() => setReminderFunnelVisible(false)}
       />
+      <RatingPrompt
+        visible={ratingPromptVisible}
+        onLater={handleRatingLater}
+        onRateNow={() => void handleRateNow()}
+      />
     </View>
   );
 }
@@ -436,7 +541,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xxl,
     gap: spacing.md,
   },
   centered: {
