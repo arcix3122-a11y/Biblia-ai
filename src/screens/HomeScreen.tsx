@@ -5,16 +5,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Swipeable } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionTile } from "@/components/dashboard/ActionTile";
-import { BookTile } from "@/components/BookTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
 import { HeroCard } from "@/components/dashboard/HeroCard";
@@ -27,28 +24,20 @@ import type { ReflectionVariant } from "@/components/dashboard/GuidedReflectionS
 import { LoadingState } from "@/components/layout/LoadingState";
 import { VotdFeedCard } from "@/components/dashboard/VotdFeedCard";
 import { TopicGrid } from "@/components/topics/TopicGrid";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useSearchHistory } from "@/hooks/useSearchHistory";
-import { useBooks, useDatabaseReady, useVerseSearch } from "@/hooks/useScripture";
+import { useDatabaseReady } from "@/hooks/useScripture";
 import { useBookmarksStore } from "@/store/bookmarksStore";
 import { useHistoryStore } from "@/store/historyStore";
 import { useSelectionStore } from "@/store/selectionStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
-import type { Book, Testament, VerseWithReference } from "@/types/scripture";
 import { useLocaleStore } from "@/store/localeStore";
-import { useActiveTranslation } from "@/store/translationStore";
 import { getDeviceLocale } from "@/i18n";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
-import { getCategoryPhotoUrl, HOME_TILE_PHOTOS } from "@/data/photoBackgrounds";
-import { HighlightedText } from "@/utils/highlightText";
+import { getBookPhotoUrl, getCategoryPhotoUrl, HOME_TILE_PHOTOS } from "@/data/photoBackgrounds";
 import { formatShortDate } from "@/utils/formatDate";
 import { getUserStats } from "@/services/stats/userStats";
 import { ReminderFunnelPrompt } from "@/components/notifications/ReminderFunnelPrompt";
 import { useReminderStore } from "@/store/reminderStore";
 import { colors, radii, spacing, typography } from "@/theme";
-
-const TESTAMENTS: readonly Testament[] = ["OT", "NT"];
-const MIN_SEARCH_LEN = 2;
 
 function dedupeRecent<T extends { book_slug?: string; chapter: number }>(
   entries: T[],
@@ -77,16 +66,8 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const locale = useLocaleStore((s) => s.locale) ?? getDeviceLocale();
-  const translation = useActiveTranslation(locale);
   const router = useRouter();
-  const [testament, setTestament] = useState<Testament>("OT");
-  const [query, setQuery] = useState("");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const debouncedQuery = useDebouncedValue(query, 350);
   const { ready, error, retry } = useDatabaseReady();
-  const { books, loading, refresh: refreshBooks } = useBooks(testament);
-  const { results, searching, search, clear } = useVerseSearch();
-  const { history, addToHistory, clearHistory, removeFromHistory } = useSearchHistory();
   const lastRead = useHistoryStore((s) => s.lastRead);
   const recent = useHistoryStore((s) => s.recent);
   const loadHistory = useHistoryStore((s) => s.loadHistory);
@@ -134,11 +115,11 @@ export default function HomeScreen() {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await Promise.all([loadHistory(), loadBookmarks(), refreshBooks()]);
+      await Promise.all([loadHistory(), loadBookmarks()]);
     } finally {
       setRefreshing(false);
     }
-  }, [loadBookmarks, loadHistory, refreshBooks]);
+  }, [loadBookmarks, loadHistory]);
 
   useEffect(() => {
     void loadHistory();
@@ -147,35 +128,17 @@ export default function HomeScreen() {
 
   useEffect(() => {
     void loadBookmarks();
-  }, [loadBookmarks, translation]);
-
-  useEffect(() => {
-    const trimmed = debouncedQuery.trim();
-    if (trimmed.length >= MIN_SEARCH_LEN) {
-      void search(trimmed);
-    } else {
-      clear();
-    }
-  }, [clear, debouncedQuery, search]);
+  }, [loadBookmarks]);
 
   const recentUnique = useMemo(() => dedupeRecent(recent, 3), [recent]);
   const bookmarkPreview = useMemo(() => bookmarks.slice(0, 2), [bookmarks]);
 
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
 
-  const openBook = useCallback(
-    (book: Book) => {
-      router.push(`/book/${book.slug}`);
-    },
-    [router]
-  );
-
   const openReader = useCallback(
     async (bookSlug: string, chapter: number, verseNumber?: number, verseText?: string) => {
       if (verseNumber) {
-        const book =
-          books.find((b) => b.slug === bookSlug) ||
-          (await scriptureRepo.getBookBySlug(bookSlug));
+        const book = await scriptureRepo.getBookBySlug(bookSlug);
         if (book) {
           setSelectedVerse({
             bookId: book.id,
@@ -193,15 +156,7 @@ export default function HomeScreen() {
           : `/reader/${bookSlug}/${chapter}`
       );
     },
-    [books, locale, router, setSelectedVerse]
-  );
-
-  const openSearchHit = useCallback(
-    (hit: VerseWithReference) => {
-      void addToHistory(debouncedQuery.trim());
-      void openReader(hit.book_slug, hit.chapter_number, hit.number, hit.text);
-    },
-    [addToHistory, debouncedQuery, openReader]
+    [locale, router, setSelectedVerse]
   );
 
   const resumeReading = useCallback(() => {
@@ -215,13 +170,8 @@ export default function HomeScreen() {
       resumeReading();
       return;
     }
-    const firstBook = books[0];
-    if (firstBook) {
-      router.push(`/book/${firstBook.slug}`);
-      return;
-    }
-    router.push("/book/genesis");
-  }, [books, lastRead, resumeReading, router]);
+    router.push("/(tabs)/library");
+  }, [lastRead, resumeReading, router]);
 
   const openTopic = useCallback(
     (slug: string) => {
@@ -242,14 +192,6 @@ export default function HomeScreen() {
     );
   }
 
-  const trimmedQuery = query.trim();
-  const showSearch = trimmedQuery.length >= MIN_SEARCH_LEN;
-  const searchHint =
-    trimmedQuery.length > 0 && trimmedQuery.length < MIN_SEARCH_LEN
-      ? t("home.searchHint", { count: MIN_SEARCH_LEN - trimmedQuery.length })
-      : null;
-  const showSearchHistory = isSearchFocused && history.length > 0;
-
   const hasContinue = Boolean(lastRead?.book_slug);
   const heroTitle = hasContinue
     ? formatBookReference(
@@ -266,6 +208,10 @@ export default function HomeScreen() {
   const heroCta = hasContinue ? t("home.continueReading") : t("home.readNow");
   const heroEyebrow = hasContinue ? t("home.continueReading") : t("common.appName");
   const greetingKey = getGreetingKey();
+  const heroPhotoUrl =
+    hasContinue && lastRead?.book_slug
+      ? getBookPhotoUrl(lastRead.book_slug, 900, 600)
+      : getCategoryPhotoUrl("continueReading", 900, 600);
 
   return (
     <View style={styles.container}>
@@ -304,7 +250,7 @@ export default function HomeScreen() {
           title={heroTitle}
           subtitle={heroSubtitle}
           ctaLabel={heroCta}
-          photoUrl={getCategoryPhotoUrl("continueReading", 900, 600)}
+          photoUrl={heroPhotoUrl}
           onPress={startReading}
         />
 
@@ -335,6 +281,14 @@ export default function HomeScreen() {
         />
 
         <Text style={styles.sectionHeading}>{t("home.exploreHeading")}</Text>
+        <ActionTile
+          icon="library-outline"
+          title={t("home.tileLibrary")}
+          subtitle={t("home.tileLibrarySub")}
+          layout="horizontal"
+          imageUrl={getCategoryPhotoUrl("continueReading", 600, 400)}
+          onPress={() => router.push("/(tabs)/library")}
+        />
         <ActionTile
           icon="grid-outline"
           title={t("practices.hubTileTitle")}
@@ -387,155 +341,6 @@ export default function HomeScreen() {
           <Text style={styles.statsLinkText}>{t("home.tileStats")}</Text>
           <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
         </Pressable>
-
-        <Text style={styles.sectionHeading}>{t("home.libraryHeading")}</Text>
-        <View style={styles.libraryCard}>
-          <View style={styles.searchRow}>
-            <Ionicons
-              name="search-outline"
-              size={18}
-              color={colors.textMuted}
-              style={styles.searchIcon}
-            />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              placeholder={t("home.searchPlaceholder")}
-              placeholderTextColor={colors.textMuted}
-              style={styles.search}
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="search"
-              accessibilityLabel={t("home.searchPlaceholder")}
-              onSubmitEditing={() => {
-                const trimmed = query.trim();
-                if (trimmed.length >= MIN_SEARCH_LEN) {
-                  void addToHistory(trimmed);
-                }
-              }}
-            />
-          </View>
-          {searchHint ? <Text style={styles.searchHint}>{searchHint}</Text> : null}
-
-          {showSearchHistory ? (
-            <View style={styles.searchHistory}>
-              <View style={styles.searchHistoryHeader}>
-                <Text style={styles.searchHistoryTitle}>{t("home.recentSearches")}</Text>
-                <Pressable
-                  onPress={() => void clearHistory()}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("home.clearSearchHistory")}
-                >
-                  <Text style={styles.searchHistoryClear}>{t("home.clearSearchHistory")}</Text>
-                </Pressable>
-              </View>
-              {history.map((item) => (
-                <Swipeable
-                  key={item}
-                  overshootRight={false}
-                  renderRightActions={() => (
-                    <Pressable
-                      onPress={() => void removeFromHistory(item)}
-                      style={styles.searchHistoryDelete}
-                      accessibilityRole="button"
-                      accessibilityLabel={t("common.delete")}
-                    >
-                      <Ionicons name="trash-outline" size={16} color={colors.canvas} />
-                      <Text style={styles.searchHistoryDeleteText}>{t("common.delete")}</Text>
-                    </Pressable>
-                  )}
-                >
-                  <Pressable
-                    onPress={() => setQuery(item)}
-                    style={styles.searchHistoryItem}
-                    accessibilityRole="button"
-                    accessibilityLabel={item}
-                  >
-                    <Ionicons name="time-outline" size={14} color={colors.textMuted} />
-                    <Text style={styles.searchHistoryText}>{item}</Text>
-                  </Pressable>
-                </Swipeable>
-              ))}
-            </View>
-          ) : null}
-
-          {showSearch ? (
-            <View>
-              {searching ? <LoadingState variant="inline" message={t("common.loading")} /> : null}
-              {!searching && results.length === 0 ? (
-                <View style={styles.emptySearchCompact}>
-                  <Ionicons name="search-outline" size={32} color={colors.textMuted} />
-                  <Text style={styles.empty}>
-                    {t("home.noResults", { query: debouncedQuery.trim() })}
-                  </Text>
-                  <Text style={styles.emptySub}>{t("home.noResultsHint")}</Text>
-                </View>
-              ) : null}
-              {results.map((item) => (
-                <Pressable
-                  key={item.id}
-                  onPress={() => openSearchHit(item)}
-                  style={styles.searchHit}
-                >
-                  <Text style={styles.searchRef}>
-                    {formatBookReference(
-                      item.book_slug,
-                      item.chapter_number,
-                      item.number,
-                      locale,
-                      item.book_name
-                    )}
-                  </Text>
-                  <HighlightedText
-                    text={item.text}
-                    query={debouncedQuery.trim()}
-                    style={styles.searchSnippet}
-                    numberOfLines={3}
-                  />
-                </Pressable>
-              ))}
-            </View>
-          ) : (
-            <>
-              <View style={styles.tabs}>
-                {TESTAMENTS.map((testamentKey) => (
-                  <Pressable
-                    key={testamentKey}
-                    onPress={() => setTestament(testamentKey)}
-                    style={[styles.tab, testament === testamentKey && styles.tabActive]}
-                  >
-                    <Text
-                      style={[styles.tabText, testament === testamentKey && styles.tabTextActive]}
-                    >
-                      {testamentKey === "OT" ? t("home.oldTestament") : t("home.newTestament")}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              {loading ? (
-                <LoadingState variant="grid" message={t("common.loading")} />
-              ) : (
-                <View style={styles.bookGrid}>
-                  {books.map((item) => (
-                    <View key={item.id} style={styles.bookCell}>
-                      <BookTile book={item} onPress={() => openBook(item)} />
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              <Text style={styles.verseTextNotice}>
-                {translation === "pl"
-                  ? t("home.verseTextLocaleNoticePl")
-                  : t("home.verseTextLocaleNoticeEn")}
-              </Text>
-            </>
-          )}
-        </View>
 
         {recentUnique.length > 0 || bookmarkPreview.length > 0 ? (
           <>
@@ -692,154 +497,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     flex: 1,
     fontWeight: "600",
-  },
-  libraryCard: {
-    backgroundColor: colors.backgroundElevated,
-    borderRadius: radii.xl,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.inputBackground,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    paddingHorizontal: spacing.sm,
-  },
-  searchIcon: {
-    marginRight: spacing.xs,
-  },
-  search: {
-    flex: 1,
-    color: colors.textPrimary,
-    paddingVertical: spacing.sm,
-    ...typography.body,
-  },
-  searchHint: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginLeft: spacing.xs,
-  },
-  tabs: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    marginTop: spacing.xs,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    alignItems: "center",
-  },
-  tabActive: {
-    backgroundColor: colors.accentGlow,
-    borderColor: colors.accent,
-  },
-  tabText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  tabTextActive: {
-    color: colors.accent,
-  },
-  bookGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginHorizontal: -spacing.xs,
-    marginTop: spacing.xs,
-  },
-  bookCell: {
-    width: "50%",
-    padding: spacing.xs,
-  },
-  verseTextNotice: {
-    ...typography.caption,
-    color: colors.textMuted,
-    textAlign: "center",
-    marginTop: spacing.sm,
-  },
-  emptySearchCompact: {
-    alignItems: "center",
-    marginVertical: spacing.md,
-    gap: spacing.sm,
-  },
-  empty: {
-    ...typography.body,
-    color: colors.textMuted,
-    textAlign: "center",
-  },
-  emptySub: {
-    ...typography.caption,
-    color: colors.textMuted,
-    textAlign: "center",
-  },
-  searchHit: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.glassBorder,
-  },
-  searchRef: {
-    ...typography.caption,
-    color: colors.accent,
-    marginBottom: spacing.xs,
-  },
-  searchSnippet: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
-  searchHistory: {
-    marginBottom: spacing.sm,
-  },
-  searchHistoryHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: spacing.sm,
-  },
-  searchHistoryTitle: {
-    ...typography.caption,
-    color: colors.textMuted,
-    letterSpacing: 0.4,
-  },
-  searchHistoryClear: {
-    ...typography.caption,
-    color: colors.accent,
-  },
-  searchHistoryDelete: {
-    width: 88,
-    marginBottom: spacing.xs,
-    borderRadius: radii.md,
-    backgroundColor: colors.danger,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-  },
-  searchHistoryDeleteText: {
-    ...typography.caption,
-    color: colors.canvas,
-  },
-  searchHistoryItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    borderRadius: radii.md,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.inputBackground,
-  },
-  searchHistoryText: {
-    ...typography.caption,
-    color: colors.textSecondary,
   },
   subSection: {
     marginBottom: spacing.sm,

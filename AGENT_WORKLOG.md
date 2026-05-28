@@ -29,7 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
-| 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | *(ten commit)* | in-progress | START |
+| 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | `ee709c0` | done | Photo hero + sticky bar; getBookPhotoUrl |
 | 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `1d09f77` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
 | 2026-05-28 17:05 | Cursor subagent | AI smoke harness (`npm run ai:smoke`) — wykrywanie powtarzalnych odpowiedzi LLM | *(ten commit)* | done | Pomija bez klucza; 5 promptów, overlap Jaccard |
 | 2026-05-28 16:30 | Cursor subagent | P0 retencja: DailyMissionHub + multi-streak + Home loop | *(ten commit)* | done | Audyt konkurencji P0 — wpięte na Home |
@@ -200,6 +200,13 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-28 15:35 (local)
+- Agent: Cursor subagent
+- Task: DONE - Zdjęcie w czytniku (ReaderHeroHeader)
+- Changes: src/components/reader/ReaderHeroHeader.tsx, src/data/photoBackgrounds.ts (getBookPhotoUrl), src/screens/ReaderScreen.tsx
+- Validation: npm run typecheck — 0 errors
+- Result: done — commit `ee709c0`
 
 ## 2026-05-28 12:25 (local)
 - Agent: Antigravity
@@ -2099,10 +2106,10 @@ npx expo start
 
 ## 2026-05-28 15:33 (local)
 - Agent: Cursor subagent
-- Task: START - Tab Biblioteka (siatka ksiąg w dolnym pasku)
-- Changes: pending
-- Validation: pending
-- Result: in-progress
+- Task: DONE - Tab Biblioteka (siatka ksiąg w dolnym pasku)
+- Changes: app/(tabs)/_layout.tsx, app/(tabs)/library.tsx, src/screens/LibraryScreen.tsx, src/screens/HomeScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1223 kl.)
+- Result: done — commit 9c53e0b
 
 ## 2026-05-28 15:30 (local)
 - Agent: Codex

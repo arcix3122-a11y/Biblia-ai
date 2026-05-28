@@ -49,9 +49,19 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t("tabs.scripture"),
-          headerTitle: t("tabs.headerScripture"),
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="book-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: t("tabs.library"),
+          headerTitle: t("tabs.headerLibrary"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="library-outline" size={size} color={color} />
           ),
         }}
       />
