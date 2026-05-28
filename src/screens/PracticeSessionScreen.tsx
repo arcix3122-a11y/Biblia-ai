@@ -18,6 +18,8 @@ import { useLocaleStore } from "@/store/localeStore";
 import { useSelectionStore } from "@/store/selectionStore";
 import { useFastingPlanStore } from "@/store/fastingPlanStore";
 import { useRosaryStore } from "@/store/rosaryStore";
+import { sharePracticeCompletion } from "@/services/share/shareInvite";
+import { getPracticeShareDay } from "@/utils/practiceShareDay";
 import { useStationsStore } from "@/store/stationsStore";
 import { hydratePracticeProgressStores, usePracticesStore } from "@/store/practicesStore";
 import type { VerseWithReference } from "@/types/scripture";
@@ -266,6 +268,22 @@ export default function PracticeSessionScreen() {
     recordStepCompleted,
   ]);
 
+  const handleSharePractice = useCallback(async () => {
+    if (!practice) {
+      return;
+    }
+    const day = getPracticeShareDay(practice.id);
+    try {
+      await sharePracticeCompletion({
+        practiceId: practice.id,
+        practiceName: t(practice.titleKey),
+        day,
+      });
+    } catch {
+      // share sheet dismissed
+    }
+  }, [practice, t]);
+
   const handleReset = useCallback(() => {
     if (!practice) {
       return;
@@ -467,6 +485,15 @@ export default function PracticeSessionScreen() {
               <View style={[styles.progressBarFill, { width: `${progress}%` as `${number}%` }]} />
             </View>
             <Text style={styles.streak}>{t("practices.streak", { count: streakCount })}</Text>
+            <Pressable
+              onPress={() => void handleSharePractice()}
+              style={styles.sharePracticeBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t("share.sharePracticeCta")}
+            >
+              <Ionicons name="share-outline" size={16} color={colors.accent} />
+              <Text style={styles.sharePracticeText}>{t("share.sharePracticeCta")}</Text>
+            </Pressable>
           </GlassCard>
 
           {practice.id === "fasting" && fastingTheme ? (
@@ -570,6 +597,18 @@ const styles = StyleSheet.create({
   },
   progressBarFill: { height: "100%", backgroundColor: colors.accent },
   streak: { ...typography.caption, color: colors.textMuted },
+  sharePracticeBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    alignSelf: "flex-start",
+    marginTop: spacing.xs,
+  },
+  sharePracticeText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "600",
+  },
   sectionTitle: { ...typography.subtitle, color: colors.textPrimary, fontWeight: "700" },
   sectionBody: { ...typography.body, color: colors.textSecondary, lineHeight: 22 },
   meta: { ...typography.caption, color: colors.textMuted },

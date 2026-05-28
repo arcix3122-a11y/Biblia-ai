@@ -1888,3 +1888,98 @@ npx expo start
 - Changes: app/_layout.tsx, src/services/sync/syncEngine.ts, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass), npm run check:locales (pass), npx expo start --lan --clear --port 8082 -> Metro online on exp://192.168.101.30:8083
 - Result: done
+
+## 2026-05-28 13:06 (local)
+- Agent: Antigravity
+- Task: START - Naprawa czatu AI, dodanie UI do wprowadzania klucza API w Settings, oraz pełne wdrożenie inteligentnych dynamicznych odpowiedzi offline (bez ciągłego powtarzania tego samego wersetu o lęku).
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 13:12 (local)
+- Agent: Antigravity
+- Task: DONE - Dodano TextInput dla klucza API w Settings (Zustand + debounced check) oraz pełna dynamiczna obsługa offline (powitania, wybrane wersety, default do rozeznania).
+- Changes: src/screens/SettingsScreen.tsx, src/services/ai/spiritualFirstAidKit.ts, src/data/spiritualFirstAidKit.ts, src/hooks/useSpiritualAssistant.ts, src/i18n/locales/pl.json, src/i18n/locales/en.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass), npm run typecheck (pass)
+- Result: done
+
+## 2026-05-28 13:16 (local)
+- Agent: Antigravity
+- Task: START - Pivot: Usunięcie możliwości dodawania własnych kluczy przez użytkownika (funkcja płatna), przywrócenie EXPO_PUBLIC_AI_API_KEY z .env jako wyłącznego źródła klucza aplikacji, wyczyszczenie customApiKey ze stanu Zustand.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 13:20 (local)
+- Agent: Antigravity
+- Task: DONE - Całkowity pivot kluczy API: usunięto pole TextInput z SettingsScreen, zlikwidowano customApiKey ze stanu Zustand/AsyncStorage oraz przywrócono EXPO_PUBLIC_AI_API_KEY jako JEDYNE, centralne źródło klucza (dla wszystkich użytkowników, bez możliwości własnych modyfikacji).
+- Changes: src/screens/SettingsScreen.tsx, src/store/aiChatStore.ts, src/services/ai/llmClient.ts, src/i18n/locales/pl.json, src/i18n/locales/en.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass), npm run typecheck (pass)
+- Result: done
+
+
+
+## 2026-05-28 12:55
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - atomowy reset Expo i fresh Expo Go start.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 13:35 (local)
+- Agent: Antigravity
+- Task: START - Integracja prawdziwego klucza API dostarczonego przez użytkownika, test curl-em oraz atomowe czyszczenie cache Metro.
+- Changes: pending
+- Validation: pending
+- Result: waiting-for-key
+
+## 2026-05-28 13:38 (local)
+- Agent: Antigravity
+- Task: START - Audyt i przebudowa Wersetu Dnia (VOTD): zmiana z losowych fragmentów na 30 wyselekcjonowanych chrześcijańskich wersetów oraz 30 unikalnych teł Picsum.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 14:15 (local)
+- Agent: Composer
+- Task: START - Retencja — dalsze braki i dowóz
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 14:10 (local)
+- Agent: Composer
+- Task: START - Pętla viralności: szablony udostępniania streaku/praktyki, zaproszenia, deep linki, locale.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 14:28 (local)
+- Agent: Composer
+- Task: DONE - Pętla viralności: szablony share (streak, praktyka, zaproszenie), deep linki, CTA w Ustawieniach, share na Home momentum i sesji praktyki, store URL w .env.example.
+- Changes: src/utils/deepLinks.ts, src/services/share/shareInvite.ts, storeLinks.ts, shareVerse.ts, src/components/InviteFriendsCard.tsx, AppDeepLinkBridge.tsx, src/hooks/useAppDeepLinks.ts, src/utils/practiceShareDay.ts, SettingsScreen, MomentumDashboard, PracticeSessionScreen, app/_layout.tsx, en.json, pl.json, .env.example, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass); npm run typecheck (brak błędów w plikach share; znane błędy w innych modułach repo)
+- Result: done
+
+## 2026-05-28 14:05 (local)
+- Agent: Composer
+- Task: START - Lejek powiadomień: ustawienia przypomnień (korzyści, wybór godziny, wieczorny ratunek), jednorazowy prompt po pierwszej misji, obsługa Expo Go.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 14:25 (local)
+- Agent: Composer
+- Task: DONE - Lejek powiadomień: sekcja Ustawień (korzyści, DateTimePicker, wieczorny ratunek), jednorazowy modal po pierwszej misji, Expo Go note, hook useDailyReminderSchedule.
+- Changes: src/services/notifications/reminderService.ts, src/store/reminderStore.ts, src/hooks/useDailyReminderSchedule.ts, src/components/notifications/ReminderTimePicker.tsx, src/components/notifications/ReminderFunnelPrompt.tsx, src/screens/SettingsScreen.tsx, src/screens/HomeScreen.tsx, src/components/dashboard/DailyMissionHub.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, package.json, package-lock.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass); npm run typecheck (2 pre-existing errors in DailyRhythmCard/StreakDashboardScreen, brak błędów w zmienionych plikach)
+- Result: done
+
+## 2026-05-28 13:42 (local)
+- Agent: Antigravity
+- Task: DONE - Zastąpiono czysto losowe wersety dnia (które potrafiły pokazać np. potop/zepsucie ziemi) stałym cyklem 30 najgłębszych, motywujących i psychologicznie wspierających wersetów Pisma. Zsynchronizowano je z 30 unikalnymi tłami (zamiast 7 powtarzających się). Zaimplementowano bezpieczne SQLite fallbacks dla bazy demo.
+- Changes: src/services/db/scriptureRepository.ts, src/data/photoBackgrounds.ts, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass), npm run typecheck (pass)
+- Result: done
+
+

@@ -6,10 +6,12 @@ import {
   Text,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { PhotoBackground } from "@/components/PhotoBackground";
 import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
+import { shareStreak } from "@/services/share/shareInvite";
 import { getUserStats } from "@/services/stats/userStats";
 import { colors, radii, spacing, typography } from "@/theme";
 import type { MomentumDashboardProps } from "@/types/ui";
@@ -46,6 +48,17 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
     void load();
   }, [load]);
 
+  const handleShareStreak = useCallback(async () => {
+    if (streakDays < 1) {
+      return;
+    }
+    try {
+      await shareStreak(streakDays);
+    } catch {
+      // share sheet dismissed
+    }
+  }, [streakDays]);
+
   if (loading) {
     return (
       <View style={[styles.loadingCard, style]}>
@@ -56,7 +69,7 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
 
   return (
     <Pressable
-      onPress={() => router.push("/stats")}
+      onPress={() => router.push("/streak-dashboard" as Href)}
       accessibilityRole="button"
       accessibilityLabel={t("dashboard.viewStats")}
     >
@@ -69,7 +82,22 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
         <View style={styles.content}>
           <View style={styles.statsRow}>
             <View style={styles.statChip}>
-              <Text style={styles.statValue}>{streakDays}</Text>
+              <View style={styles.streakRow}>
+                <Text style={styles.statValue}>{streakDays}</Text>
+                {streakDays > 0 ? (
+                  <Pressable
+                    onPress={(event) => {
+                      event.stopPropagation();
+                      void handleShareStreak();
+                    }}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("share.shareStreakCta")}
+                  >
+                    <Ionicons name="share-outline" size={16} color={colors.accent} />
+                  </Pressable>
+                ) : null}
+              </View>
               <Text style={styles.statLabel}>{t("dashboard.dayStreak")}</Text>
             </View>
             <View style={styles.statChip}>
@@ -125,6 +153,11 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.35)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.12)",
+  },
+  streakRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
   },
   statValue: {
     ...typography.subtitle,

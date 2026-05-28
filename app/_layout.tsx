@@ -4,6 +4,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
+import { AppDeepLinkBridge } from "@/components/AppDeepLinkBridge";
 import { GlobalAudioBar } from "@/components/audio/GlobalAudioBar";
 import { AudioOnboarding } from "@/components/AudioOnboarding";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
@@ -111,6 +112,8 @@ function RootStack() {
       <Stack.Screen name="stations" options={{ headerShown: false }} />
       <Stack.Screen name="rosary" options={{ headerShown: false }} />
       <Stack.Screen name="stats" options={{ headerShown: false }} />
+      <Stack.Screen name="streak-dashboard" options={{ headerShown: false }} />
+      <Stack.Screen name="daily-rhythm" options={{ headerShown: false }} />
       <Stack.Screen
         name="study"
         options={{
@@ -283,6 +286,7 @@ export default function RootLayout() {
         <StatusBar style="light" />
         <View style={{ flex: 1, backgroundColor: colors.canvas }} key={locale ?? "en"}>
           <RootStack />
+          <AppDeepLinkBridge />
           <GlobalAudioBar />
         </View>
       </ChromeProvider>

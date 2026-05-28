@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -24,8 +24,10 @@ import type { TranslationPreference } from "@/types/scripture";
 import { resetDatabaseForDev, resetDatabaseInit } from "@/services/db/database";
 import { colors, radii, spacing, typography } from "@/theme";
 import { useReminderStore } from "@/store/reminderStore";
-import { requestNotificationPermission, scheduleDailyReminder, cancelDailyReminder } from "@/services/notifications/reminderService";
+import { useDailyReminderSchedule } from "@/hooks/useDailyReminderSchedule";
+import { ReminderTimePicker } from "@/components/notifications/ReminderTimePicker";
 import { EcosystemModal } from "@/components/EcosystemModal";
+import { InviteFriendsCard } from "@/components/InviteFriendsCard";
 
 export default function SettingsScreen() {
   const { t } = useAppTranslation();
@@ -71,44 +73,65 @@ export default function SettingsScreen() {
     [dailyGoal]
   );
 
-  const { enabled: reminderEnabled, hour, minute, setEnabled, setTime, load: loadReminder } = useReminderStore();
+  const reminderEnabled = useReminderStore((s) => s.enabled);
+  const loadReminder = useReminderStore((s) => s.load);
+  const {
+    hour,
+    minute,
+    eveningRescueEnabled,
+    canSchedule,
+    enableReminders,
+    disableReminders,
+    updateTime,
+    updateEveningRescue,
+  } = useDailyReminderSchedule();
 
   useEffect(() => {
     void loadReminder();
   }, [loadReminder]);
 
+  const notifyScheduled = useCallback(
+    (nextHour: number, nextMinute: number) => {
+      Alert.alert(
+        t("settings.notifications"),
+        t("settings.notificationsScheduled", {
+          hour: nextHour,
+          minute: String(nextMinute).padStart(2, "0"),
+        })
+      );
+    },
+    [t]
+  );
+
   const handleToggleReminder = useCallback(async () => {
+    if (!canSchedule) {
+      return;
+    }
     if (!reminderEnabled) {
-      const granted = await requestNotificationPermission();
-      if (!granted) {
+      const result = await enableReminders();
+      if (result === "denied") {
         Alert.alert(t("settings.notifications"), t("settings.notificationsPermissionDenied"));
         return;
       }
-      const paddedMin = String(minute).padStart(2, "0");
-      await scheduleDailyReminder(hour, minute, t("common.appName"), t("settings.notificationsHint"), {
-        title: t("settings.eveningRescueTitle"),
-        body: t("settings.eveningRescueBody"),
-      });
-      setEnabled(true);
-      Alert.alert(t("settings.notifications"), t("settings.notificationsScheduled", { hour, minute: paddedMin }));
+      notifyScheduled(hour, minute);
     } else {
-      await cancelDailyReminder();
-      setEnabled(false);
+      await disableReminders();
     }
-  }, [reminderEnabled, hour, minute, setEnabled, t]);
+  }, [canSchedule, disableReminders, enableReminders, hour, minute, notifyScheduled, reminderEnabled, t]);
 
-  const handleHourChange = useCallback(async (delta: number) => {
-    const newHour = (hour + delta + 24) % 24;
-    setTime(newHour, minute);
-    if (reminderEnabled) {
-      const paddedMin = String(minute).padStart(2, "0");
-      await scheduleDailyReminder(newHour, minute, t("common.appName"), t("settings.notificationsHint"), {
-        title: t("settings.eveningRescueTitle"),
-        body: t("settings.eveningRescueBody"),
-      });
-      Alert.alert(t("settings.notifications"), t("settings.notificationsScheduled", { hour: newHour, minute: paddedMin }));
-    }
-  }, [hour, minute, reminderEnabled, setTime, t]);
+  const handleTimeChange = useCallback(
+    async (nextHour: number, nextMinute: number) => {
+      await updateTime(nextHour, nextMinute, reminderEnabled);
+      if (reminderEnabled) {
+        notifyScheduled(nextHour, nextMinute);
+      }
+    },
+    [notifyScheduled, reminderEnabled, updateTime]
+  );
+
+  const handleToggleEveningRescue = useCallback(async () => {
+    await updateEveningRescue(!eveningRescueEnabled, reminderEnabled);
+  }, [eveningRescueEnabled, reminderEnabled, updateEveningRescue]);
 
   const healthLabel = useMemo(() => {
     if (health === "checking") {
@@ -143,6 +166,8 @@ export default function SettingsScreen() {
     }
     void runHealthCheck();
   }, [advancedOpen, hasApiKey, runHealthCheck]);
+
+
 
   const handleResetQuota = () => {
     Alert.alert(t("settings.resetQuotaTitle"), t("settings.resetQuotaMessage"), [
@@ -185,6 +210,8 @@ export default function SettingsScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.groupHeading}>{t("settings.basic")}</Text>
+
+      <InviteFriendsCard style={styles.card} />
 
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
@@ -261,27 +288,33 @@ export default function SettingsScreen() {
 
       <GlassCard style={styles.card}>
         <Text style={styles.sectionTitle}>{t("settings.notifications")}</Text>
-        <Text style={styles.hint}>{t("settings.notificationsHint")}</Text>
-        <Pressable onPress={() => void handleToggleReminder()} style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>
-            {reminderEnabled ? t("settings.notificationsEnabled") : t("settings.notificationsDisabled")}
-          </Text>
-          <View style={[styles.pill, reminderEnabled && styles.pillOn]}>
-            <View style={[styles.knob, reminderEnabled && styles.knobOn]} />
-          </View>
-        </Pressable>
-        {reminderEnabled ? (
-          <View style={styles.timeRow}>
-            <Pressable onPress={() => void handleHourChange(-1)} style={styles.timeBtn} hitSlop={10}>
-              <Ionicons name="chevron-back" size={20} color={colors.accent} />
+        <Text style={styles.hint}>{t("settings.notificationsBenefits")}</Text>
+        {!canSchedule ? (
+          <Text style={styles.note}>{t("settings.notificationsExpoGoNote")}</Text>
+        ) : null}
+        {canSchedule ? (
+          <>
+            <Pressable onPress={() => void handleToggleReminder()} style={styles.toggleRow}>
+              <Text style={styles.toggleLabel}>
+                {reminderEnabled ? t("settings.notificationsEnabled") : t("settings.notificationsDisabled")}
+              </Text>
+              <View style={[styles.pill, reminderEnabled && styles.pillOn]}>
+                <View style={[styles.knob, reminderEnabled && styles.knobOn]} />
+              </View>
             </Pressable>
-            <Text style={styles.timeLabel}>
-              {String(hour).padStart(2, "0")}:{String(minute).padStart(2, "0")}
-            </Text>
-            <Pressable onPress={() => void handleHourChange(1)} style={styles.timeBtn} hitSlop={10}>
-              <Ionicons name="chevron-forward" size={20} color={colors.accent} />
+            {reminderEnabled ? (
+              <ReminderTimePicker hour={hour} minute={minute} onChange={handleTimeChange} />
+            ) : null}
+            <Pressable onPress={() => void handleToggleEveningRescue()} style={[styles.toggleRow, styles.eveningRow]}>
+              <View style={styles.eveningCopy}>
+                <Text style={styles.toggleLabel}>{t("settings.eveningRescue")}</Text>
+                <Text style={styles.eveningHint}>{t("settings.eveningRescueHint")}</Text>
+              </View>
+              <View style={[styles.pill, eveningRescueEnabled && styles.pillOn]}>
+                <View style={[styles.knob, eveningRescueEnabled && styles.knobOn]} />
+              </View>
             </Pressable>
-          </View>
+          </>
         ) : null}
       </GlassCard>
 
@@ -322,6 +355,8 @@ export default function SettingsScreen() {
                   {hasApiKey ? t("settings.aiStatusConfigured") : t("settings.aiStatusMissing")}
                 </Text>
               </View>
+
+
 
               {hasApiKey ? (
                 <View style={styles.aiDetails}>
@@ -537,6 +572,21 @@ const styles = StyleSheet.create({
   knobOn: {
     alignSelf: "flex-end",
     backgroundColor: colors.accent,
+  },
+  eveningRow: {
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.glassBorder,
+  },
+  eveningCopy: {
+    flex: 1,
+    marginRight: spacing.md,
+    gap: spacing.xs,
+  },
+  eveningHint: {
+    ...typography.caption,
+    color: colors.textMuted,
   },
   aiStatusContainer: {
     marginTop: spacing.sm,

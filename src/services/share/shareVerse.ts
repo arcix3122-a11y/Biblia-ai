@@ -1,7 +1,7 @@
 import { Platform, Share } from "react-native";
 import * as Sharing from "expo-sharing";
 import i18n from "@/i18n";
-import { buildReaderDeepLink, buildShareUrl } from "@/utils/deepLinks";
+import { buildReaderDeepLink, buildShareUrl, formatShareLinkLine } from "@/utils/deepLinks";
 
 const EXCERPT_MAX = 140;
 
@@ -24,10 +24,7 @@ export interface VerseSharePayload {
 export function buildVerseShareMessage(payload: VerseSharePayload): string {
   const deepLink = buildReaderDeepLink(payload.bookSlug, payload.chapter, payload.verse);
   const publicUrl = buildShareUrl(payload.bookSlug, payload.chapter, payload.verse);
-  const linkLine =
-    publicUrl !== deepLink
-      ? i18n.t("share.openInAppWithWeb", { webUrl: publicUrl, deepLink })
-      : i18n.t("share.openInApp", { link: deepLink });
+  const linkLine = formatShareLinkLine(deepLink, publicUrl);
 
   return i18n.t("share.verseMessage", {
     reference: payload.reference,
