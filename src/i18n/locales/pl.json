@@ -115,6 +115,11 @@
     "continueSubtitle": "Kontynuuj tam, gdzie przerwałeś.",
     "readNow": "Czytaj teraz",
     "todaySection": "Na dziś",
+    "supportCard": {
+      "title": "Wesprzyj Biblia AI",
+      "body": "Pomóż utrzymać Pismo, modlitwę i towarzysza bez opłat — bez reklam i paywalla na Słowo.",
+      "cta": "Ofiaruj jednorazowo"
+    },
     "verseReflectionSection": "Refleksja nad wersem dnia",
     "verseReflectionDone": "Refleksja ukończona",
     "dailyMission": {
@@ -910,6 +915,11 @@
     "ecosystemHint": "Poznaj inne minimalistyczne, ultraszybkie narzędzia od SolidCode.",
     "ecosystemView": "Odkryj ekosystem",
     "clearLibraryData": "Wyczyść dane biblioteki",
+    "resetDonorStateTitle": "Reset rangi darczyńcy",
+    "resetDonorStateMessage": "Wyczyść lokalną rangę darczyńcy i historię zweryfikowanych zakupów. Użyj, jeśli ranga została przyznana bez płatności.",
+    "resetDonorStateHint": "Tylko dev — czyści lokalną rangę i zweryfikowane rekordy IAP.",
+    "resetDonorStateAction": "Resetuj stan darczyńcy",
+    "resetDonorStateSuccess": "Stan darczyńcy wyczyszczony.",
     "clearLibraryTitle": "Usunąć lokalną bazę Pisma?",
     "clearLibraryMessage": "To trwale usuwa wszystkie zaimportowane księgi, rozdziały i wersety z tego urządzenia. Zakładki i historia czytania pozostają, ale mogą wskazywać brakujący tekst. Aplikacja ponownie zaimportuje bibliotekę z paczki przy następnym uruchomieniu. Tej operacji nie można cofnąć.",
     "clearLibraryConfirm": "Usuń bibliotekę",
@@ -1555,6 +1565,21 @@
     "amountPln": "{{amount}} zł",
     "secureRedirect": "Przekierowanie do bezpiecznej płatności.",
     "donateNow": "Ofiaruj teraz",
+    "iap": {
+      "expoGoNotice": "Darowizny działają w wersji ze sklepu Play. Zainstaluj wersję ze sklepu lub build testowy wewnętrzny, aby złożyć datek.",
+      "playBillingHint": "Jednorazowe datki przez Google Play. Ranga odblokowuje się dopiero po potwierdzeniu płatności.",
+      "tierCta": "Ofiaruj {{amount}} — {{tier}}",
+      "devOnlyTitle": "Dev: symulacja datku",
+      "devOnlyHint": "Stuknij próg powyżej, aby symulować zweryfikowany zakup bez Play Billing. W produkcji ranga nie jest przyznawana w ten sposób.",
+      "errors": {
+        "cancelled": "Zakup anulowany.",
+        "connectionFailed": "Nie udało się połączyć ze sklepem. Spróbuj później.",
+        "productsFailed": "Nie udało się wczytać produktów darowizn ze sklepu.",
+        "purchaseFailed": "Zakup nie powiódł się. Spróbuj ponownie.",
+        "verifyFailed": "Płatność otrzymana, ale nie udało się jej zweryfikować. Skontaktuj się z nami, jeśli pobrano opłatę.",
+        "unknownProduct": "Nieznany produkt. Skontaktuj się z nami, jeśli pobrano opłatę."
+      }
+    },
     "confirmTitle": "Potwierdź datek",
     "confirmBody": "Jeśli ukończyłeś płatność {{amount}}, potwierdź poniżej, aby odblokować rangę darczyńcy.",
     "confirmPaid": "Zapłaciłem / zapłaciłam",

@@ -38,6 +38,7 @@ export default function SettingsScreen() {
   const locale = useLocaleStore((s) => s.locale);
   const donorTier = useDonorStore((s) => s.donorTier);
   const totalDonatedPln = useDonorStore((s) => s.totalDonatedPln);
+  const resetDonorState = useDonorStore((s) => s.resetDonorState);
   const translationPreference = useTranslationStore((s) => s.preference);
   const setTranslationPreference = useTranslationStore((s) => s.setPreference);
   const supabaseConfigured = Boolean(getSupabaseClient());
@@ -184,6 +185,20 @@ export default function SettingsScreen() {
         onPress: () => {
           resetQuotaAndChat();
           Alert.alert(t("common.success"), t("settings.resetQuotaSuccess"));
+        },
+      },
+    ]);
+  };
+
+  const handleResetDonorState = () => {
+    Alert.alert(t("settings.resetDonorStateTitle"), t("settings.resetDonorStateMessage"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.clear"),
+        style: "destructive",
+        onPress: () => {
+          resetDonorState();
+          Alert.alert(t("common.success"), t("settings.resetDonorStateSuccess"));
         },
       },
     ]);
@@ -497,6 +512,17 @@ export default function SettingsScreen() {
               <Text style={styles.dangerButtonText}>{t("settings.clearLibraryData")}</Text>
             </Pressable>
           </GlassCard>
+
+          {__DEV__ ? (
+            <GlassCard style={styles.nestedCard}>
+              <Text style={styles.sectionTitle}>{t("settings.resetDonorStateTitle")}</Text>
+              <Text style={styles.hint}>{t("settings.resetDonorStateHint")}</Text>
+              <Pressable onPress={handleResetDonorState} style={styles.dangerButton}>
+                <Ionicons name="refresh-outline" size={16} color={colors.danger} style={{ marginRight: 6 }} />
+                <Text style={styles.dangerButtonText}>{t("settings.resetDonorStateAction")}</Text>
+              </Pressable>
+            </GlassCard>
+          ) : null}
         </Accordion>
       </GlassCard>
 

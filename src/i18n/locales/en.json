@@ -115,6 +115,11 @@
     "continueSubtitle": "Continue where you left off.",
     "readNow": "Read now",
     "todaySection": "For you today",
+    "supportCard": {
+      "title": "Support Biblia AI",
+      "body": "Help keep Scripture, prayer, and the companion free — no ads, no paywall on the Word.",
+      "cta": "Give a one-time gift"
+    },
     "verseReflectionSection": "Reflect on today's verse",
     "verseReflectionDone": "Reflection complete",
     "dailyMission": {
@@ -910,6 +915,11 @@
     "ecosystemHint": "Explore other minimalistic, ultra-fast utilities designed by SolidCode.",
     "ecosystemView": "Discover Ecosystem",
     "clearLibraryData": "Clear Scripture library data",
+    "resetDonorStateTitle": "Reset donor rank",
+    "resetDonorStateMessage": "Clear your local donor tier and verified purchase history. Use this if a rank was granted without payment.",
+    "resetDonorStateHint": "Dev only — clears local donor tier and verified IAP records.",
+    "resetDonorStateAction": "Reset donor state",
+    "resetDonorStateSuccess": "Donor state cleared.",
     "clearLibraryTitle": "Delete local Scripture database?",
     "clearLibraryMessage": "This permanently deletes all locally imported books, chapters, and verses from this device. Bookmarks and reading history remain, but may point to missing text. The app will re-import the bundled library on next launch. This cannot be undone.",
     "clearLibraryConfirm": "Delete library",
@@ -1555,6 +1565,21 @@
     "amountPln": "{{amount}} PLN",
     "secureRedirect": "You will be redirected to a secure payment page.",
     "donateNow": "Give now",
+    "iap": {
+      "expoGoNotice": "Donations work in the Play Store build. Install the store version or an internal testing build to give a gift.",
+      "playBillingHint": "One-time gifts via Google Play. Your rank unlocks only after payment is confirmed.",
+      "tierCta": "Give {{amount}} — {{tier}}",
+      "devOnlyTitle": "Dev: simulate gift",
+      "devOnlyHint": "Tap a tier above to simulate a verified purchase without Play Billing. Production builds never grant rank this way.",
+      "errors": {
+        "cancelled": "Purchase cancelled.",
+        "connectionFailed": "Could not connect to the store. Try again later.",
+        "productsFailed": "Could not load donation products from the store.",
+        "purchaseFailed": "Purchase failed. Please try again.",
+        "verifyFailed": "Payment received but could not be verified. Contact support if you were charged.",
+        "unknownProduct": "Unknown product. Contact support if you were charged."
+      }
+    },
     "confirmTitle": "Confirm your gift",
     "confirmBody": "If you completed payment for {{amount}}, confirm below to unlock your donor rank.",
     "confirmPaid": "I completed payment",

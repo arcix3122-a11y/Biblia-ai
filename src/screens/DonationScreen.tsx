@@ -9,12 +9,13 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import * as WebBrowser from "expo-web-browser";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
 import { GlassCard } from "@/components/GlassCard";
-import { DONATION_TIERS, type DonationTier } from "@/data/donationTiers";
+import { DONATION_TIERS, type DonationTier, type DonorTierId } from "@/data/donationTiers";
+import { useDonationIap } from "@/hooks/useDonationIap";
+import type { DonationIapMessageKey } from "@/services/donation/iapService";
 import {
   donationThankYouTierKey,
   shareDonationSupport,
@@ -22,66 +23,33 @@ import {
 import { useDonorStore } from "@/store/donorStore";
 import { colors, radii, spacing, typography } from "@/theme";
 
-type DonationStep = "select" | "confirm" | "thanks";
-
-function buildDonationUrl(baseUrl: string, amountPln: number): string {
-  try {
-    const url = new URL(baseUrl);
-    url.searchParams.set("amount", String(amountPln));
-    return url.toString();
-  } catch {
-    const separator = baseUrl.includes("?") ? "&" : "?";
-    return `${baseUrl}${separator}amount=${amountPln}`;
-  }
-}
+type DonationStep = "select" | "thanks";
 
 export default function DonationScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const recordDonation = useDonorStore((s) => s.recordDonation);
+  const recordVerifiedPurchase = useDonorStore((s) => s.recordVerifiedPurchase);
   const donorTier = useDonorStore((s) => s.donorTier);
 
-  const [selectedTier, setSelectedTier] = useState<DonationTier>(DONATION_TIERS[0]);
   const [step, setStep] = useState<DonationStep>("select");
-  const [busy, setBusy] = useState(false);
   const [awardedTier, setAwardedTier] = useState(donorTier);
+  const [devBusy, setDevBusy] = useState(false);
 
-  const donationUrl = process.env.EXPO_PUBLIC_DONATION_URL?.trim() ?? "";
+  const onPurchaseSuccess = useCallback((tierId: DonorTierId) => {
+    setAwardedTier(tierId);
+    setStep("thanks");
+  }, []);
 
-  const formattedAmount = useMemo(
-    () => t("donation.amountPln", { amount: selectedTier.amountPln }),
-    [selectedTier.amountPln, t]
-  );
-
-  const openPayment = useCallback(async () => {
-    if (!donationUrl) {
-      setStep("confirm");
-      return;
-    }
-
-    setBusy(true);
-    try {
-      await WebBrowser.openBrowserAsync(buildDonationUrl(donationUrl, selectedTier.amountPln), {
-        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
-        controlsColor: colors.accent,
-      });
-      setStep("confirm");
-    } finally {
-      setBusy(false);
-    }
-  }, [donationUrl, selectedTier.amountPln]);
-
-  const confirmPayment = useCallback(async () => {
-    setBusy(true);
-    try {
-      const tier = await recordDonation(selectedTier.amountPln);
-      setAwardedTier(tier);
-      setStep("thanks");
-    } finally {
-      setBusy(false);
-    }
-  }, [recordDonation, selectedTier.amountPln]);
+  const {
+    iapAvailable,
+    errorKey,
+    activeTierId,
+    purchaseTier,
+    getDisplayPrice,
+    clearError,
+    isBusy,
+  } = useDonationIap({ onPurchaseSuccess });
 
   const shareSupport = useCallback(async () => {
     try {
@@ -97,6 +65,30 @@ export default function DonationScreen() {
     }
     return t(donationThankYouTierKey(awardedTier));
   }, [awardedTier, t]);
+
+  const confirmDevPayment = useCallback(
+    async (tier: DonationTier) => {
+      if (!__DEV__) {
+        return;
+      }
+      setDevBusy(true);
+      try {
+        const nextTier = await recordVerifiedPurchase({
+          productId: `dev_${tier.id}`,
+          transactionId: `dev_${Date.now()}`,
+          purchaseToken: null,
+          verifiedAt: new Date().toISOString(),
+          amountPln: tier.amountPln,
+          tierId: tier.id,
+        });
+        setAwardedTier(nextTier);
+        setStep("thanks");
+      } finally {
+        setDevBusy(false);
+      }
+    },
+    [recordVerifiedPurchase]
+  );
 
   return (
     <ScrollView
@@ -118,30 +110,72 @@ export default function DonationScreen() {
 
       {step === "select" ? (
         <>
+          {!iapAvailable ? (
+            <GlassCard style={styles.noticeCard}>
+              <Ionicons name="storefront-outline" size={22} color={colors.accent} />
+              <Text style={styles.noticeText}>{t("donation.iap.expoGoNotice")}</Text>
+            </GlassCard>
+          ) : null}
+
+          {errorKey ? (
+            <GlassCard style={styles.errorCard}>
+              <Text style={styles.errorText}>{t(errorKey as DonationIapMessageKey)}</Text>
+              <Pressable onPress={clearError} hitSlop={8}>
+                <Text style={styles.errorDismiss}>{t("common.dismiss")}</Text>
+              </Pressable>
+            </GlassCard>
+          ) : null}
+
           <GlassCard style={styles.card}>
             <Text style={styles.sectionTitle}>{t("donation.chooseAmount")}</Text>
             <Text style={styles.hint}>{t("donation.chooseAmountHint")}</Text>
+            <Text style={styles.meta}>{t("donation.iap.playBillingHint")}</Text>
             <View style={styles.amountGrid}>
               {DONATION_TIERS.map((tier) => {
-                const active = selectedTier.id === tier.id;
+                const purchasing = activeTierId === tier.id && isBusy;
+                const fallbackAmount = t("donation.amountPln", { amount: tier.amountPln });
+                const displayPrice = getDisplayPrice(tier.id, fallbackAmount);
                 return (
                   <Pressable
                     key={tier.id}
-                    onPress={() => setSelectedTier(tier)}
+                    onPress={() => {
+                      if (isBusy) {
+                        return;
+                      }
+                      if (iapAvailable) {
+                        void purchaseTier(tier.id);
+                        return;
+                      }
+                      if (__DEV__) {
+                        void confirmDevPayment(tier);
+                      }
+                    }}
                     style={[
                       styles.amountButton,
-                      active && {
+                      {
                         borderColor: tier.badgeBorder,
                         backgroundColor: tier.badgeGlow,
                       },
+                      isBusy && !purchasing ? styles.amountButtonDisabled : null,
                     ]}
+                    disabled={isBusy && !purchasing}
                     accessibilityRole="button"
-                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={t("donation.iap.tierCta", {
+                      tier: t(`donorTier.${tier.id}`),
+                      amount: displayPrice,
+                    })}
                   >
-                    <Text style={[styles.amountValue, active && { color: tier.badgeColor }]}>
-                      {t("donation.amountPln", { amount: tier.amountPln })}
-                    </Text>
-                    <DonorTierBadge tierId={tier.id} compact />
+                    {purchasing ? (
+                      <ActivityIndicator color={tier.badgeColor} />
+                    ) : (
+                      <>
+                        <Text style={[styles.amountValue, { color: tier.badgeColor }]}>
+                          {displayPrice}
+                        </Text>
+                        <DonorTierBadge tierId={tier.id} compact />
+                        <Text style={styles.tierCta}>{t("donation.donateNow")}</Text>
+                      </>
+                    )}
                   </Pressable>
                 );
               })}
@@ -152,56 +186,16 @@ export default function DonationScreen() {
             <Text style={styles.sectionTitle}>{t("donation.whyDonate.title")}</Text>
             <Text style={styles.previewText}>{t("donation.whyDonate.lead")}</Text>
             <Text style={styles.body}>{t("donation.whyDonate.body")}</Text>
-            <Text style={styles.meta}>{t("donation.secureRedirect")}</Text>
           </GlassCard>
 
-          <Pressable
-            onPress={() => void openPayment()}
-            style={[styles.primaryCta, busy && styles.primaryCtaDisabled]}
-            disabled={busy}
-            accessibilityRole="button"
-            accessibilityLabel={t("donation.donateNow")}
-          >
-            {busy ? (
-              <ActivityIndicator color={colors.canvas} />
-            ) : (
-              <>
-                <Ionicons name="gift-outline" size={18} color={colors.canvas} />
-                <Text style={styles.primaryCtaText}>
-                  {t("donation.donateNow")} · {formattedAmount}
-                </Text>
-              </>
-            )}
-          </Pressable>
+          {__DEV__ && !iapAvailable ? (
+            <GlassCard style={styles.devCard}>
+              <Text style={styles.sectionTitle}>{t("donation.iap.devOnlyTitle")}</Text>
+              <Text style={styles.hint}>{t("donation.iap.devOnlyHint")}</Text>
+              {devBusy ? <ActivityIndicator color={colors.accent} /> : null}
+            </GlassCard>
+          ) : null}
         </>
-      ) : null}
-
-      {step === "confirm" ? (
-        <GlassCard style={styles.card}>
-          <Text style={styles.sectionTitle}>{t("donation.confirmTitle")}</Text>
-          <Text style={styles.body}>{t("donation.confirmBody", { amount: formattedAmount })}</Text>
-          <View style={styles.confirmActions}>
-            <Pressable
-              onPress={() => setStep("select")}
-              style={styles.secondaryBtn}
-              accessibilityRole="button"
-            >
-              <Text style={styles.secondaryBtnText}>{t("common.back")}</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => void confirmPayment()}
-              style={[styles.primaryCta, styles.confirmCta, busy && styles.primaryCtaDisabled]}
-              disabled={busy}
-              accessibilityRole="button"
-            >
-              {busy ? (
-                <ActivityIndicator color={colors.canvas} />
-              ) : (
-                <Text style={styles.primaryCtaText}>{t("donation.confirmPaid")}</Text>
-              )}
-            </Pressable>
-          </View>
-        </GlassCard>
       ) : null}
 
       {step === "thanks" ? (
@@ -275,9 +269,45 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 22,
   },
+  noticeCard: {
+    padding: spacing.md,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+    borderColor: "rgba(184,137,46,0.35)",
+    backgroundColor: "rgba(184,137,46,0.08)",
+  },
+  noticeText: {
+    ...typography.body,
+    color: colors.textSecondary,
+    flex: 1,
+    lineHeight: 22,
+  },
+  errorCard: {
+    padding: spacing.md,
+    gap: spacing.sm,
+    borderColor: colors.danger,
+    backgroundColor: "rgba(220,80,80,0.08)",
+  },
+  errorText: {
+    ...typography.body,
+    color: colors.textPrimary,
+    lineHeight: 22,
+  },
+  errorDismiss: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "600",
+  },
   card: {
     padding: spacing.md,
     gap: spacing.sm,
+  },
+  devCard: {
+    padding: spacing.md,
+    gap: spacing.sm,
+    borderColor: colors.glassBorder,
+    opacity: 0.85,
   },
   sectionTitle: {
     ...typography.subtitle,
@@ -305,16 +335,22 @@ const styles = StyleSheet.create({
   },
   amountButton: {
     borderWidth: 1,
-    borderColor: colors.glassBorder,
     borderRadius: radii.lg,
-    backgroundColor: colors.backgroundElevated,
     padding: spacing.md,
     gap: spacing.sm,
+    alignItems: "center",
+  },
+  amountButtonDisabled: {
+    opacity: 0.55,
   },
   amountValue: {
     ...typography.subtitle,
-    color: colors.textPrimary,
     fontWeight: "700",
+  },
+  tierCta: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontWeight: "600",
   },
   previewText: {
     ...typography.body,
@@ -332,36 +368,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
   },
-  primaryCtaDisabled: {
-    opacity: 0.7,
-  },
   primaryCtaText: {
     ...typography.body,
     color: colors.canvas,
     fontWeight: "700",
-  },
-  confirmActions: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  secondaryBtn: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    borderRadius: radii.md,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.backgroundElevated,
-  },
-  secondaryBtnText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    fontWeight: "600",
-  },
-  confirmCta: {
-    flex: 1.4,
   },
   thanksCard: {
     alignItems: "center",

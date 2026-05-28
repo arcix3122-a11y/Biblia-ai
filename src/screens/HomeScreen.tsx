@@ -36,6 +36,7 @@ import { getBookPhotoUrl, getCategoryPhotoUrl, HOME_TILE_PHOTOS } from "@/data/p
 import { formatShortDate } from "@/utils/formatDate";
 import { getUserStats } from "@/services/stats/userStats";
 import { ReminderFunnelPrompt } from "@/components/notifications/ReminderFunnelPrompt";
+import { SupportCard } from "@/components/dashboard/SupportCard";
 import { useReminderStore } from "@/store/reminderStore";
 import { colors, radii, spacing, typography } from "@/theme";
 
@@ -272,6 +273,8 @@ export default function HomeScreen() {
             setVotdRef(ref);
           }}
         />
+
+        <SupportCard />
 
         <GuidedReflectionCards
           verseText={votdText}

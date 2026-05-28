@@ -2223,6 +2223,13 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Validation: pending
 - Result: in-progress
 
+## 2026-05-28 17:18 (local)
+- Agent: Cursor subagent
+- Task: DONE - podziękowania za darowiznę PL/EN (copy + UI)
+- Changes: DonationScreen, SettingsScreen, shareDonation.ts, i18n en/pl, AGENT_WORKLOG
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1256 kl.)
+- Result: done — commit 7be7ada
+
 ## 2026-05-28 16:38 (local)
 - Agent: Codex
 - Task: START - naprawa faktycznego ekranu modlitwy i usunięcie SoundHelix
@@ -2243,3 +2250,17 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Changes: src/components/notifications/ReminderFunnelPrompt.tsx, src/i18n/locales/pl.json, src/i18n/locales/en.json, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass); npm run check:locales (pass, 1247 keys).
 - Result: done
+
+## 2026-05-28 17:00 (local)
+- Agent: Cursor subagent
+- Task: START - Google Play IAP darowizny + karta wsparcia na Home
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:05 (local)
+- Agent: Cursor subagent
+- Task: DONE - Google Play IAP darowizny + karta wsparcia na Home
+- Changes: react-native-iap, donationProducts, iapService, useDonationIap, DonationScreen, donorStore, SupportCard, HomeScreen, SettingsScreen dev reset, i18n, migration 006, app.json plugin
+- Validation: npm run typecheck (pass)
+- Result: done — commit pending
