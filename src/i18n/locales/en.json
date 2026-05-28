@@ -128,8 +128,9 @@
       "reflectionTitle": "Reflection",
       "reflectionSub": "Reflect on VOTD"
     },
-    "reminderFunnelTitle": "Stay on track tomorrow?",
-    "reminderFunnelBody": "Turn on a daily reminder so you don't miss your missions and streak.",
+    "reminderFunnelBadge": "Gentle rhythm for tomorrow",
+    "reminderFunnelTitle": "Want an easy restart tomorrow?",
+    "reminderFunnelBody": "Turn on one daily reminder. It takes a second and helps you keep your rhythm and streak.",
     "reminderFunnelEnable": "Enable reminders",
     "reminderFunnelLater": "Not now",
     "exploreHeading": "Explore",
@@ -1548,21 +1549,34 @@
     "rowTitle": "Donation",
     "rowHint": "Help keep Biblia AI free for everyone. Choose a one-time gift and unlock a supporter badge.",
     "title": "Support Biblia AI",
-    "subtitle": "Your gift helps us build Scripture tools for Polish and English readers.",
+    "subtitle": "Your gift helps us build Scripture tools for Polish and English readers — no ads, no paywall on the Word.",
     "chooseAmount": "Choose an amount",
     "chooseAmountHint": "Each tier unlocks a donor rank badge on your profile.",
     "amountPln": "{{amount}} PLN",
-    "impactCopy": "Gifts fund hosting, AI companion costs, and new devotional features.",
     "secureRedirect": "You will be redirected to a secure payment page.",
     "donateNow": "Give now",
     "confirmTitle": "Confirm your gift",
     "confirmBody": "If you completed payment for {{amount}}, confirm below to unlock your donor rank.",
     "confirmPaid": "I completed payment",
-    "thankYouTitle": "Thank you!",
-    "thankYouBody": "Your generosity keeps Biblia AI growing. May God bless your gift.",
-    "yourRank": "Your donor rank",
-    "done": "Done",
-    "totalDonated": "Total gifted: {{amount}} PLN"
+    "totalDonated": "Total gifted: {{amount}} PLN",
+    "whyDonate": {
+      "title": "Why give?",
+      "lead": "Biblia AI runs locally and stays free — gifts cover what you do not see on screen.",
+      "body": "Hosting, the spiritual companion, and time to grow features in Polish and English. Your gift helps others read Scripture and pray without a paywall."
+    },
+    "thankYou": {
+      "title": "Thank you, truly",
+      "body": "Your gift makes a real difference — it helps us keep the app, servers, and free access for those who cannot pay.",
+      "supporter": "You have joined our Supporters. Your generosity helps us keep Biblia AI alive every day — with gratitude.",
+      "patron": "As a Patron you give more than a gift — you give us room to grow guided prayer and tools for Scripture readers.",
+      "mecenas": "Benefactor is a trust we do not take lightly. Thanks to you we can plan what is next and keep access open for others.",
+      "yourRank": "Your donor rank",
+      "done": "Done",
+      "shareCta": "Share support",
+      "shareDialogTitle": "Share Biblia AI",
+      "shareMessage": "I support {{brand}} — Scripture, prayer, and a spiritual companion in Polish and English. If you would like to help keep the app free for others:\n\n{{link}}",
+      "settingsBanner": "Thank you — you are a {{tier}}"
+    }
   },
   "donorTier": {
     "supporter": "Supporter",

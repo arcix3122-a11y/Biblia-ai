@@ -15,6 +15,10 @@ import { useTranslation } from "react-i18next";
 import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
 import { GlassCard } from "@/components/GlassCard";
 import { DONATION_TIERS, type DonationTier } from "@/data/donationTiers";
+import {
+  donationThankYouTierKey,
+  shareDonationSupport,
+} from "@/services/share/shareDonation";
 import { useDonorStore } from "@/store/donorStore";
 import { colors, radii, spacing, typography } from "@/theme";
 
@@ -79,6 +83,21 @@ export default function DonationScreen() {
     }
   }, [recordDonation, selectedTier.amountPln]);
 
+  const shareSupport = useCallback(async () => {
+    try {
+      await shareDonationSupport();
+    } catch {
+      // share sheet dismissed
+    }
+  }, []);
+
+  const thanksTierMessage = useMemo(() => {
+    if (!awardedTier) {
+      return t("donation.thankYou.body");
+    }
+    return t(donationThankYouTierKey(awardedTier));
+  }, [awardedTier, t]);
+
   return (
     <ScrollView
       style={styles.container}
@@ -130,10 +149,9 @@ export default function DonationScreen() {
           </GlassCard>
 
           <GlassCard style={styles.card}>
-            <View style={styles.previewRow}>
-              <Ionicons name="heart-outline" size={20} color={colors.accent} />
-              <Text style={styles.previewText}>{t("donation.impactCopy")}</Text>
-            </View>
+            <Text style={styles.sectionTitle}>{t("donation.whyDonate.title")}</Text>
+            <Text style={styles.previewText}>{t("donation.whyDonate.lead")}</Text>
+            <Text style={styles.body}>{t("donation.whyDonate.body")}</Text>
             <Text style={styles.meta}>{t("donation.secureRedirect")}</Text>
           </GlassCard>
 
@@ -187,25 +205,37 @@ export default function DonationScreen() {
       ) : null}
 
       {step === "thanks" ? (
-        <GlassCard style={styles.card}>
+        <GlassCard style={[styles.card, styles.thanksCard]}>
           <View style={styles.thanksIconWrap}>
-            <Ionicons name="sparkles-outline" size={28} color={colors.accent} />
+            <Ionicons name="heart" size={28} color={colors.accent} />
           </View>
-          <Text style={styles.sectionTitle}>{t("donation.thankYouTitle")}</Text>
-          <Text style={styles.body}>{t("donation.thankYouBody")}</Text>
+          <Text style={styles.thanksTitle}>{t("donation.thankYou.title")}</Text>
+          <Text style={styles.thanksBody}>{thanksTierMessage}</Text>
+          <Text style={styles.thanksClosing}>{t("donation.thankYou.body")}</Text>
           {awardedTier ? (
             <View style={styles.thanksBadgeWrap}>
-              <Text style={styles.meta}>{t("donation.yourRank")}</Text>
+              <Text style={styles.meta}>{t("donation.thankYou.yourRank")}</Text>
               <DonorTierBadge tierId={awardedTier} />
             </View>
           ) : null}
-          <Pressable
-            onPress={() => router.back()}
-            style={[styles.primaryCta, styles.confirmCta]}
-            accessibilityRole="button"
-          >
-            <Text style={styles.primaryCtaText}>{t("donation.done")}</Text>
-          </Pressable>
+          <View style={styles.thanksActions}>
+            <Pressable
+              onPress={() => void shareSupport()}
+              style={styles.shareSupportBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t("donation.thankYou.shareCta")}
+            >
+              <Ionicons name="share-social-outline" size={18} color={colors.accent} />
+              <Text style={styles.shareSupportText}>{t("donation.thankYou.shareCta")}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => router.back()}
+              style={[styles.primaryCta, styles.thanksDoneCta]}
+              accessibilityRole="button"
+            >
+              <Text style={styles.primaryCtaText}>{t("donation.thankYou.done")}</Text>
+            </Pressable>
+          </View>
         </GlassCard>
       ) : null}
     </ScrollView>
@@ -286,11 +316,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontWeight: "700",
   },
-  previewRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
   previewText: {
     ...typography.body,
     color: colors.textSecondary,
@@ -338,20 +363,71 @@ const styles = StyleSheet.create({
   confirmCta: {
     flex: 1.4,
   },
+  thanksCard: {
+    alignItems: "center",
+    paddingVertical: spacing.lg,
+  },
   thanksIconWrap: {
-    width: 56,
-    height: 56,
+    width: 64,
+    height: 64,
     borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
-    backgroundColor: colors.backgroundElevated,
+    borderColor: "rgba(184,137,46,0.45)",
+    backgroundColor: "rgba(184,137,46,0.12)",
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
+    marginBottom: spacing.xs,
+  },
+  thanksTitle: {
+    ...typography.hero,
+    color: colors.textPrimary,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  thanksBody: {
+    ...typography.body,
+    color: colors.textPrimary,
+    lineHeight: 24,
+    textAlign: "center",
+  },
+  thanksClosing: {
+    ...typography.caption,
+    color: colors.textMuted,
+    lineHeight: 20,
+    textAlign: "center",
   },
   thanksBadgeWrap: {
     alignItems: "center",
     gap: spacing.sm,
     marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.glassBorder,
+    alignSelf: "stretch",
+  },
+  thanksActions: {
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    alignSelf: "stretch",
+  },
+  shareSupportBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    borderRadius: radii.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.backgroundElevated,
+  },
+  shareSupportText: {
+    ...typography.body,
+    color: colors.accent,
+    fontWeight: "600",
+  },
+  thanksDoneCta: {
+    alignSelf: "stretch",
   },
 });

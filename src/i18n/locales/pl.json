@@ -128,8 +128,9 @@
       "reflectionTitle": "Refleksja",
       "reflectionSub": "Refleksja nad wersetem dnia"
     },
-    "reminderFunnelTitle": "Utrzymaj rytm jutro?",
-    "reminderFunnelBody": "Włącz codzienne przypomnienie, aby nie przegapić misji i streaku.",
+    "reminderFunnelBadge": "Lekki rytm na jutro",
+    "reminderFunnelTitle": "Chcesz prosty restart jutro?",
+    "reminderFunnelBody": "Włącz jedno codzienne przypomnienie. To tylko chwila, a pomaga trzymać rytm i nie gubić streaku.",
     "reminderFunnelEnable": "Włącz przypomnienia",
     "reminderFunnelLater": "Nie teraz",
     "exploreHeading": "Odkryj",
@@ -1548,21 +1549,34 @@
     "rowTitle": "Darowizna",
     "rowHint": "Pomóż utrzymać Biblia AI bezpłatnie dla wszystkich. Wybierz jednorazowy datek i odblokuj odznakę wspierającego.",
     "title": "Wesprzyj Biblia AI",
-    "subtitle": "Twój datek pomaga rozwijać narzędzia do Pisma po polsku i po angielsku.",
+    "subtitle": "Twój datek pomaga rozwijać narzędzia do Pisma po polsku i po angielsku — bez reklam i bez paywalla na Słowo.",
     "chooseAmount": "Wybierz kwotę",
     "chooseAmountHint": "Każdy próg odblokowuje rangę darczyńcy na Twoim profilu.",
     "amountPln": "{{amount}} zł",
-    "impactCopy": "Datki finansują hosting, koszty asystenta AI i nowe funkcje duchowe.",
     "secureRedirect": "Przekierowanie do bezpiecznej płatności.",
     "donateNow": "Ofiaruj teraz",
     "confirmTitle": "Potwierdź datek",
     "confirmBody": "Jeśli ukończyłeś płatność {{amount}}, potwierdź poniżej, aby odblokować rangę darczyńcy.",
     "confirmPaid": "Zapłaciłem / zapłaciłam",
-    "thankYouTitle": "Dziękujemy!",
-    "thankYouBody": "Twoja hojność pomaga rozwijać Biblia AI. Niech Bóg błogosławi Twój datek.",
-    "yourRank": "Twoja ranga darczyńcy",
-    "done": "Gotowe",
-    "totalDonated": "Suma datków: {{amount}} zł"
+    "totalDonated": "Suma datków: {{amount}} zł",
+    "whyDonate": {
+      "title": "Po co darowizna?",
+      "lead": "Biblia AI działa lokalnie i jest darmowa — datki pokrywają to, czego nie widać na ekranie.",
+      "body": "Hosting, koszty towarzysza duchowego i czas na rozwój po polsku i po angielsku. Dzięki Tobie inni mogą czytać Pismo i modlić się bez opłat."
+    },
+    "thankYou": {
+      "title": "Dziękujemy z serca",
+      "body": "Twój datek naprawdę coś zmienia — pomaga nam utrzymać aplikację, serwery i dostęp dla tych, którzy nie mogą zapłacić.",
+      "supporter": "Dołączyłeś do grona Wspierających. Twoja hojność pomaga nam codziennie utrzymywać Biblia AI przy życiu — z wdzięcznością.",
+      "patron": "Jako Patron wnosisz więcej niż datek — dajesz nam oddech na rozwój modlitwy prowadzonej i narzędzi dla czytelników Pisma.",
+      "mecenas": "Ranga Mecenasa to zaufanie, którego nie traktujemy lekko. Dzięki Tobie możemy planować kolejne funkcje i utrzymać dostęp dla innych.",
+      "yourRank": "Twoja ranga darczyńcy",
+      "done": "Gotowe",
+      "shareCta": "Poleć wsparcie",
+      "shareDialogTitle": "Podziel się Biblia AI",
+      "shareMessage": "Wspieram {{brand}} — Pismo, modlitwa i towarzysz duchowy po polsku i po angielsku. Jeśli chcesz pomóc utrzymać aplikację dla innych:\n\n{{link}}",
+      "settingsBanner": "Dziękujemy — jesteś {{tier}}"
+    }
   },
   "donorTier": {
     "supporter": "Wspierający",

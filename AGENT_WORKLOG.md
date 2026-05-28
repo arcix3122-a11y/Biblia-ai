@@ -2202,9 +2202,23 @@ npx expo start
 - Validation: ubito procesy Expo/Metro na portach 8081/8082/19000/19001/19002; 
 px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.168.101.30:8082.
 - Result: done
+## 2026-05-28 16:45 (local)
+- Agent: Cursor subagent
+- Task: DONE - mechanika darowizn 10/30/50 PLN z rangami Wspierający/Patron/Mecenas
+- Changes: src/data/donationTiers.ts, src/store/donorStore.ts, src/services/donation/donationRepository.ts, src/screens/DonationScreen.tsx, src/components/donation/DonorTierBadge.tsx, app/donate.tsx, SettingsScreen, i18n en/pl, supabase/migrations/005_donations.sql, expo-web-browser
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1246 kl.), Supabase migration donations applied on txwksirnvzoifcdpniby
+- Result: done — commit 7bac1cb
+
 ## 2026-05-28 16:41 (local)
 - Agent: Cursor subagent
 - Task: START - mechanika darowizn 10/30/50 PLN z rangami Wspierający/Patron/Mecenas
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:10 (local)
+- Agent: Cursor subagent
+- Task: START - podziękowania za darowiznę PL/EN (copy + UI)
 - Changes: pending
 - Validation: pending
 - Result: in-progress
@@ -2215,3 +2229,17 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-28 16:40 (local)
+- Agent: Codex
+- Task: DONE - naprawa faktycznego ekranu modlitwy i usunięcie SoundHelix
+- Changes: src/screens/GuidedPrayerScreen.tsx, assets/guided-prayer/*, assets/audio/prayer-ambient-loop.wav, AGENT_WORKLOG.md
+- Validation: rg SoundHelix/Song-3/AUDIO_STREAM_URL (removed from GuidedPrayerScreen), npm run check:locales (pass), npm run typecheck (pass), npx expo start --clear --host lan --port 8081 (running)
+- Result: done
+
+## 2026-05-28 16:46
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - redesign popup reminder: ladniejszy i prostszy UX + podobny ton copy.
+- Changes: src/components/notifications/ReminderFunnelPrompt.tsx, src/i18n/locales/pl.json, src/i18n/locales/en.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass); npm run check:locales (pass, 1247 keys).
+- Result: done

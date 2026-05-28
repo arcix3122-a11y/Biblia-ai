@@ -225,12 +225,22 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>{t("donation.rowTitle")}</Text>
         <Text style={styles.hint}>{t("donation.rowHint")}</Text>
         {donorTier ? (
-          <View style={styles.donorSummary}>
-            <DonorTierBadge tierId={donorTier} />
-            <Text style={styles.meta}>
-              {t("donation.totalDonated", { amount: totalDonatedPln })}
-            </Text>
-          </View>
+          <>
+            <View style={styles.donorThankBanner}>
+              <Ionicons name="heart" size={16} color={colors.accent} />
+              <Text style={styles.donorThankBannerText}>
+                {t("donation.thankYou.settingsBanner", {
+                  tier: t(`donorTier.${donorTier}`),
+                })}
+              </Text>
+            </View>
+            <View style={styles.donorSummary}>
+              <DonorTierBadge tierId={donorTier} />
+              <Text style={styles.meta}>
+                {t("donation.totalDonated", { amount: totalDonatedPln })}
+              </Text>
+            </View>
+          </>
         ) : null}
         <Pressable
           onPress={() => router.push("/donate")}
@@ -820,6 +830,25 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.danger,
     fontWeight: "600",
+  },
+  donorThankBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: "rgba(184,137,46,0.35)",
+    backgroundColor: "rgba(184,137,46,0.1)",
+  },
+  donorThankBannerText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "600",
+    flex: 1,
+    lineHeight: 18,
   },
   donorSummary: {
     alignItems: "flex-start",
