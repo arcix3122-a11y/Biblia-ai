@@ -12,8 +12,10 @@ import { useLocaleStore } from "@/store/localeStore";
 import { ChapterTile } from "@/components/ChapterTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { LoadingState } from "@/components/layout/LoadingState";
+import { PhotoBackground } from "@/components/PhotoBackground";
+import { getBookPhotoUrl } from "@/data/photoBackgrounds";
 import { useBook, useChapters, useDatabaseReady } from "@/hooks/useScripture";
-import { colors, spacing, typography } from "@/theme";
+import { colors, radii, spacing, typography } from "@/theme";
 
 const CHAPTER_TILE_SIZE = 64 + spacing.xs * 2;
 
@@ -69,9 +71,17 @@ export default function BookChaptersRoute() {
         options={{ title: getBookDisplayName(book.slug, locale, book.name) }}
       />
       <View style={styles.container}>
-        <Text style={styles.subtitle}>
-          {t("book.chaptersAvailable", { count: chapters.length })}
-        </Text>
+        <PhotoBackground
+          uri={getBookPhotoUrl(book.slug, 900, 220)}
+          style={styles.header}
+          borderRadius={radii.lg}
+          scrimOpacity={0.55}
+        >
+          <Text style={styles.title}>{getBookDisplayName(book.slug, locale, book.name)}</Text>
+          <Text style={styles.subtitle}>
+            {t("book.chaptersAvailable", { count: chapters.length })}
+          </Text>
+        </PhotoBackground>
         <FlatList
           data={chapters}
           keyExtractor={(item) => String(item.id)}
@@ -105,10 +115,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  header: {
+    marginBottom: spacing.md,
+    padding: spacing.md,
+    minHeight: 96,
+    justifyContent: "flex-end",
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  title: {
+    ...typography.title,
+    color: colors.textPrimary,
+  },
   subtitle: {
     ...typography.caption,
-    color: colors.textMuted,
-    marginBottom: spacing.md,
+    color: "rgba(255,255,255,0.78)",
+    marginTop: spacing.xs,
   },
   grid: {
     paddingBottom: spacing.xl,

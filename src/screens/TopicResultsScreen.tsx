@@ -13,9 +13,11 @@ import { formatBookReference } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
 import { getTopicBySlug } from "@/data/semanticTopics";
+import { getTopicPhotoUrl } from "@/data/photoBackgrounds";
+import { PhotoBackground } from "@/components/PhotoBackground";
 import { useLocalizedTopic } from "@/hooks/useLocalizedTopic";
 import { searchTopicVerses } from "@/services/db/semanticSearch";
-import { colors, spacing, typography } from "@/theme";
+import { colors, radii, spacing, typography } from "@/theme";
 import type { VerseWithReference } from "@/types/scripture";
 
 export default function TopicResultsScreen() {
@@ -51,7 +53,15 @@ export default function TopicResultsScreen() {
       <Stack.Screen options={{ title: topic?.title ?? t("stack.topic") }} />
 
       {topic ? (
-        <Text style={styles.description}>{topic.description}</Text>
+        <PhotoBackground
+          uri={getTopicPhotoUrl(topicSlug, 900, 200)}
+          style={styles.hero}
+          borderRadius={radii.lg}
+          scrimOpacity={0.54}
+        >
+          <Text style={styles.heroTitle}>{topic.title}</Text>
+          <Text style={styles.description}>{topic.description}</Text>
+        </PhotoBackground>
       ) : (
         <Text style={styles.description}>{t("topic.notFound")}</Text>
       )}
@@ -97,8 +107,20 @@ const styles = StyleSheet.create({
   },
   description: {
     ...typography.body,
-    color: colors.textSecondary,
+    color: "rgba(255,255,255,0.82)",
+  },
+  hero: {
     marginBottom: spacing.md,
+    padding: spacing.md,
+    minHeight: 112,
+    justifyContent: "flex-end",
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  heroTitle: {
+    ...typography.title,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
   list: {
     paddingBottom: spacing.xxl,

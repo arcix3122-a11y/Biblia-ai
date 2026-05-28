@@ -1,6 +1,8 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { PhotoBackground } from "@/components/PhotoBackground";
+import { getTopicPhotoUrl } from "@/data/photoBackgrounds";
 import { SEMANTIC_TOPICS } from "@/data/semanticTopics";
 import { colors, radii, spacing, typography } from "@/theme";
 import type { TopicGridProps } from "@/types/ui";
@@ -18,6 +20,12 @@ export function TopicGrid({ onTopicPress }: TopicGridProps) {
             onPress={() => onTopicPress(topic.slug)}
             style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
           >
+            <PhotoBackground
+              uri={getTopicPhotoUrl(topic.slug, 480, 320)}
+              style={StyleSheet.absoluteFill}
+              borderRadius={radii.lg}
+              scrimOpacity={0.56}
+            />
             <Text style={styles.title}>
               {t(`topics.${topic.slug}.title`, { defaultValue: topic.title })}
             </Text>
@@ -47,24 +55,26 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "48%",
-    backgroundColor: colors.tile,
     borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: colors.glassBorder,
     padding: spacing.md,
-    minHeight: 96,
+    minHeight: 104,
+    overflow: "hidden",
+    justifyContent: "flex-end",
   },
   cardPressed: {
     borderColor: colors.accent,
-    backgroundColor: colors.cardHover,
+    opacity: 0.92,
   },
   title: {
     ...typography.subtitle,
     color: colors.textPrimary,
+    fontWeight: "700",
     marginBottom: spacing.xs,
   },
   description: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.78)",
   },
 });

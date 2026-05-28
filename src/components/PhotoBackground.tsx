@@ -77,8 +77,8 @@ export function PhotoBackground({
         source={{ uri }}
         style={[StyleSheet.absoluteFill, { borderRadius }, imageStyle]}
         contentFit="cover"
-        cachePolicy="memory-disk"
-        transition={200}
+        cachePolicy="disk"
+        transition={180}
         onError={() => setFailed(true)}
       />
       {scrim}

@@ -1,6 +1,8 @@
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 import { useTranslation } from "react-i18next";
+import { PhotoBackground } from "@/components/PhotoBackground";
+import { getBookPhotoUrl } from "@/data/photoBackgrounds";
 import { getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
 import { colors, radii, spacing, typography } from "@/theme";
@@ -15,6 +17,7 @@ function BookTileComponent({ book, onPress }: BookTileProps) {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
   const displayName = getBookDisplayName(book.slug, locale, book.name);
+  const photoUrl = getBookPhotoUrl(book.slug, 420, 260);
 
   return (
     <Pressable
@@ -23,6 +26,12 @@ function BookTileComponent({ book, onPress }: BookTileProps) {
       accessibilityRole="button"
       accessibilityLabel={t("book.openBook", { name: displayName })}
     >
+      <PhotoBackground
+        uri={photoUrl}
+        style={StyleSheet.absoluteFill}
+        borderRadius={radii.lg}
+        scrimOpacity={0.58}
+      />
       <Text style={styles.name} numberOfLines={2}>
         {displayName}
       </Text>
@@ -37,27 +46,27 @@ const styles = StyleSheet.create({
   tile: {
     flex: 1,
     minWidth: "45%",
-    backgroundColor: colors.tile,
     borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: colors.glassBorder,
     padding: spacing.md,
     margin: spacing.xs,
-    minHeight: 88,
+    minHeight: 96,
     justifyContent: "space-between",
+    overflow: "hidden",
   },
   pressed: {
-    backgroundColor: colors.cardHover,
     borderColor: colors.accentMuted,
     opacity: 0.92,
   },
   name: {
     ...typography.subtitle,
     color: colors.textPrimary,
+    fontWeight: "700",
   },
   meta: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.78)",
     marginTop: spacing.sm,
   },
 });

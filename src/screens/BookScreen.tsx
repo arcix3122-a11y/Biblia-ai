@@ -12,10 +12,11 @@ import { getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
 import { ChapterTile } from "@/components/ChapterTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
-import { GlassChrome } from "@/components/GlassChrome";
 import { LoadingState } from "@/components/layout/LoadingState";
+import { PhotoBackground } from "@/components/PhotoBackground";
+import { getBookPhotoUrl } from "@/data/photoBackgrounds";
 import { useBook, useChapters, useDatabaseReady } from "@/hooks/useScripture";
-import { colors, spacing, typography } from "@/theme";
+import { colors, radii, spacing, typography } from "@/theme";
 
 const CHAPTER_TILE_SIZE = 64 + spacing.xs * 2;
 
@@ -69,10 +70,15 @@ export default function BookScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <GlassChrome style={styles.header}>
+      <PhotoBackground
+        uri={getBookPhotoUrl(book.slug, 900, 220)}
+        style={styles.header}
+        borderRadius={radii.lg}
+        scrimOpacity={0.55}
+      >
         <Text style={styles.title}>{getBookDisplayName(book.slug, locale, book.name)}</Text>
         <Text style={styles.meta}>{t("book.chaptersAvailable", { count: chapters.length })}</Text>
-      </GlassChrome>
+      </PhotoBackground>
 
       <FlatList
         data={chapters}
@@ -106,8 +112,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   header: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+    minHeight: 96,
+    justifyContent: "flex-end",
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
   },
   title: {
     ...typography.title,
@@ -115,7 +127,7 @@ const styles = StyleSheet.create({
   },
   meta: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: "rgba(255,255,255,0.78)",
     marginTop: spacing.xs,
   },
   list: {
