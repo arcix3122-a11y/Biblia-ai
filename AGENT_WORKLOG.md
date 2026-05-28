@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 19:00 | Cursor subagent | Stabilizacja buildu — typecheck green | *(ten commit)* | done | haptics, ui types, brakujące moduły AI/TTS |
 | 2026-05-28 16:15 | Cursor subagent | Reader — mapowanie zdjęć ksiąg | `7e68fe2` | done | photoUrl z getBookPhotoUrl jak BookTile |
 | 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | `ee709c0` | done | Photo hero + sticky bar; getBookPhotoUrl |
 | 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `1d09f77` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
@@ -2139,3 +2140,17 @@ npx expo start
 - Changes: src/data/photoBackgrounds.ts, src/components/PhotoBackground.tsx, src/components/BookTile.tsx, src/components/topics/TopicGrid.tsx, app/book/[bookSlug].tsx, src/screens/BookScreen.tsx, src/screens/HomeScreen.tsx, src/screens/TopicResultsScreen.tsx, AGENT_WORKLOG.md
 - Validation: npm run check:locales (pass), typecheck on changed files (pass); repo-wide typecheck blocked by pre-existing GuidedPrayerScreen.tsx errors
 - Result: done
+
+## 2026-05-28 19:00 (local)
+- Agent: Cursor subagent
+- Task: START - Stabilizacja buildu (typecheck + locale parity)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 19:05 (local)
+- Agent: Cursor subagent
+- Task: DONE - Stabilizacja buildu (typecheck + locale parity)
+- Changes: src/utils/haptics.ts, src/types/ui.ts, src/components/ai/AnimatedSacredBackdrop.tsx, src/hooks/useChapterTTS.ts, src/data/spiritualFirstAidKit.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1223 kl.)
+- Result: done — commit fix: restore typecheck green

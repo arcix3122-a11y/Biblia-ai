@@ -33,3 +33,25 @@ export async function hapticSuccess(): Promise<void> {
     // Haptics unavailable on this device
   }
 }
+
+export async function hapticMedium(): Promise<void> {
+  if (Platform.OS === "web") {
+    return;
+  }
+  try {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  } catch {
+    // Haptics unavailable on this device
+  }
+}
+
+export async function hapticError(): Promise<void> {
+  if (Platform.OS === "web") {
+    return;
+  }
+  try {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  } catch {
+    // Haptics unavailable on this device
+  }
+}

@@ -35,6 +35,8 @@ export interface ContextPillsProps {
 export type ContextPillTemplateId =
   | "historical"
   | "application"
+  | "prayer"
+  | "hope"
   | "original-language";
 
 export interface MomentumDashboardProps {
