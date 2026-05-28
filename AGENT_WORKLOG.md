@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `c58ccc7` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
 | 2026-05-28 17:05 | Cursor subagent | AI smoke harness (`npm run ai:smoke`) — wykrywanie powtarzalnych odpowiedzi LLM | *(ten commit)* | done | Pomija bez klucza; 5 promptów, overlap Jaccard |
 | 2026-05-28 16:30 | Cursor subagent | P0 retencja: DailyMissionHub + multi-streak + Home loop | *(ten commit)* | done | Audyt konkurencji P0 — wpięte na Home |
 | 2026-05-28 14:00 | Cursor subagent | Audyt konkurencji UX (YouVersion/Glorify/Hallow) — plan P0/P1/P2 | — | done | Bez kodu; sekcja „Audyt konkurencji” poniżej |
@@ -2027,6 +2028,23 @@ npx expo start
 - Validation: `npm run ai:smoke` (pass with local key; skip path when EXPO_PUBLIC_AI_API_KEY unset)
 - Result: done — imports `callLiveChatCompletion` from `llmClient.ts`; 5 varied prompts; fails on identical or ≥85% token overlap
 
+## 2026-05-28 18:30 (local)
+- Agent: Cursor subagent
+- Task: START - E2E AI: live Groq z historią czatu (koniec powtarzalnych szablonów)
+- Cel: Naprawa runtime — żądanie live gdy klucz OK; payload `messages` z historią + bieżącą wiadomością; fallback tylko po błędzie.
+- Zakres: `useSpiritualAssistant.ts`, `llmClient.ts`, `AiChatScreen.tsx`, `aiChatStore.ts`
+- Walidacja: `npm run typecheck`, `npm run ai:smoke`
+- Result: in-progress
+
+## 2026-05-28 18:35 (local)
+- Agent: Cursor subagent
+- Task: DONE - E2E AI: live Groq z historią czatu (koniec powtarzalnych szablonów)
+- Przyczyna: `addUserMessage` ustawiał `source: "system"`, a `buildConversationHistory` odfiltrowywał wszystkie wiadomości użytkownika — model dostawał pustą historię i odpowiadał generycznie / offline szablonem po błędzie.
+- Zmiany: `aiChatStore.ts` (user bez source system), `useSpiritualAssistant.ts` (historia + LIVE_GROQ/OFFLINE_MOCK, max_tokens 512), `AiChatScreen.tsx` (dev pill), `llmClient.ts` (domyślne 512 tokenów).
+- Walidacja: `npm run typecheck` OK; `npm run ai:smoke` OK (5/5 distinct).
+- Weryfikacja na telefonie: Expo Go → Asystent → wyślij 2 różne pytania; w __DEV__ pod trybem widać `LIVE_GROQ` (bez błędu). Po celowym złym kluczu: `OFFLINE_MOCK` + komunikat błędu.
+- Result: done — commit `c58ccc7` (`fix(ai): stop canned replies; use live Groq with history`)
+
 ## 2026-05-28 17:30 (local)
 - Agent: Cursor subagent
 - Task: START - Naprawa jakości czatu Groq
@@ -2039,4 +2057,4 @@ npx expo start
 - Task: DONE - Naprawa jakości czatu Groq
 - Changes: llmClient.ts, useSpiritualAssistant.ts, spiritualFirstAidKit.ts, scripts/test-groq-chat.mjs, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass), node scripts/test-groq-chat.mjs (pass)
-- Result: done — commit pending
+- Result: done — commit 473441d

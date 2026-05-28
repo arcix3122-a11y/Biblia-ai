@@ -59,7 +59,11 @@ export default function AiChatScreen() {
     assistantMode,
     modeLabel,
     modeReason,
+    lastResponseMode,
+    lastLlmError,
   } = useSpiritualAssistant();
+
+  const showDevLlmDebug = __DEV__;
 
   const quickPrompts = useMemo(() => getAssistantQuickPrompts(), []);
   const hasUserMessages = messages.some((message) => message.role === "user");
@@ -225,6 +229,15 @@ export default function AiChatScreen() {
                 </View>
 
                 <Text style={styles.modeHint}>{modeReason}</Text>
+
+                {showDevLlmDebug && lastResponseMode ? (
+                  <View style={styles.devLlmDebug}>
+                    <Text style={styles.devLlmDebugLabel}>
+                      {lastResponseMode}
+                      {lastLlmError ? ` · ${lastLlmError}` : ""}
+                    </Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.guardrailCard}>
                   <View style={styles.guardrailIcon}>
@@ -458,6 +471,19 @@ const styles = StyleSheet.create({
   modeHint: {
     ...typography.caption,
     color: colors.textMuted,
+  },
+  devLlmDebug: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.md,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(229,169,60,0.2)",
+  },
+  devLlmDebugLabel: {
+    ...typography.caption,
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace", default: "monospace" }),
+    color: colors.accent,
   },
   guardrailCard: {
     flexDirection: "row",
