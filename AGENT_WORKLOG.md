@@ -2006,6 +2006,13 @@ npx expo start
 - Validation: pending
 - Result: in-progress
 
+## 2026-05-28 (local)
+- Agent: Composer
+- Task: DONE - AI live/offline mode indicator and retry UX
+- Changes: AiModePill.tsx, useSpiritualAssistant.ts, AiChatScreen.tsx, en.json, pl.json
+- Validation: npm run typecheck (pass)
+- Result: done — commit 2127a7d
+
 ## 2026-05-28 17:05 (local)
 - Agent: Cursor subagent
 - Task: START - Local AI smoke harness (repetitive reply detection)
@@ -2019,3 +2026,17 @@ npx expo start
 - Changes: scripts/ai-smoke-test.mjs, package.json, AGENT_WORKLOG.md
 - Validation: `npm run ai:smoke` (pass with local key; skip path when EXPO_PUBLIC_AI_API_KEY unset)
 - Result: done — imports `callLiveChatCompletion` from `llmClient.ts`; 5 varied prompts; fails on identical or ≥85% token overlap
+
+## 2026-05-28 17:30 (local)
+- Agent: Cursor subagent
+- Task: START - Naprawa jakości czatu Groq
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:45 (local)
+- Agent: Cursor subagent
+- Task: DONE - Naprawa jakości czatu Groq
+- Changes: llmClient.ts, useSpiritualAssistant.ts, spiritualFirstAidKit.ts, scripts/test-groq-chat.mjs, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), node scripts/test-groq-chat.mjs (pass)
+- Result: done — commit pending

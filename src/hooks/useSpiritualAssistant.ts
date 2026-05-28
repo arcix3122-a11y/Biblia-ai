@@ -20,6 +20,51 @@ import type { ContextPillTemplateId } from "@/types/ui";
 import { generateSpiritualFirstAidKit } from "@/services/ai/spiritualFirstAidKit";
 
 export type AssistantMode = "live" | "offline" | "fallback";
+export type AssistantResponseMode = "LIVE_GROQ" | "OFFLINE_MOCK";
+
+const ASSISTANT_CHAT_OPTIONS = {
+  maxTokens: 512,
+  temperature: 0.7,
+  topP: 0.9,
+} as const;
+
+function isDevEnvironment(): boolean {
+  return typeof __DEV__ !== "undefined" && __DEV__;
+}
+
+function buildConversationHistory(
+  messages: Array<{ role: string; content: string; source?: string }>
+): Array<{ role: "user" | "assistant"; content: string }> {
+  return messages
+    .filter((message) => {
+      if (message.role === "user") {
+        return true;
+      }
+      return message.role === "assistant" && message.source !== "system";
+    })
+    .slice(-20)
+    .map((message) => ({
+      role: message.role as "user" | "assistant",
+      content: message.content,
+    }));
+}
+
+function ensureCurrentUserTurn(
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+  currentUserText: string
+): Array<{ role: "user" | "assistant"; content: string }> {
+  const trimmed = currentUserText.trim();
+  if (!trimmed) {
+    return history;
+  }
+
+  const last = history[history.length - 1];
+  if (last?.role === "user" && last.content === trimmed) {
+    return history;
+  }
+
+  return [...history, { role: "user", content: trimmed }];
+}
 
 async function callLiveAssistant(
   history: Array<{ role: "user" | "assistant"; content: string }>,
@@ -31,13 +76,12 @@ async function callLiveAssistant(
     ...history.map((item) => ({ role: item.role, content: item.content })),
   ];
 
-  return callLiveChatCompletion(messages);
+  return callLiveChatCompletion(messages, ASSISTANT_CHAT_OPTIONS);
 }
 
 export function useSpiritualAssistant() {
   const { t, locale } = useAppTranslation();
   const {
-    messages: chatMessages,
     addUserMessage,
     addAssistantMessage,
     consumeMessageQuota,
@@ -50,6 +94,10 @@ export function useSpiritualAssistant() {
   const [isThinking, setIsThinking] = useState(false);
   const [connectionWarning, setConnectionWarning] = useState<string | null>(null);
   const [lastInput, setLastInput] = useState<string | null>(null);
+  const [lastResponseMode, setLastResponseMode] = useState<AssistantResponseMode | null>(
+    null
+  );
+  const [lastLlmError, setLastLlmError] = useState<string | null>(null);
 
   useEffect(() => {
     syncDailyQuota();
@@ -69,24 +117,26 @@ export function useSpiritualAssistant() {
       }
 
       setConnectionWarning(null);
+      setLastLlmError(null);
       addUserMessage(trimmed);
       setIsThinking(true);
 
-      const history = chatMessages
-        .filter((message) => message.role === "user" || message.role === "assistant")
-        .slice(-20)
-        .map((message) => ({
-          role: message.role as "user" | "assistant",
-          content: message.content,
-        }));
-      history.push({ role: "user", content: trimmed });
+      const history = ensureCurrentUserTurn(
+        buildConversationHistory(useAiChatStore.getState().messages),
+        trimmed
+      );
 
       const useLiveApi = hasLlmApiKey();
 
       try {
         let reply = "";
+        let replySource: "live" | "offline" = "offline";
+
         if (useLiveApi) {
           reply = await callLiveAssistant(history, verse, locale);
+          replySource = "live";
+          setLastResponseMode("LIVE_GROQ");
+          setLastLlmError(null);
         } else {
           const firstAid = await generateSpiritualFirstAidKit(trimmed, {
             locale,
@@ -94,35 +144,41 @@ export function useSpiritualAssistant() {
             verse,
           });
           reply = firstAid.commentary;
+          replySource = firstAid.usedLiveApi ? "live" : "offline";
+          setLastResponseMode(firstAid.usedLiveApi ? "LIVE_GROQ" : "OFFLINE_MOCK");
+          setLastLlmError(null);
         }
 
-        addAssistantMessage(reply, useLiveApi ? "live" : "offline");
-        if (useLiveApi) {
-          consumeMessageQuota();
-        }
+        addAssistantMessage(reply, replySource);
+        consumeMessageQuota();
         setLastInput(null);
         return true;
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        setLastLlmError(errorMessage);
+        setLastResponseMode("OFFLINE_MOCK");
+
         logError(error, "spiritual-assistant-live", {
           hasApiKey: useLiveApi,
           provider: resolveLlmProvider(),
           hasVerseContext: Boolean(verse),
           locale,
+          llmDebug: getLastLlmDebugInfo(),
         });
 
-        let fallback = "";
-        try {
-          const firstAid = await generateSpiritualFirstAidKit(trimmed, {
-            locale,
-            translation: locale,
-            verse,
+        if (isDevEnvironment()) {
+          console.warn("[spiritual-assistant] live request failed, using offline fallback", {
+            provider: resolveLlmProvider(),
+            llmDebug: getLastLlmDebugInfo(),
+            error: errorMessage,
           });
-          fallback = firstAid.commentary;
-        } catch {
-          fallback = buildOfflineCompanionReply(trimmed, verse);
         }
 
+        const fallback = buildOfflineCompanionReply(trimmed, verse);
+
         addAssistantMessage(fallback, "offline");
+        consumeMessageQuota();
 
         if (useLiveApi) {
           setConnectionWarning(t("ai.connectionFallback"));
@@ -138,7 +194,6 @@ export function useSpiritualAssistant() {
       addAssistantMessage,
       addUserMessage,
       canSend,
-      chatMessages,
       consumeMessageQuota,
       locale,
       syncDailyQuota,
@@ -221,5 +276,7 @@ export function useSpiritualAssistant() {
     connectionWarning,
     clearConnectionWarning,
     lastInput,
+    lastResponseMode,
+    lastLlmError,
   };
 }
