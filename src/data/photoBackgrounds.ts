@@ -28,6 +28,7 @@ export type PhotoCategoryKey =
   | "discoverCompanion"
   | "guidedMeditation"
   | "guidedSilence"
+  | "dailyPractice"
   | AffirmationCategory;
 
 const PHOTO_SEEDS: Record<PhotoCategoryKey, string> = {
@@ -41,6 +42,7 @@ const PHOTO_SEEDS: Record<PhotoCategoryKey, string> = {
   discoverCompanion: "biblia-discover-companion",
   guidedMeditation: "biblia-meditation-calm",
   guidedSilence: "biblia-silence-mist",
+  dailyPractice: "biblia-daily-practice",
   identity: "affirm-identity",
   peace: "affirm-peace",
   strength: "affirm-strength",

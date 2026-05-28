@@ -18,6 +18,8 @@ import { BookTile } from "@/components/BookTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
 import { HeroCard } from "@/components/dashboard/HeroCard";
+import { DailyPracticeCard } from "@/components/dashboard/DailyPracticeCard";
+import { GuidedReflectionCards } from "@/components/dashboard/GuidedReflectionCards";
 import { LoadingState } from "@/components/layout/LoadingState";
 import { VotdFeedCard } from "@/components/dashboard/VotdFeedCard";
 import { TopicGrid } from "@/components/topics/TopicGrid";
@@ -33,7 +35,7 @@ import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
 import { getDeviceLocale } from "@/i18n";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
-import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
+import { getCategoryPhotoUrl, HOME_TILE_PHOTOS } from "@/data/photoBackgrounds";
 import { HighlightedText } from "@/utils/highlightText";
 import { formatShortDate } from "@/utils/formatDate";
 import { colors, radii, spacing, typography } from "@/theme";
@@ -57,6 +59,13 @@ function dedupeRecent<T extends { book_slug?: string; chapter: number }>(
   return result;
 }
 
+function getGreetingKey(): "viralFeed.greetingMorning" | "viralFeed.greetingAfternoon" | "viralFeed.greetingEvening" {
+  const hour = new Date().getHours();
+  if (hour < 12) return "viralFeed.greetingMorning";
+  if (hour < 17) return "viralFeed.greetingAfternoon";
+  return "viralFeed.greetingEvening";
+}
+
 export default function HomeScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -77,8 +86,8 @@ export default function HomeScreen() {
   const bookmarks = useBookmarksStore((s) => s.bookmarks);
   const loadBookmarks = useBookmarksStore((s) => s.loadBookmarks);
   const [refreshing, setRefreshing] = useState(false);
-  const [, setVotdText] = useState("");
-  const [, setVotdRef] = useState("");
+  const [votdText, setVotdText] = useState("");
+  const [votdRef, setVotdRef] = useState("");
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -214,6 +223,7 @@ export default function HomeScreen() {
     : t("home.welcomeSubtitle");
   const heroCta = hasContinue ? t("home.continueReading") : t("home.readNow");
   const heroEyebrow = hasContinue ? t("home.continueReading") : t("common.appName");
+  const greetingKey = getGreetingKey();
 
   return (
     <View style={styles.container}>
@@ -232,6 +242,7 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <View style={styles.headerCopy}>
+            <Text style={styles.greeting}>{t(greetingKey)}</Text>
             <Text style={styles.brand}>{t("common.appName")}</Text>
           </View>
           <Pressable
@@ -244,6 +255,8 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
+        <Text style={styles.sectionHeading}>{t("home.todaySection")}</Text>
+
         <HeroCard
           eyebrow={heroEyebrow}
           title={heroTitle}
@@ -253,6 +266,8 @@ export default function HomeScreen() {
           onPress={startReading}
         />
 
+        <DailyPracticeCard />
+
         <VotdFeedCard
           onVerse={(text, ref) => {
             setVotdText(text);
@@ -260,21 +275,32 @@ export default function HomeScreen() {
           }}
         />
 
+        <GuidedReflectionCards verseText={votdText} verseReference={votdRef} />
+
         <Text style={styles.sectionHeading}>{t("home.exploreHeading")}</Text>
+        <ActionTile
+          icon="grid-outline"
+          title={t("devotionals.hubTileTitle")}
+          subtitle={t("devotionals.hubTileSub")}
+          badge={t("common.new")}
+          layout="horizontal"
+          imageUrl={getCategoryPhotoUrl("guidedSilence", 600, 400)}
+          onPress={() => router.push("/devotional-hub")}
+        />
         <View style={styles.tileRow}>
           <ActionTile
             icon="musical-notes-outline"
             title={t("affirmations.homeTileTitle")}
             subtitle={t("affirmations.homeTileSub")}
             badge={t("common.new")}
-            imageUrl={getCategoryPhotoUrl("discoverAffirmations", 600, 600)}
+            imageUrl={HOME_TILE_PHOTOS.affirmations}
             onPress={() => router.push("/affirmations")}
           />
           <ActionTile
             icon="sparkles-outline"
             title={t("home.tileCompanion")}
             subtitle={t("home.tileCompanionSub")}
-            imageUrl={getCategoryPhotoUrl("discoverCompanion", 600, 600)}
+            imageUrl={HOME_TILE_PHOTOS.companion}
             onPress={() => router.push("/(tabs)/ai")}
           />
         </View>
@@ -283,14 +309,14 @@ export default function HomeScreen() {
             icon="calendar-outline"
             title={t("home.tilePlan")}
             subtitle={t("home.tilePlanSub")}
-            imageUrl={getCategoryPhotoUrl("readingPlan", 600, 600)}
+            imageUrl={HOME_TILE_PHOTOS.plan}
             onPress={() => router.push("/reading-plan")}
           />
           <ActionTile
             icon="heart-outline"
             title={t("home.tilePrayer")}
             subtitle={t("home.tilePrayerSub")}
-            imageUrl={getCategoryPhotoUrl("guidedPrayer", 600, 600)}
+            imageUrl={HOME_TILE_PHOTOS.prayer}
             onPress={() => router.push("/guided-prayer")}
           />
         </View>
@@ -560,6 +586,11 @@ const styles = StyleSheet.create({
   },
   headerCopy: {
     flex: 1,
+  },
+  greeting: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginBottom: 2,
   },
   brand: {
     ...typography.label,

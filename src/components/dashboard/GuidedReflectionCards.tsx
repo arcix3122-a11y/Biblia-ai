@@ -51,7 +51,7 @@ export function GuidedReflectionCards({ verseText, verseReference }: Props) {
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.sectionLabel}>{t("viralFeed.guidedSection")}</Text>
+      <Text style={styles.sectionLabel}>{t("home.verseReflectionSection")}</Text>
       <View style={styles.row}>
         {CARDS.map((card) => (
           <View key={card.variant} style={styles.tileWrap}>

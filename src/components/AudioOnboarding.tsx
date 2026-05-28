@@ -14,8 +14,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   AUDIO_ONBOARDING_SLIDES,
+  type AudioOnboardingHeroKey,
   type AudioOnboardingSlideConfig,
 } from "@/data/audioOnboardingSlides";
+import { getCategoryPhotoUrl, type PhotoCategoryKey } from "@/data/photoBackgrounds";
+import { PhotoBackground } from "@/components/PhotoBackground";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
 import { hapticSelection, hapticSuccess } from "@/utils/haptics";
 import { colors, radii, spacing, typography } from "@/theme";
@@ -29,7 +32,15 @@ interface AudioOnboardingProps {
 const SLIDE_ICONS: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
   slide1: "book-outline",
   slide2: "language-outline",
-  slide3: "cloud-offline-outline",
+  slide3: "sparkles-outline",
+  slide4: "leaf-outline",
+};
+
+const SLIDE_PHOTOS: Record<AudioOnboardingHeroKey, PhotoCategoryKey> = {
+  slide1: "continueReading",
+  slide2: "discoverCompanion",
+  slide3: "guidedMeditation",
+  slide4: "dailyPractice",
 };
 
 function resolveSlideCopy(
@@ -53,14 +64,20 @@ function resolveSlideCopy(
 function SlidePage({ slide }: { slide: AudioOnboardingSlideConfig }) {
   const { t } = useAppTranslation();
   const copy = useMemo(() => resolveSlideCopy(slide, t), [slide, t]);
+  const photoUrl =
+    slide.kind === "hero" && slide.heroKey
+      ? getCategoryPhotoUrl(SLIDE_PHOTOS[slide.heroKey], 900, 700)
+      : getCategoryPhotoUrl("guidedSilence", 900, 700);
 
   return (
     <View style={styles.slide}>
-      <View style={styles.heroArea}>
-        <View style={styles.iconBubble}>
-          <Ionicons name={copy.iconName} size={56} color={colors.accent} />
+      <PhotoBackground uri={photoUrl} style={styles.heroPhoto} borderRadius={radii.xl} scrimOpacity={0.58}>
+        <View style={styles.heroArea}>
+          <View style={styles.iconBubble}>
+            <Ionicons name={copy.iconName} size={48} color={colors.accent} />
+          </View>
         </View>
-      </View>
+      </PhotoBackground>
       <View style={styles.copyArea}>
         <Text style={styles.slideTitle}>{copy.title}</Text>
         <Text style={styles.slideBody}>{copy.body}</Text>
@@ -201,6 +218,13 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     flex: 1,
     paddingHorizontal: spacing.lg,
+    gap: spacing.lg,
+  },
+  heroPhoto: {
+    flex: 1,
+    minHeight: 220,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
   },
   heroArea: {
     flex: 1,

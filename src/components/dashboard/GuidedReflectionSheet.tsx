@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { logError } from "@/services/errors/errorLogger";
+import { useDailyEngagementStore } from "@/store/dailyEngagementStore";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export type ReflectionVariant = "meditation" | "silence";
@@ -39,6 +40,7 @@ const TYPEWRITER_INTERVAL_MS = 18;
 
 export function GuidedReflectionSheet({ visible, variant, verseText, verseReference, onClose }: Props) {
   const { t, i18n } = useTranslation();
+  const markReflectionComplete = useDailyEngagementStore((s) => s.markReflectionComplete);
   const [status, setStatus] = useState<"idle" | "loading" | "typing" | "done" | "error">("idle");
   const [fullText, setFullText] = useState("");
   const [displayText, setDisplayText] = useState("");
@@ -182,8 +184,14 @@ export function GuidedReflectionSheet({ visible, variant, verseText, verseRefere
               <View style={styles.accentBar} />
               <Text style={styles.reflectionText}>{displayText}</Text>
               {status === "done" ? (
-                <Pressable onPress={onClose} style={styles.doneBtn}>
-                  <Text style={styles.doneBtnText}>{t("viralFeed.closeSheet")}</Text>
+                <Pressable
+                  onPress={() => {
+                    markReflectionComplete();
+                    onClose();
+                  }}
+                  style={styles.doneBtn}
+                >
+                  <Text style={styles.doneBtnText}>{t("home.verseReflectionDone")}</Text>
                 </Pressable>
               ) : null}
             </View>

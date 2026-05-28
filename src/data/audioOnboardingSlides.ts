@@ -1,7 +1,7 @@
 import type { ImageSourcePropType } from "react-native";
 import { AUDIO_ONBOARDING_IMAGES } from "@/data/audioOnboardingImages";
 
-export type AudioOnboardingHeroKey = "slide1" | "slide2" | "slide3";
+export type AudioOnboardingHeroKey = "slide1" | "slide2" | "slide3" | "slide4";
 
 export type AudioOnboardingSlideKind = "hero" | "premium";
 
@@ -21,10 +21,11 @@ function heroKeyForSlide(id: number): AudioOnboardingHeroKey | undefined {
   if (id === 1) return "slide1";
   if (id === 2) return "slide2";
   if (id === 3) return "slide3";
+  if (id === 4) return "slide4";
   return undefined;
 }
 
-export const AUDIO_ONBOARDING_SLIDE_COUNT = 3;
+export const AUDIO_ONBOARDING_SLIDE_COUNT = 4;
 
 export const AUDIO_ONBOARDING_SLIDES: readonly AudioOnboardingSlideConfig[] = Array.from(
   { length: AUDIO_ONBOARDING_SLIDE_COUNT },

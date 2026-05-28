@@ -94,6 +94,9 @@
     "welcomeSubtitle": "Pick a book to start reading offline.",
     "continueSubtitle": "Continue where you left off.",
     "readNow": "Read now",
+    "todaySection": "For you today",
+    "verseReflectionSection": "Reflect on today's verse",
+    "verseReflectionDone": "Reflection complete",
     "exploreHeading": "Explore",
     "libraryHeading": "Library",
     "discoveryHeading": "Your journey",
@@ -118,6 +121,67 @@
       "anxiety": "I feel anxious. Give me calm, grounding Scriptures and a short prayer for this moment.",
       "healing": "I need healing. Help me with passages about restoration and hope, plus one practical step.",
       "anger": "I am struggling with anger. Show me verses that lead me toward wisdom, restraint, and grace."
+    },
+    "dailyPractice": {
+      "sectionTitle": "Daily practice",
+      "sheetTitle": "Today's practice",
+      "ctaStart": "Begin practice",
+      "completedToday": "Practice complete for today",
+      "minutes": "{{min}} min",
+      "stepLabel": "Step {{current}} of {{total}}",
+      "nextStep": "Next step",
+      "done": "Mark complete",
+      "themes": {
+        "breath": {
+          "title": "Breath prayer",
+          "prompt": "Pause twice today for a short breath prayer.",
+          "step1": "Find a quiet spot. Inhale slowly and pray: \"Lord, You are near.\"",
+          "step2": "Exhale and release one worry you cannot control today.",
+          "step3": "Repeat once more before your next task. Carry the calm with you."
+        },
+        "gratitude": {
+          "title": "Gratitude pause",
+          "prompt": "Name three gifts before the day rushes ahead.",
+          "step1": "Thank God for one person who has been kind to you recently.",
+          "step2": "Thank Him for one ordinary mercy you often overlook.",
+          "step3": "Thank Him for one hope you are still carrying. Let gratitude soften your heart."
+        },
+        "scripture": {
+          "title": "Scripture anchor",
+          "prompt": "Let one verse steady your attention today.",
+          "step1": "Read today's verse slowly — once aloud, once silently.",
+          "step2": "Choose one phrase that stands out and repeat it three times.",
+          "step3": "Ask: \"How might this truth shape my next conversation or decision?\""
+        },
+        "silence": {
+          "title": "Sacred silence",
+          "prompt": "Give God three minutes without filling the space.",
+          "step1": "Set a gentle timer. Sit comfortably and close your eyes.",
+          "step2": "When thoughts arise, return to a single word: \"Jesus\" or \"Peace.\"",
+          "step3": "Before the timer ends, whisper one honest sentence to God and listen."
+        },
+        "service": {
+          "title": "Quiet service",
+          "prompt": "Love someone today in a small, unseen way.",
+          "step1": "Ask God to bring one person to mind who may need encouragement.",
+          "step2": "Choose one concrete act: a message, a prayer, or a practical help.",
+          "step3": "Do it without announcing it. Offer the act as a simple gift to God."
+        },
+        "trust": {
+          "title": "Trust reset",
+          "prompt": "Release what you cannot carry alone.",
+          "step1": "Name aloud one situation that feels heavy or uncertain.",
+          "step2": "Pray: \"Father, I cannot control this. I choose to trust Your care.\"",
+          "step3": "Take one wise step you can take today, then leave the rest with God."
+        },
+        "rest": {
+          "title": "Sabbath moment",
+          "prompt": "Receive rest as a gift, not a reward.",
+          "step1": "Step away from one screen or task for five minutes.",
+          "step2": "Breathe deeply. Remember that your worth is not measured by output.",
+          "step3": "Thank God for rest already given — sleep, breath, salvation — and receive it again."
+        }
+      }
     }
   },
   "dashboard": {
@@ -173,7 +237,11 @@
     "anonAuthDisabled": "Anonymous sign-in is disabled in Supabase. Enable it in Dashboard → Authentication → Providers → Anonymous to publish comments.",
     "offlineHint": "Comments require a Supabase connection. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in your .env file.",
     "deleteTitle": "Delete comment?",
-    "deleteMessage": "This action cannot be undone."
+    "deleteMessage": "This action cannot be undone.",
+    "count_one": "{{count}} comment",
+    "count_few": "{{count}} comments",
+    "count_many": "{{count}} comments",
+    "count_other": "{{count}} comments"
   },
   "readingPlan": {
     "foundationTitle": "Foundation week",
@@ -295,7 +363,7 @@
     "deepStudy": "Deep Scripture Study"
   },
   "ai": {
-    "responsesRemaining": "{{remaining}} / {{limit}} responses",
+    "responsesRemaining": "Remaining today: {{remaining}} of {{limit}} replies",
     "clearChat": "Clear chat history",
     "clear": "Clear",
     "selectedVerse": "Selected verse",
@@ -308,10 +376,10 @@
     "pillHistorical": "Explain historical context",
     "pillApplication": "Give a daily life application",
     "pillOriginalLanguage": "Break down original Greek/Hebrew",
-    "welcomeMessage": "Peace be with you. I am your spiritual companion — ask about Scripture, prayer, or faith. When live service is unavailable, I draw on built-in guidance.",
-    "chatCleared": "Chat cleared. How may I walk with you in Scripture today?",
+    "welcomeMessage": "Peace be with you. I am a Scripture-first companion, not a priest. Ask about Scripture, prayer, or your spiritual walk, and I will answer with humility and care.",
+    "chatCleared": "Chat cleared. What would you like to bring before Scripture now?",
     "liveServiceError": "I could not reach the live AI service right now. Please try again in a moment.",
-    "connectionFallback": "Live AI is temporarily unavailable — showing a local response. You can keep chatting or tap Retry.",
+    "connectionFallback": "The live AI service is temporarily unavailable, so I switched to an offline Scripture-based reply.",
     "liveError": "I could not reach the live AI service right now. Please try again in a moment.",
     "templateHistorical": "Explain the historical context of {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
     "templateApplication": "Give a practical daily-life application for {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
@@ -322,41 +390,132 @@
     "fallback4": "The Spirit intercedes for us with groanings too deep for words. Bring your burdens honestly before God.",
     "fallback5": "Wisdom begins with reverence for the Lord. As you read, ask: what is God inviting me to trust or obey?",
     "fallbackResponses": {
-      "0": "Scripture reminds us that God's mercies are new every morning. What passage is on your heart today?",
-      "1": "In prayer, we draw near to the One who hears. Consider pausing for a moment of stillness before you continue reading.",
-      "2": "Faith is strengthened in community and in the Word. Would you like a verse to meditate on from what you've read?",
-      "3": "The Spirit intercedes for us with groanings too deep for words. Bring your burdens honestly before God.",
-      "4": "Wisdom begins with reverence for the Lord. As you read, ask: what is God inviting me to trust or obey?"
+      "sectionScripture": "Scripture anchor",
+      "sectionReflection": "Reflection",
+      "sectionStep": "Next step",
+      "sectionPrayer": "Short prayer",
+      "sectionNextReading": "Read next",
+      "sectionBoundary": "Important",
+      "withVerse": "{{reference}} - \"{{text}}\"",
+      "withoutVerse": "Start with {{reference}}.",
+      "boundaries": {
+        "default": "I am not a priest. For sacramental, doctrinal, crisis, or mental-health guidance, please speak with a priest, pastor, or qualified professional.",
+        "crisis": "If you may harm yourself or someone else, contact local emergency services or a crisis line now and tell a nearby trusted person immediately."
+      },
+      "default": {
+        "reflection": "Begin with what the text shows about God's character before you rush to application. Let Scripture shape the conversation instead of pressure or fear.",
+        "step": "Read the passage once slowly, once aloud, and ask: what is God inviting me to trust, receive, or obey today?",
+        "prayer": "Lord, steady my heart in Your word. Give me light for this moment and grace for the next faithful step. Amen.",
+        "nextReading": "Psalm 23; Matthew 11:28-30; Philippians 4:6-9"
+      },
+      "study": {
+        "reflection": "Look at the surrounding verses, repeated words, and the wider story of the chapter. Good understanding usually comes from context before conclusions.",
+        "step": "Read five verses before and after this passage, then write one sentence about the main idea before you look for a personal takeaway.",
+        "prayer": "God of truth, teach me to read carefully, humbly, and with love for what Your word actually says. Amen.",
+        "nextReading": "Luke 24:27; 2 Timothy 3:16-17; Psalm 119:105"
+      },
+      "prayer": {
+        "reflection": "Prayer does not need polished language. Bring God what is true, ask for mercy and wisdom, and let Scripture carry what you cannot say clearly.",
+        "step": "Name one burden honestly, one gift to thank God for, and one person to place before Him today.",
+        "prayer": "Father, receive what I carry today. Give me peace, honesty, and trust as I stand before You. Amen.",
+        "nextReading": "Psalm 62:8; Matthew 6:9-13; Romans 8:26"
+      },
+      "anxiety": {
+        "reflection": "God often meets an unsettled heart with nearness before answers. Scripture invites you to slow down, breathe, and remember that you are not carrying this moment alone.",
+        "step": "Take three slow breaths, loosen your shoulders, and repeat one phrase from Scripture before you make the next decision.",
+        "prayer": "Lord Jesus, quiet what is racing in me. Hold my mind in peace and teach me to rest in Your presence right now. Amen.",
+        "nextReading": "Psalm 46; Matthew 6:25-34; Philippians 4:6-9"
+      },
+      "guidance": {
+        "reflection": "Discernment is often quieter than it is dramatic. Look for what is wise, honest, loving, and aligned with Scripture instead of chasing certainty at any cost.",
+        "step": "Name the decision, write the two wisest next actions, and ask which path best reflects truth, love, and integrity.",
+        "prayer": "God, lead me in wisdom, not hurry. Close what is harmful, strengthen what is good, and show me a step clear enough to obey. Amen.",
+        "nextReading": "Proverbs 3:5-6; James 1:5; Psalm 25:4-5"
+      },
+      "forgiveness": {
+        "reflection": "Forgiveness does not deny pain or erase wisdom. It begins by naming the truth, releasing revenge, and asking God to free the heart from the rule of the wound.",
+        "step": "Name the hurt honestly before God, then ask for grace to release one small part of the debt today without pretending the wound was small.",
+        "prayer": "Merciful God, I cannot heal this by force. Meet me in the pain and teach me the next honest step toward forgiveness and freedom. Amen.",
+        "nextReading": "Matthew 18:21-35; Ephesians 4:31-32; Romans 12:17-21"
+      },
+      "doubt": {
+        "reflection": "Doubt does not end the conversation with God. Bring your questions into the light and let Scripture hold honesty and hope together.",
+        "step": "Write the truest question you are carrying today and place it beside one thing you still know about God from Scripture.",
+        "prayer": "Lord, meet me inside these questions. Keep me honest, near, and give me enough light for the next faithful step. Amen.",
+        "nextReading": "Psalm 73; Mark 9:24; John 20:24-29"
+      },
+      "crisis": {
+        "reflection": "Your safety comes first right now. This is a moment to reach real human support immediately, not carry it alone in silence.",
+        "step": "Move away from anything you could use to harm yourself, contact emergency services or a crisis line now, and tell a trusted person nearby exactly what is happening.",
+        "prayer": "God, hold me and preserve me in this moment. Send immediate help, protection, and people who will stay with me now. Amen.",
+        "nextReading": "Psalm 34:18; Psalm 121; Romans 8:38-39"
+      }
     },
     "retry": "Retry",
     "starterTitle": "Your spiritual companion",
     "starterHint": "Ask about Scripture, prayer, or faith. Select a verse in the reader for contextual prompts.",
     "userLabel": "You",
     "assistantLabel": "Companion",
-    "assistantSystemLabel": "Companion",
-    "sourceOffline": "Offline guidance",
-    "sourceSystem": "System",
-    "sourceLive": "Live AI",
-    "heroEyebrow": "Spiritual companion",
-    "heroTitle": "Walk with Scripture in conversation",
-    "heroBody": "Ask about passages, prayer, or discernment. Your selected verse can anchor every reply.",
-    "statusLive": "Live",
-    "statusFallback": "Offline companion",
-    "statusOffline": "Offline",
-    "statusLiveHint": "Connected to live AI when available.",
-    "statusFallbackHint": "Using built-in guidance while live service is unavailable.",
-    "statusOfflineHint": "No network — responses use local guidance.",
+    "assistantSystemLabel": "Guide",
+    "sourceOffline": "Offline",
+    "sourceSystem": "Guide",
+    "sourceLive": "Live",
+    "heroEyebrow": "Scripture-first companion",
+    "heroTitle": "A thoughtful guide for prayer, Scripture, and discernment",
+    "heroBody": "Each reply is grounded in the Bible, your selected verse, and calm Christian reflection. I can help explain a passage, shape a short prayer, or suggest a faithful next step.",
+    "statusLive": "Live AI",
+    "statusFallback": "Offline fallback",
+    "statusOffline": "Offline companion",
+    "statusLiveHint": "Live responses are enabled and shaped by the companion profile below.",
+    "statusFallbackHint": "The live service did not respond, so I switched to a built-in Scripture-based reply.",
+    "statusOfflineHint": "No API key is configured, so the built-in Scripture-based companion is active.",
     "basisScripture": "Scripture",
     "basisPrayer": "Prayer",
     "basisDiscernment": "Discernment",
-    "guardrailTitle": "Pastoral boundaries",
-    "guardrailBody": "This companion offers spiritual reflection, not medical, legal, or crisis counseling. Seek qualified help in emergencies.",
-    "selectedVerseHintTitle": "No verse selected",
-    "selectedVerseActiveHint": "Context from your selected verse is included in replies.",
-    "selectedVerseHintBody": "Long-press a verse in the reader to attach it here.",
-    "quickPromptsTitle": "Quick prompts",
-    "quickPromptsHint": "Tap to start with a guided question.",
-    "quotaHint": "Daily message limit resets tomorrow."
+    "guardrailTitle": "Important boundary",
+    "guardrailBody": "I am not a priest. For confession, sacraments, serious doctrine, crisis, or mental-health care, please speak with a priest, pastor, or qualified professional.",
+    "selectedVerseHintTitle": "Anchor the conversation in Scripture",
+    "selectedVerseActiveHint": "This verse will shape the next reply.",
+    "selectedVerseHintBody": "Select a verse in the reader to unlock verse-specific prayer, context, and application prompts.",
+    "quickPromptsTitle": "Start where your heart is today",
+    "quickPromptsHint": "Choose a path into study, prayer, peace, or discernment.",
+    "quotaHint": "The conversation limit refreshes each new day.",
+    "quickPrompts": {
+      "study": {
+        "title": "Understand this passage",
+        "subtitle": "Context, meaning, and what to notice.",
+        "prompt": "Help me understand this passage in context. Show the main idea, what it reveals about God, and one practical response."
+      },
+      "calm": {
+        "title": "Calm my heart",
+        "subtitle": "Ground me in Scripture and prayer.",
+        "prompt": "I feel anxious and unsettled. Give me a short Scripture-based reflection, one calming next step, and a brief prayer."
+      },
+      "discernment": {
+        "title": "I need direction",
+        "subtitle": "Discernment without pressure or hype.",
+        "prompt": "I need discernment for a decision. Help me think prayerfully, stay grounded in Scripture, and notice one wise next step."
+      },
+      "forgiveness": {
+        "title": "Help me forgive",
+        "subtitle": "Grace, honesty, and the next small step.",
+        "prompt": "I am struggling to forgive. Ground me in Scripture, help me name one honest next step, and pray with me."
+      },
+      "prayer": {
+        "title": "Pray with me",
+        "subtitle": "A short, reverent prayer from where I am.",
+        "prompt": "Pray with me in a simple and reverent way about what I am carrying today."
+      },
+      "doubt": {
+        "title": "I am wrestling with doubt",
+        "subtitle": "Honest questions, steady hope.",
+        "prompt": "I am wrestling with doubt. Respond with compassion, stay rooted in Scripture, and help me take one honest next step."
+      }
+    },
+    "pillPrayer": "Turn this verse into a prayer",
+    "pillHope": "Speak hope from this verse",
+    "templatePrayer": "Turn {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" into a short prayer I can pray right now.",
+    "templateHope": "Draw out the hope, comfort, and encouragement in {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" for someone who needs strength today."
   },
   "workspace": {
     "title": "Workspace",
@@ -903,6 +1062,204 @@
       }
     }
   },
+  "fasting": {
+    "title": "40-Day Fast",
+    "subtitle": "A 40-day journey of surrender, hunger, and steady prayer.",
+    "homeTileTitle": "40-Day Fast",
+    "homeTileSub": "A focused devotional journey",
+    "homeTileBadge": "New",
+    "startJourney": "Start journey",
+    "notStartedTitle": "Begin your fast",
+    "notStartedBody": "This 40-day path is designed to keep you grounded, honest, and prayerful. Open it daily, read the verses, and take one small faithful step.",
+    "journeyCompleteTitle": "You have finished the journey",
+    "journeyCompleteBody": "You can revisit any day, reset the plan, or keep using the final day as a place of prayer and reflection.",
+    "dayLabel": "Day {{day}} of 40",
+    "weekLabel": "Week {{week}} of 5",
+    "progressLabel": "{{percent}}% complete",
+    "completedDays": "{{count}} days completed",
+    "verseSectionTitle": "Scripture anchors",
+    "practiceSectionTitle": "Daily practice",
+    "prayerSectionTitle": "Prayer prompt",
+    "practicePrompt": "Today's practice: receive the theme of {{theme}} slowly and without pressure.",
+    "practiceBody": "Pause twice today for a short breath prayer. Name one thing you are releasing, then do the next wise action with calm focus.",
+    "prayerPrompt": "Prayer anchor: let {{theme}} shape your words before God.",
+    "prayerBody": "Lord, meet me in this day. Order my desires, steady my body, and teach my heart to trust You one step at a time.",
+    "markDone": "Mark day complete",
+    "alreadyDone": "Day completed",
+    "resetJourney": "Reset journey",
+    "resetConfirmTitle": "Reset the fast?",
+    "resetConfirmBody": "This will clear your start date and all completed days for the 40-day plan.",
+    "noVerseFound": "No verses loaded for today yet.",
+    "themes": {
+      "surrender": {
+        "title": "Surrender",
+        "subtitle": "Open hands instead of trying to control everything."
+      },
+      "hunger": {
+        "title": "Hunger",
+        "subtitle": "Let spiritual hunger reorder what you reach for first."
+      },
+      "silence": {
+        "title": "Silence",
+        "subtitle": "Make room for stillness before God speaks."
+      },
+      "repentance": {
+        "title": "Repentance",
+        "subtitle": "Return honestly, without hiding or self-condemnation."
+      },
+      "trust": {
+        "title": "Trust",
+        "subtitle": "Trade anxious control for steady confidence in God."
+      },
+      "mercy": {
+        "title": "Mercy",
+        "subtitle": "Receive grace before you try to prove anything."
+      },
+      "endurance": {
+        "title": "Endurance",
+        "subtitle": "Stay faithful when the fast feels ordinary or difficult."
+      },
+      "joy": {
+        "title": "Joy",
+        "subtitle": "Let gratitude and delight reawaken your heart."
+      }
+    }
+  },
+  "practices": {
+    "hubTitle": "Spiritual practices hub",
+    "hubSubtitle": "Choose the practice that fits your heart today.",
+    "hubIntroTitle": "One place for every practice",
+    "hubIntroBody": "Start with fasting, step into the Stations of the Cross, or pray the rosary in a steady decade flow.",
+    "hubTileTitle": "Practices hub",
+    "hubTileSub": "Fasting, Stations, or Rosary",
+    "meta": "{{steps}} steps · ~{{minutes}} min",
+    "streak": "Streak: {{count}} days",
+    "progress": "{{percent}}% complete",
+    "stepsPreviewTitle": "Daily steps",
+    "stepsPreviewHint": "{{total}} guided steps in this practice",
+    "stepsMore": "+ {{count}} more steps",
+    "startSession": "Start practice",
+    "continueSession": "Continue practice",
+    "listenDescription": "Listen to overview",
+    "reminderTitle": "Daily reminder",
+    "reminderHint": "Optional notification for your active practice",
+    "reminderOn": "Reminder is on",
+    "reminderDeniedTitle": "Notifications blocked",
+    "reminderDeniedBody": "Allow notifications in device settings to schedule a practice reminder.",
+    "reminderScheduledTitle": "Reminder scheduled",
+    "reminderScheduledBody": "Daily at {{hour}}:{{minute}}",
+    "reminderBody": "Time for {{practice}} — open Biblia AI and continue your practice.",
+    "notFound": "Practice not found.",
+    "categories": {
+      "lent": "Lent & fasting",
+      "devotion": "Devotion",
+      "prayer": "Prayer"
+    },
+    "items": {
+      "fasting": {
+        "title": "40-Day Fast",
+        "subtitle": "Focused surrender and prayer",
+        "description": "A forty-day rhythm of Scripture, reflection, and daily surrender. Mark each day as you stay faithful to the fast."
+      },
+      "stations": {
+        "title": "Stations of the Cross",
+        "subtitle": "A guided path through suffering and hope",
+        "description": "Walk fourteen stations with Scripture anchors and prayer prompts. Move slowly and let each station meet your life."
+      },
+      "rosary": {
+        "title": "Rosary",
+        "subtitle": "Five decades, ten beads each",
+        "description": "Pray five decades with Scripture meditations. Count ten Hail Mary beads per decade in a calm, steady rhythm."
+      }
+    },
+    "steps": {
+      "fasting": {
+        "day": "Day {{day}}"
+      },
+      "stations": {
+        "station": "Station {{number}}"
+      },
+      "rosary": {
+        "decade": "Decade {{decade}}"
+      }
+    },
+    "session": {
+      "notStartedTitle": "Ready to begin?",
+      "notStartedBody": "Start the practice to unlock step-by-step guidance, progress, and streak tracking.",
+      "versesTitle": "Scripture anchors",
+      "noVerses": "No verses loaded for this step yet.",
+      "completeStep": "Mark step complete",
+      "stepDone": "Step completed",
+      "reset": "Reset practice",
+      "fastingStep": "Day {{day}} of {{total}}",
+      "stationsStep": "Station {{current}} of {{total}}",
+      "rosaryStep": "{{set}} — decade {{decade}} of {{total}}"
+    }
+  },
+  "devotionals": {
+    "title": "Devotional hub",
+    "subtitle": "Choose the practice that fits your heart today.",
+    "introTitle": "One place for every practice",
+    "introBody": "Start with fasting, step into the Stations of the Cross, or pray the rosary in a steady decade flow.",
+    "hubTileTitle": "Devotional hub",
+    "hubTileSub": "Choose fasting, stations, or rosary",
+    "fastingTitle": "40-Day Fast",
+    "fastingSub": "Focused surrender and prayer",
+    "stationsTitle": "Stations of the Cross",
+    "stationsSub": "A guided path through suffering and hope",
+    "rosaryTitle": "Rosary",
+    "rosarySub": "Five decades, one steady rhythm"
+  },
+  "stations": {
+    "title": "Stations of the Cross",
+    "subtitle": "A guided path of prayer, suffering, and steadfast hope.",
+    "startJourney": "Start journey",
+    "notStartedTitle": "Begin the Stations",
+    "notStartedBody": "Walk through each station slowly. Read the anchors, sit with the reflection, and let prayer meet your real life.",
+    "stationLabel": "Station {{current}} of {{total}}",
+    "progressLabel": "{{percent}}% complete",
+    "completedStations": "{{count}} stations completed",
+    "currentStationHint": "Read the verses, then stay with the meaning of this moment.",
+    "verseSectionTitle": "Scripture anchors",
+    "reflectionSectionTitle": "Reflection",
+    "prayerSectionTitle": "Prayer prompt",
+    "reflectionBody": "Let this station remind you that Jesus meets you in pain, pressure, and weakness. Stay present with {{station}} and notice where God is speaking to your own story.",
+    "prayerBody": "Lord, in {{station}}, teach me to stay with You rather than escape. Give me courage, compassion, and a steady heart.",
+    "markDone": "Mark station complete",
+    "alreadyDone": "Station completed",
+    "resetJourney": "Reset journey",
+    "resetConfirmTitle": "Reset the Stations?",
+    "resetConfirmBody": "This will clear your start date and all completed stations.",
+    "journeyCompleteTitle": "You have completed the Stations",
+    "journeyCompleteBody": "Return to any station, reset the journey, or keep praying with the last station as a place of quiet reflection.",
+    "noVerseFound": "No verses loaded for this station yet."
+  },
+  "rosary": {
+    "title": "Rosary",
+    "subtitle": "A steady decade flow through mystery, Scripture, and prayer.",
+    "startJourney": "Start rosary",
+    "notStartedTitle": "Choose a mystery set",
+    "notStartedBody": "Pick the set you want to pray today, then begin the five-decade rhythm.",
+    "setLabel": "Set: {{set}}",
+    "decadeLabel": "Decade {{current}} of {{total}}",
+    "beadCountLabel": "Beads prayed: {{count}} / {{total}}",
+    "progressLabel": "{{percent}}% complete",
+    "chooseSetTitle": "Choose a set",
+    "chooseSetBody": "Joyful, Luminous, Sorrowful, or Glorious — pick the set that fits your prayer moment.",
+    "verseSectionTitle": "Scripture anchors",
+    "meditationSectionTitle": "Meditation",
+    "prayerSectionTitle": "Prayer prompt",
+    "mysteryPrompt": "Stay with {{mystery}} and let the mystery shape your prayer.",
+    "meditationBody": "Hold {{mystery}} slowly. Notice one word, one image, and one invitation for your life today.",
+    "prayerBody": "Lord, through {{mystery}}, draw my attention back to Christ and teach me to pray with trust and tenderness.",
+    "countBead": "Pray one bead",
+    "resetJourney": "Reset rosary",
+    "resetConfirmTitle": "Reset the rosary?",
+    "resetConfirmBody": "This will clear the selected set and the current decade flow.",
+    "journeyCompleteTitle": "You completed the rosary flow",
+    "journeyCompleteBody": "You can pray another set, restart the flow, or linger in the final mystery.",
+    "noVerseFound": "No verses loaded for this mystery yet."
+  },
   "audioIntro": {
     "heroLabel": "Welcome",
     "premiumLabel": "Premium {{number}}",
@@ -917,6 +1274,10 @@
     "slide3": {
       "title": "Spiritual companion",
       "body": "Ask about any verse. The companion is grounded in Scripture and works offline with built-in responses."
+    },
+    "slide4": {
+      "title": "Your daily rhythm",
+      "body": "Each day brings a gentle practice, a verse to reflect on, and a one-tap path back to Scripture."
     },
     "premium": {
       "title": "Premium experience {{number}}",

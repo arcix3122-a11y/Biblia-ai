@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 14:00 | Cursor subagent | Audyt konkurencji UX (YouVersion/Glorify/Hallow) — plan P0/P1/P2 | — | done | Bez kodu; sekcja „Audyt konkurencji” poniżej |
 | 2026-05-27 16:00 | Cursor subagent | Śledzenie dostawy pełnej Biblii PL+EN — koordynacja | *(ten commit)* | done | Checklist deliverable; seed nadal demo 4 ks. — **w trakcie** |
 | 2026-05-27 15:45 | User (arcix) | Skarga: demo 4 ks. niewystarczające — wymagany pełny E2E | — | open | Numbers 20 / pusty rozdział; pełna Biblia PL+EN w SQLite |
 | 2026-05-27 13:45 | Cursor Agent (full-bible E2E) | Pełna Biblia PL+EN — 66 ks., seed + progress UI | `4e67a1f`, `5157d06` | done | 31100 EN / 31073 PL wersetów; ~11,8 MB assetów |
@@ -1663,6 +1664,12 @@ npx expo start
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+## 2026-05-27 15:14 (local)
+- Agent: Codex
+- Task: DONE - rozbudowa ekranu Notatki / Workspace o konkretny pusty stan, szybkie akcje i lepszy UX
+- Changes: AGENT_WORKLOG.md, src/screens/WorkspaceScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json
+- Validation: npm run typecheck (pass), npm run check:locales (pass), git diff --check (pass), skan uszkodzonych znaków w ai/workspace PL (pass)
+- Result: done
 
 ## 2026-05-27 (local)
 - Agent: Composer
@@ -1670,6 +1677,15 @@ npx expo start
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-27 (local)
+- Agent: Composer
+- Task: DONE - Komentarze — Supabase anon E2E
+- Changes: `de93f03` — VotdCommentsSheet, votdSocialRepository, supabaseClient, locale votdComments, .env.example
+- Validation: npm run typecheck (0 errors); Supabase MCP — migracja `votd_social` (20260527114222) applied; RLS anon select+insert own; 0 rows w `votd_comments` (świeża tabela)
+- Result: done
+- Supabase project: `txwksirnvzoifcdpniby` (eu-west-1). Polityki: `votd_comments_read_all` (SELECT anon/authenticated), `votd_comments_insert_own` (INSERT with check auth.uid()=user_id), `votd_comments_delete_own`. Anonymous Auth — weryfikacja w Dashboard (MCP nie włącza providera); banner w aplikacji gdy signInAnonymously zwraca disabled.
+- App: usunięto gate `EXPO_PUBLIC_COMMENTS_ENABLED`; optimistic insert + rollback; kolejka offline + „Wyślemy, gdy wrócisz online”; loading/error/retry w sheet.
 
 ## 2026-05-27 (local)
 - Agent: Composer
@@ -1688,3 +1704,171 @@ npx expo start
 - Deep link: scheme `biblia-ai` w app.json; Reader już scrolluje do `?verse=`; Android intentFilters
 - Komentarze: sesja anon przed insert, kolejka AsyncStorage + flush przy starcie; `EXPO_PUBLIC_COMMENTS_ENABLED=false` → „Komentarze wkrótce” bez błędu wysyłki
 - Migracja Supabase: `supabase/migrations/003_votd_social.sql` (votd_comments) — wymaga `supabase db push` + Anonymous Auth
+
+## 2026-05-28 11:41
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - uruchomienie Expo Go do testow E2E na telefonie.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 11:45
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - uruchomienie Expo Go do testow E2E na telefonie.
+- Changes: AGENT_WORKLOG.md
+- Validation: npx expo start --lan --clear --port 8082 (Metro online: exp://192.168.101.30:8082)
+- Result: done
+
+## 2026-05-28 (local)
+- Agent: Claude Opus 4.7
+- Task: DONE - Komentarze VOTD działają E2E (podpięcie realnego Supabase do .env)
+- Changes: `.env` (EXPO_PUBLIC_SUPABASE_URL + EXPO_PUBLIC_SUPABASE_ANON_KEY — realne wartości projektu `txwksirnvzoifcdpniby` zamiast placeholderów)
+- Validation: npm run typecheck (0 błędów); pełny test pipeline przez REST/Auth API realnego projektu — signInAnonymously 200 (`is_anonymous:true`), INSERT votd_comments 201 pod RLS (auth.uid()=user_id), SELECT anon 200, DELETE own 204; wiersz testowy + 2 anon userów testowych posprzątane
+- Result: done
+- **Root cause:** wszyscy poprzedni agenci zakładali, że `.env` ma już realne klucze Supabase ("już powinno być dla syncu"), ale plik miał wartości `https://your-project.supabase.co` / `your-anon-key`. Klient Supabase celował w fałszywy URL → każdy request failował → komentarze szły do kolejki offline i nigdy się nie dosyłały → 0 wierszy w tabeli.
+- Backend bez zmian — był poprawny: tabele `votd_comments`/`votd_likes` z RLS (read_all anon/auth, insert/delete own), Anonymous Auth **już włączony** w Dashboard (zweryfikowane testem auth endpointu, nie tylko założenie).
+- Po stronie usera: po `npx expo start` musi być restart Metro (zmienne `EXPO_PUBLIC_*` inline'owane przy starcie bundlera), żeby nowy `.env` zadziałał.
+
+## 2026-05-28 12:13
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - Spiritual First-Aid Kit end-to-end helper.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 12:13
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - Spiritual First-Aid Kit end-to-end helper.
+- Changes: src/data/spiritualFirstAidKit.ts, src/services/ai/spiritualFirstAidKit.ts, src/services/ai/llmClient.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), explicit exit code check TSC_EXIT:0
+- Result: done
+
+## 2026-05-28 12:20 (local)
+- Agent: Antigravity (Parent coordinator)
+- Task: DONE - Kompleksowa przebudowa modułu asystenta AI / czatu (end-to-end, layout, offline database integration, theological profiles)
+- Changes: src/screens/AiChatScreen.tsx, src/services/ai/spiritualAssistantProfile.ts, src/hooks/useSpiritualAssistant.ts, src/services/ai/llmClient.ts, src/hooks/useChapterTTS.ts, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (865 keys, pass), npm run typecheck (0 errors, pass)
+- Result: done
+
+
+## 2026-05-28 12:23
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - start implementation of 40-day fasting devotional hub.
+- Changes: app/fasting.tsx, app/_layout.tsx, src/data/fastingPlan.ts, src/store/fastingPlanStore.ts, src/screens/FastingScreen.tsx, src/screens/HomeScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), npm run check:locales (pass)
+- Result: done
+
+## 2026-05-28 14:35 (local)
+- Agent: Cursor subagent (Composer)
+- Task: DONE - Hub praktyk duchowych end-to-end (practices.ts, detail, session, store, i18n)
+- Changes: src/data/practices.ts, src/store/practicesStore.ts, src/hooks/usePracticeAudio.ts, src/screens/PracticeDetailScreen.tsx, src/screens/PracticeSessionScreen.tsx, src/screens/DevotionalHubScreen.tsx, app/practice/[id].tsx, app/practice/[id]/session.tsx, app/fasting|stations|rosary.tsx (redirect), app/_layout.tsx, src/i18n/locales/en.json, pl.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1020 kluczy)
+- Result: done — Hub → szczegóły → sesja krok-po-kroku; post 40 dni, Droga Krzyżowa 14 stacji, różaniec 5×10 pacierzy; przypomnienia + TTS
+
+## 2026-05-28 14:22 (local)
+- Agent: Cursor subagent (Composer)
+- Task: PROGRESS - Hub praktyk: model practices.ts, practicesStore, ekrany detail/session, trasy /practice/[id]
+- Changes: w trakcie (patrz DONE)
+- Validation: typecheck w toku
+- Result: in-progress
+
+## 2026-05-28 14:10 (local)
+- Agent: Cursor subagent (Composer)
+- Task: START - Hub praktyk duchowych end-to-end (practices.ts, detail, session, store, i18n)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 (local)
+- Agent: Claude Opus 4.7
+- Task: DONE - Moduł komentarzy VOTD A-Z: naprawa fałszywego "offline" + przebudowa UI + realtime + skala
+- Changes: src/services/social/votdSocialRepository.ts (NetInfo isOnline, CommentError, paginacja listComments→{comments,hasMore}, subscribeToComments realtime, uczciwe online/offline), src/components/dashboard/VotdCommentsSheet.tsx (pełny rewrite UI), src/utils/formatDate.ts (formatRelativeTime), supabase/migrations/004_votd_realtime.sql, en.json/pl.json (votdComments.count plurale)
+- Validation: npm run typecheck (0 błędów); npm run check:locales (OK, 865 kluczy); REST E2E ponownie po migracji realtime — INSERT 201 / SELECT anon 200 / DELETE 204; publikacja supabase_realtime zawiera votd_comments+votd_likes (zweryfikowane SQL); test row + anon user posprzątane
+- **Bug naprawiony:** komentarz lądował jako "Oczekuje na wysłanie" mimo WiFi, bo `postComment` kolejkował zawsze, gdy `getSessionUserIdAsync()` zwracał null (np. stary bundle/env nie przeładowany → host nie resolvował → brak sesji). Teraz: NetInfo rozróżnia realny offline (kolejka + "wyślemy gdy online") od online-ale-błąd (uczciwy błąd + retry, nie udawany offline). Anon disabled → osobny baner.
+- **Skala/UI:** paginacja (strona 30, load-more przy scrollu), realtime insert/delete z dedupe vs optimistic/pending, live licznik w nagłówku, kolorowe deterministyczne awatary, względny czas (teraz/min/godz./data), skeleton loadery, dopracowany kompozytor (okrągły send, licznik tylko przy <80 znaków). FlatList wirtualizuje listę → działa przy setkach komentarzy.
+- Realtime wymaga włączenia replikacji tabeli — zrobione migracją 004 (`alter publication supabase_realtime add table ...`). RLS read_all nadal obowiązuje subskrybentów anon.
+- Po stronie usera: nadal konieczny restart Metro z `--clear` żeby realny `.env` wszedł do bundla.
+
+
+## 2026-05-28 12:34
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - devotional hub / stations / rosary end-to-end.
+- Changes: app/devotional-hub.tsx, app/fasting.tsx, app/rosary.tsx, app/stations.tsx, app/_layout.tsx, src/data/fastingPlan.ts, src/data/rosary.ts, src/data/stations.ts, src/screens/DevotionalHubScreen.tsx, src/screens/FastingScreen.tsx, src/screens/RosaryScreen.tsx, src/screens/StationsScreen.tsx, src/store/fastingPlanStore.ts, src/store/rosaryStore.ts, src/store/stationsStore.ts, src/screens/HomeScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), npm run check:locales (pass)
+- Result: done
+
+## 2026-05-28 12:48 (local)
+- Agent: Antigravity (Parent coordinator)
+- Task: DONE - Naprawa krytycznego ucinania / braku widoczności okienka czatu oraz pełne wpięcie silnika SQL SpiritualFirstAidKit do useSpiritualAssistant
+- Changes: src/screens/AiChatScreen.tsx, src/hooks/useSpiritualAssistant.ts, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass), npm run typecheck (pass)
+- Result: done
+
+## 2026-05-28 14:00 (local)
+- Agent: Cursor subagent
+- Task: START - Audyt konkurencji UX (YouVersion / Glorify / Hallow / Pray.com) — retencja, plan P0/P1/P2
+- Changes: pending (AGENT_WORKLOG.md)
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 14:30 (local)
+- Agent: Cursor subagent
+- Task: DONE - Audyt konkurencji UX — 15 wzorców retencji, adaptacja Cyber-Monastery, priorytety P0/P1/P2
+- Changes: AGENT_WORKLOG.md (sekcja „Audyt konkurencji”, START/DONE)
+- Validation: przegląd kodu (Home, VOTD, stats, plany, devotional hub, guided prayer, reminders); brak typecheck (bez kodu)
+- Result: done
+
+---
+
+## Audyt konkurencji (2026-05-28)
+
+**Benchmark:** YouVersion, Glorify, Hallow, Pray.com / Lectio 365. **Cel:** retencja dzienna bez logowania, offline-first, estetyka Cyber-Monastery (złoto na czerni, cisza, Pismo pierwsze).
+
+**Stan Biblia AI (skrót):** mocne fundamenty — VOTD z social barem, czytnik PL+EN, Companion AI, plany czytania, stats + kalendarz streak, afirmacje TTS, devotional hub (post/stacje/różaniec), guided prayer, przypomnienia (store + service). **Luki vs liderzy:** brak jednego „Daily Rhythm” na Home, streak tylko za rozdział (nie multi-aktywność), brak streak freeze/repair, `MomentumDashboard`/`ReadingPlanCard` nie wpięte na Home, brak hubu misji dziennych, community tylko VOTD (online), brak memory verse, brak widgetu, share bez pętli zaproszeń.
+
+### 15 wzorców retencji (co robi konkurencja → dlaczego działa → adaptacja)
+
+1. **Multi-aktywność streak** (YouVersion: rozdział / modlitwa / wideo / memory verse) — obniża próg wejścia → Biblia AI: 4 ścieżki offline: rozdział, afirmacja, guided prayer, wpis w Workspace; `StreakActivitySheet` + rozszerzenie `userStats.ts`.
+2. **Kalendarz streak + freeze** (YouVersion żółty/szary/niebieski; Glorify streak repair) — loss aversion bez frustracji → 1 freeze/tydzień w AsyncStorage, ekran `StreakDashboardScreen` (już częściowo `StatsScreen` + `StreakCalendar`).
+3. **10-min Daily Devotional** (Glorify: cytat → passage → medytacja → modlitwa) — jeden rytm poranka → `DailyRhythmScreen` (nowy flow 4 kroków, AI offline fallback z locale).
+4. **VOTD jako kotwica społeczna** (YouVersion feed) — powód codziennego powrotu → już jest `VotdFeedCard`; dodać „Dokończ dzisiaj” CTA + licznik streak w nagłówku Home.
+5. **Plany czytania z postępem widocznym** (YouVersion, Hallow BIAY) — struktura + win → `ReadingPlanCard` na Home (komponent gotowy!), pasek % w Hero.
+6. **Push + „11:58 PM” nudge** (Hallow, Glorify reminders) — ratuje streak → `reminderService` + wieczorny push „Jeszcze X min do północy”; onboarding w guided prayer już prosi o czas.
+7. **Practice / Daily Mission Hub** (YouVersion activity cards) — jeden ekran „co dziś” → `DailyMissionHub` pod Hero: 3 kafle (Pismo / Modlitwa / Refleksja) ze stanem done/pending.
+8. **Guided audio prayer** (Hallow sesje 5–15 min) — immersja bez czytania → rozbudowa `GuidedPrayerScreen` + ambient z `audioStore`; offline TTS gdy brak streamu.
+9. **Afirmacje / deklaracje** (Glorify, Hallow) — emocjonalny hook → `AffirmationsScreen` już jest; dodać „Dzisiejsza afirmacja” na Home + liczy do streak.
+10. **Share loop (story + zaproszenie)** (YouVersion share card) — wiralowość → `VotdFeedCard` ma share; dodać watermark + deep link `biblia-ai://votd` + „Podziel się streak”.
+11. **Dashboard postępu OT/NT** (YouVersion plans) — długoterminowa motywacja → `StatsScreen` istnieje; wpiąć mini-ring na Home (`ProgressRing`).
+12. **Memory verse / gamifikacja** (YouVersion Bible Loop) — mikro-cel → `MemoryVerseScreen` + spaced repetition lokalnie (SQLite/AsyncStorage).
+13. **Community modlitewna** (Hallow campaigns; YouVersion friends) — więź → VOTD comments już są; P1: anonimowe „Prośby modlitewne” (Supabase opcjonalnie, kolejka offline).
+14. **Wyzwania sezonowe** (Hallow Pray40, YouVersion 30-day) — szczyty engagement → `FastingScreen` 40 dni to start; ujednolicić jako `SeasonalChallengeCard` (Wielki Post / Adwent).
+15. **Continue reading one-tap** (wszyscy) — redukcja tarcia → `HeroCard` już działa; dodać „Następny rozdział planu” obok resume.
+
+### Plan priorytetów (implementacja)
+
+| Priorytet | Zakres | Ekrany / komponenty |
+|-----------|--------|---------------------|
+| **P0** (2–3 tyg.) | Daily loop + streak + Home | `DailyMissionHub`, wpięcie `MomentumDashboard` + `ReadingPlanCard` na `HomeScreen`, multi-aktywność w `userStats.ts`, `StreakDashboardScreen` (freeze + kalendarz), wieczorny nudge w `reminderService`, `DailyRhythmScreen` (4 kroki) |
+| **P1** (4–6 tyg.) | Głębia + share + sezon | `MemoryVerseScreen`, `ProgressRing` na Home, share streak + deep link, rozbudowa `GuidedPrayerScreen` (offline TTS), `SeasonalChallengeCard`, opcjonalne `PrayerRequestsSheet` |
+| **P2** (backlog) | Skala + platforma | Widget VOTD (Expo widget), bundled photo assets (offline), worship ambient playlist, grupy studyjne, cele tygodniowe modlitwy (Hallow-style), eksport PDF notatek |
+
+### Różnicowanie Cyber-Monastery (vs klonowanie)
+
+- **Bez konta obowiązkowego** — streak, plany, notatki w AsyncStorage; sync anonimowy opcjonalny (już jest).
+- **Offline-first** — TTS, plany, afirmacje, Pismo PL+EN lokalnie; social VOTD graceful degrade (kolejka jak komentarze).
+- **AI jako przewodnik, nie centrum** — Companion wspiera Daily Rhythm, nie zastępuje Pisma.
+- **Estetyka:** pełnoekranowe zdjęcia + scrim, serif na wersecie, brak reklam, brak paywall na codziennym rytmie (zgodnie z AGENTS.md UX principles).
+
+## 2026-05-28 15:00 (local)
+- Agent: Cursor subagent
+- Task: START - Home: codzienna praktyka + refleksja nad wersem, personalizacja feedu, onboarding
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 15:30 (local)
+- Agent: Cursor subagent
+- Task: DONE - Home: codzienna praktyka + refleksja nad wersem, personalizacja feedu, onboarding
+- Changes: src/data/dailyPractice.ts, src/store/dailyEngagementStore.ts, src/components/dashboard/DailyPracticeCard.tsx, src/components/dashboard/DailyPracticeSheet.tsx, src/screens/HomeScreen.tsx, src/components/dashboard/GuidedReflectionCards.tsx, src/components/dashboard/GuidedReflectionSheet.tsx, src/components/AudioOnboarding.tsx, src/data/audioOnboardingSlides.ts, src/data/photoBackgrounds.ts, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass, 1020 kl.); npm run typecheck — błędy w Practice Hub (app/practice/*, nie w zakresie tego commitu); nowe pliki Home/onboarding bez błędów TS
+- Result: done

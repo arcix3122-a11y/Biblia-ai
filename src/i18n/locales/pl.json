@@ -94,6 +94,9 @@
     "welcomeSubtitle": "Wybierz księgę, aby rozpocząć czytanie offline.",
     "continueSubtitle": "Kontynuuj tam, gdzie przerwałeś.",
     "readNow": "Czytaj teraz",
+    "todaySection": "Na dziś",
+    "verseReflectionSection": "Refleksja nad wersem dnia",
+    "verseReflectionDone": "Refleksja ukończona",
     "exploreHeading": "Odkryj",
     "libraryHeading": "Biblioteka",
     "discoveryHeading": "Twoja droga",
@@ -118,6 +121,67 @@
       "anxiety": "Czuję niepokój. Daj mi uspokajające fragmenty Pisma i krótką modlitwę na ten moment.",
       "healing": "Potrzebuję uzdrowienia. Pomóż mi fragmentami o odnowie i nadziei oraz jednym praktycznym krokiem.",
       "anger": "Zmagam się z gniewem. Pokaż mi wersety, które prowadzą do mądrości, opanowania i łaski."
+    },
+    "dailyPractice": {
+      "sectionTitle": "Codzienna praktyka",
+      "sheetTitle": "Praktyka na dziś",
+      "ctaStart": "Rozpocznij praktykę",
+      "completedToday": "Praktyka na dziś ukończona",
+      "minutes": "{{min}} min",
+      "stepLabel": "Krok {{current}} z {{total}}",
+      "nextStep": "Następny krok",
+      "done": "Oznacz jako ukończone",
+      "themes": {
+        "breath": {
+          "title": "Modlitwa oddechu",
+          "prompt": "Zatrzymaj się dziś dwa razy na krótką modlitwę oddechu.",
+          "step1": "Znajdź spokojne miejsce. Weź wolny wdech i módl się: „Panie, jesteś blisko.”",
+          "step2": "Na wydechu oddaj Bogu jedną troskę, nad którą nie masz kontroli.",
+          "step3": "Powtórz jeszcze raz przed następnym zadaniem. Zabierz ten spokój ze sobą."
+        },
+        "gratitude": {
+          "title": "Chwila wdzięczności",
+          "prompt": "Wymień trzy dary, zanim dzień Cię pochłonie.",
+          "step1": "Podziękuj Bogu za jedną osobę, która ostatnio okazała Ci dobro.",
+          "step2": "Podziękuj za jedną zwyczajną łaskę, którą często pomijasz.",
+          "step3": "Podziękuj za jedną nadzieję, którą nadal nosisz. Pozwól wdzięczności zmiękczyć serce."
+        },
+        "scripture": {
+          "title": "Kotwica w Piśmie",
+          "prompt": "Niech jeden werset ustabilizuje Twoją uwagę na dziś.",
+          "step1": "Przeczytaj dzisiejszy werset powoli — raz na głos, raz w ciszy.",
+          "step2": "Wybierz jedno zdanie, które Cię porusza, i powtórz je trzy razy.",
+          "step3": "Zadaj pytanie: „Jak ta prawda może ukształtować moją następną rozmowę lub decyzję?”"
+        },
+        "silence": {
+          "title": "Święta cisza",
+          "prompt": "Daj Bogu trzy minuty bez wypełniania przestrzeni.",
+          "step1": "Ustaw delikatny timer. Usiądź wygodnie i zamknij oczy.",
+          "step2": "Gdy pojawią się myśli, wracaj do jednego słowa: „Jezu” lub „Pokój.”",
+          "step3": "Zanim timer się skończy, wyszeptaj Bogu jedno szczere zdanie i posłuchaj."
+        },
+        "service": {
+          "title": "Cicha służba",
+          "prompt": "Okazuj dziś miłość komuś w mały, niewidoczny sposób.",
+          "step1": "Poproś Boga, by wskazał Ci jedną osobę potrzebującą wsparcia.",
+          "step2": "Wybierz jeden konkretny gest: wiadomość, modlitwę lub praktyczną pomoc.",
+          "step3": "Zrób to bez ogłaszania. Ofiaruj ten gest Bogu jako prosty dar."
+        },
+        "trust": {
+          "title": "Reset zaufania",
+          "prompt": "Oddaj to, czego nie możesz nieść sam.",
+          "step1": "Wypowiedz na głos jedną sytuację, która wydaje się ciężka lub niepewna.",
+          "step2": "Pomódl się: „Ojcze, nie kontroluję tego. Wybieram zaufanie Twojej opiece.”",
+          "step3": "Wykonaj jeden mądry krok, jaki możesz dziś podjąć, a resztę zostaw Bogu."
+        },
+        "rest": {
+          "title": "Chwila odpoczynku",
+          "prompt": "Przyjmij odpoczynek jako dar, nie nagrodę.",
+          "step1": "Odejdź na pięć minut od jednego ekranu lub zadania.",
+          "step2": "Oddychaj głęboko. Przypomnij sobie, że Twoja wartość nie zależy od wydajności.",
+          "step3": "Podziękuj Bogu za odpoczynek, który już dał — sen, oddech, zbawienie — i przyjmij go na nowo."
+        }
+      }
     }
   },
   "dashboard": {
@@ -173,7 +237,11 @@
     "anonAuthDisabled": "Logowanie anonimowe jest wyłączone w Supabase. Włącz je w Dashboard → Authentication → Providers → Anonymous, aby publikować komentarze.",
     "offlineHint": "Komentarze wymagają połączenia z Supabase. Ustaw EXPO_PUBLIC_SUPABASE_URL i EXPO_PUBLIC_SUPABASE_ANON_KEY w pliku .env.",
     "deleteTitle": "Usunąć komentarz?",
-    "deleteMessage": "Tej operacji nie można cofnąć."
+    "deleteMessage": "Tej operacji nie można cofnąć.",
+    "count_one": "{{count}} komentarz",
+    "count_few": "{{count}} komentarze",
+    "count_many": "{{count}} komentarzy",
+    "count_other": "{{count}} komentarza"
   },
   "readingPlan": {
     "foundationTitle": "Tydzień fundamentów",
@@ -295,7 +363,7 @@
     "deepStudy": "Głębokie studium Pisma"
   },
   "ai": {
-    "responsesRemaining": "{{remaining}} / {{limit}} odpowiedzi",
+    "responsesRemaining": "Pozostało dziś {{remaining}} z {{limit}} odpowiedzi",
     "clearChat": "Wyczyść historię czatu",
     "clear": "Wyczyść",
     "selectedVerse": "Wybrany werset",
@@ -308,10 +376,10 @@
     "pillHistorical": "Wyjaśnij kontekst historyczny",
     "pillApplication": "Podaj zastosowanie w codziennym życiu",
     "pillOriginalLanguage": "Omów oryginalne znaczenie (grecki/hebrajski)",
-    "welcomeMessage": "Pokój z Tobą. Jestem Twoim duchowym towarzyszem — pytaj o Pismo, modlitwę lub wiarę. Gdy usługa na żywo jest niedostępna, korzystam z wbudowanych wskazówek.",
-    "chatCleared": "Czat wyczyszczony. W czym mogę Ci towarzyszyć w Piśmie?",
+    "welcomeMessage": "Pokój z tobą. Jestem towarzyszem opartym na Piśmie, a nie księdzem. Pytaj o Pismo, modlitwę albo drogę wiary, a odpowiem z pokorą i troską.",
+    "chatCleared": "Czat wyczyszczony. Z czym chcesz teraz przyjść do Pisma?",
     "liveServiceError": "Nie udało się połączyć z usługą AI. Spróbuj ponownie za chwilę.",
-    "connectionFallback": "Usługa AI jest chwilowo niedostępna — pokazuję lokalną odpowiedź. Możesz kontynuować rozmowę lub dotknąć „Spróbuj ponownie”.",
+    "connectionFallback": "Usługa AI na żywo jest chwilowo niedostępna, więc przełączyłem odpowiedź na tryb offline oparty na Piśmie.",
     "liveError": "Nie udało się połączyć z usługą AI. Spróbuj ponownie za chwilę.",
     "templateHistorical": "Wyjaśnij kontekst historyczny wersetu {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
     "templateApplication": "Podaj praktyczne zastosowanie w codziennym życiu dla {{bookName}} {{chapter}}:{{verse}} — \"{{text}}\"",
@@ -322,41 +390,132 @@
     "fallback4": "Duch wstawia się za nami w westchnieniach niewypowiedzianych. Przynieś swoje brzemię szczerze przed Boga.",
     "fallback5": "Początkiem mądrości jest bojaźń Pańska. Czytając, zapytaj: do czego Bóg zaprasza mnie dziś — zaufania czy posłuszeństwa?",
     "fallbackResponses": {
-      "0": "Pismo przypomina, że miłosierdzia Pana są nowe co rano. Który fragment jest dziś bliski Twojemu sercu?",
-      "1": "W modlitwie zbliżamy się do Tego, który słyszy. Zatrzymaj się na chwilę ciszy, zanim wrócisz do czytania.",
-      "2": "Wiara wzmacnia się we wspólnocie i w Słowie. Czy chcesz werset do rozważenia z tego, co czytasz?",
-      "3": "Duch wstawia się za nami w westchnieniach niewypowiedzianych. Przynieś swoje brzemię szczerze przed Boga.",
-      "4": "Początkiem mądrości jest bojaźń Pańska. Czytając, zapytaj: do czego Bóg zaprasza mnie dziś — zaufania czy posłuszeństwa?"
+      "sectionScripture": "Zakotwiczenie w Piśmie",
+      "sectionReflection": "Refleksja",
+      "sectionStep": "Następny krok",
+      "sectionPrayer": "Krótka modlitwa",
+      "sectionNextReading": "Czytaj dalej",
+      "sectionBoundary": "Ważne",
+      "withVerse": "{{reference}} - \"{{text}}\"",
+      "withoutVerse": "Zacznij od: {{reference}}.",
+      "boundaries": {
+        "default": "Nie jestem księdzem. W sprawach sakramentalnych, doktrynalnych, kryzysowych lub dotyczących zdrowia psychicznego porozmawiaj z księdzem, pastorem albo odpowiednim specjalistą.",
+        "crisis": "Jeśli możesz zrobić krzywdę sobie lub komuś innemu, skontaktuj się teraz z lokalnymi służbami ratunkowymi albo linią kryzysową i natychmiast powiedz o tym zaufanej osobie obok ciebie."
+      },
+      "default": {
+        "reflection": "Najpierw zobacz, co tekst odsłania o Bożym charakterze, zanim przejdziesz do zastosowania. Niech to Pismo prowadzi rozmowę, a nie presja czy lęk.",
+        "step": "Przeczytaj fragment raz powoli i raz na głos, a potem zapytaj: do czego Bóg zaprasza mnie dziś - do zaufania, przyjęcia albo posłuszeństwa?",
+        "prayer": "Panie, uspokój moje serce w Twoim słowie. Daj mi światło na ten moment i łaskę do kolejnego wiernego kroku. Amen.",
+        "nextReading": "Psalm 23; Mateusz 11:28-30; Filipian 4:6-9"
+      },
+      "study": {
+        "reflection": "Zobacz wersety wokół, powtarzające się słowa i szerszą historię rozdziału. Dobre zrozumienie zwykle rodzi się z kontekstu, zanim pojawią się wnioski.",
+        "step": "Przeczytaj pięć wersetów przed i po tym fragmencie, a potem zapisz jedno zdanie z główną myślą, zanim przejdziesz do osobistego zastosowania.",
+        "prayer": "Boże prawdy, ucz mnie czytać uważnie, pokornie i z miłością do tego, co naprawdę mówi Twoje słowo. Amen.",
+        "nextReading": "Łukasz 24:27; 2 Tymoteusza 3:16-17; Psalm 119:105"
+      },
+      "prayer": {
+        "reflection": "Modlitwa nie potrzebuje idealnych słów. Przynieś Bogu to, co jest prawdziwe, proś o miłosierdzie i mądrość, a Pismo niech poniesie to, czego jeszcze nie umiesz wypowiedzieć.",
+        "step": "Nazwij uczciwie jeden ciężar, jedną rzecz, za którą chcesz podziękować, i jedną osobę, którą chcesz dziś przynieść przed Boga.",
+        "prayer": "Ojcze, przyjmij to, co dziś noszę w sercu. Daj mi pokój, szczerość i zaufanie, gdy staję przed Tobą. Amen.",
+        "nextReading": "Psalm 62:8; Mateusz 6:9-13; Rzymian 8:26"
+      },
+      "anxiety": {
+        "reflection": "Bóg często spotyka niespokojne serce najpierw bliskością, a dopiero potem odpowiedzią. Pismo zaprasza, żeby zwolnić, odetchnąć i pamiętać, że nie niesiesz tej chwili sam.",
+        "step": "Weź trzy spokojne oddechy, rozluźnij ramiona i powtórz krótką frazę z wersetu, zanim podejmiesz kolejną decyzję.",
+        "prayer": "Panie Jezu, ucisz to, co we mnie pędzi. Utrzymaj mój umysł w pokoju i naucz mnie odpoczywać w Twojej obecności właśnie teraz. Amen.",
+        "nextReading": "Psalm 46; Mateusz 6:25-34; Filipian 4:6-9"
+      },
+      "guidance": {
+        "reflection": "Rozeznanie zwykle jest spokojniejsze niż spektakularne. Szukaj tego, co mądre, uczciwe, pełne miłości i zgodne z Pismem, zamiast gonić za pewnością za wszelką cenę.",
+        "step": "Nazwij decyzję, wypisz dwa najmądrzejsze następne działania i zapytaj, która droga najbardziej odbija prawdę, miłość i integralność.",
+        "prayer": "Boże, prowadź mnie w mądrości, a nie w pośpiechu. Zamknij to, co szkodliwe, umocnij to, co dobre, i pokaż mi krok wystarczająco jasny, bym mógł być posłuszny. Amen.",
+        "nextReading": "Przysłów 3:5-6; Jakuba 1:5; Psalm 25:4-5"
+      },
+      "forgiveness": {
+        "reflection": "Przebaczenie nie zaprzecza bólowi ani nie kasuje mądrości. Zaczyna się od nazwania prawdy, puszczenia pragnienia odwetu i proszenia Boga, by uwolnić serce spod władzy rany.",
+        "step": "Nazwij ból szczerze przed Bogiem, a potem poproś o łaskę, by dziś wypuścić choć małą część długu, nie udając, że rana była mała.",
+        "prayer": "Miłosierny Boże, nie uzdrowię tego siłą. Spotkaj mnie w bólu i naucz kolejnego uczciwego kroku ku przebaczeniu i wolności. Amen.",
+        "nextReading": "Mateusz 18:21-35; Efezjan 4:31-32; Rzymian 12:17-21"
+      },
+      "doubt": {
+        "reflection": "Wątpliwości nie kończą rozmowy z Bogiem. Przynieś pytania do światła i pozwól, by Pismo utrzymało jednocześnie szczerość i nadzieję.",
+        "step": "Zapisz najprawdziwsze pytanie, które dziś nosisz, i połóż je obok jednej rzeczy, którą wciąż wiesz o Bożym charakterze z Pisma.",
+        "prayer": "Panie, spotkaj mnie pośród pytań. Zachowaj mnie w szczerości, bliskości i daj mi dość światła na kolejny wierny krok. Amen.",
+        "nextReading": "Psalm 73; Marka 9:24; Jana 20:24-29"
+      },
+      "crisis": {
+        "reflection": "Twoje bezpieczeństwo ma teraz pierwszeństwo. To moment, żeby natychmiast zwrócić się ku realnemu wsparciu drugiego człowieka, a nie nieść tego samotnie w ciszy.",
+        "step": "Odłóż to, czym możesz zrobić sobie krzywdę, zadzwoń teraz po służby ratunkowe albo linię kryzysową i powiedz zaufanej osobie obok ciebie dokładnie, co się dzieje.",
+        "prayer": "Boże, trzymaj mnie i zachowaj w tej chwili. Poślij natychmiastową pomoc, ochronę i ludzi, którzy zostaną teraz przy mnie. Amen.",
+        "nextReading": "Psalm 34:18; Psalm 121; Rzymian 8:38-39"
+      }
     },
     "retry": "Spróbuj ponownie",
     "starterTitle": "Twój duchowy towarzysz",
     "starterHint": "Pytaj o Pismo, modlitwę lub wiarę. Wybierz werset w czytniku, aby włączyć kontekstowe podpowiedzi.",
     "userLabel": "Ty",
     "assistantLabel": "Towarzysz",
-    "assistantSystemLabel": "Towarzysz",
-    "sourceOffline": "Wskazówki offline",
-    "sourceSystem": "System",
-    "sourceLive": "AI na żywo",
-    "heroEyebrow": "Duchowy towarzysz",
-    "heroTitle": "Rozmawiaj ze Słowem",
-    "heroBody": "Pytaj o fragmenty, modlitwę lub rozeznanie. Wybrany werset może być kotwicą każdej odpowiedzi.",
-    "statusLive": "Na żywo",
-    "statusFallback": "Towarzysz offline",
-    "statusOffline": "Offline",
-    "statusLiveHint": "Połączenie z AI na żywo, gdy jest dostępne.",
-    "statusFallbackHint": "Wbudowane wskazówki, gdy usługa na żywo jest niedostępna.",
-    "statusOfflineHint": "Brak sieci — odpowiedzi z lokalnych wskazówek.",
+    "assistantSystemLabel": "Przewodnik",
+    "sourceOffline": "Offline",
+    "sourceSystem": "Przewodnik",
+    "sourceLive": "Na żywo",
+    "heroEyebrow": "Towarzysz oparty na Piśmie",
+    "heroTitle": "Spokojny przewodnik po modlitwie, Piśmie i rozeznaniu",
+    "heroBody": "Każda odpowiedź opiera się na Biblii, wybranym wersecie i spokojnej chrześcijańskiej refleksji. Mogę pomóc zrozumieć fragment, ułożyć krótką modlitwę albo wskazać wierny następny krok.",
+    "statusLive": "AI na żywo",
+    "statusFallback": "Awaryjny tryb offline",
+    "statusOffline": "Towarzysz w trybie offline",
+    "statusLiveHint": "Odpowiedzi na żywo są włączone i prowadzone przez profil towarzysza poniżej.",
+    "statusFallbackHint": "Usługa na żywo nie odpowiedziała, więc przełączyłem się na wbudowaną odpowiedź opartą na Piśmie.",
+    "statusOfflineHint": "Nie ma skonfigurowanego klucza API, więc działa wbudowany towarzysz oparty na Piśmie.",
     "basisScripture": "Pismo",
     "basisPrayer": "Modlitwa",
     "basisDiscernment": "Rozeznanie",
-    "guardrailTitle": "Granice pasterskie",
-    "guardrailBody": "Ten towarzysz oferuje refleksję duchową, nie poradę medyczną, prawną ani kryzysową. W nagłych sytuacjach szukaj fachowej pomocy.",
-    "selectedVerseHintTitle": "Brak wybranego wersetu",
-    "selectedVerseActiveHint": "Kontekst wybranego wersetu jest dołączany do odpowiedzi.",
-    "selectedVerseHintBody": "Przytrzymaj werset w czytniku, aby go tu dołączyć.",
-    "quickPromptsTitle": "Szybkie pytania",
-    "quickPromptsHint": "Dotknij, aby zacząć od prowadzonego pytania.",
-    "quotaHint": "Dzienny limit wiadomości odnowi się jutro."
+    "guardrailTitle": "Ważna granica",
+    "guardrailBody": "Nie jestem księdzem. W sprawach spowiedzi, sakramentów, poważnej doktryny, kryzysu albo zdrowia psychicznego porozmawiaj z księdzem, pastorem lub odpowiednim specjalistą.",
+    "selectedVerseHintTitle": "Zakotwicz rozmowę w Piśmie",
+    "selectedVerseActiveHint": "Ten werset poprowadzi następną odpowiedź.",
+    "selectedVerseHintBody": "Wybierz werset w czytniku, aby odblokować modlitwę, kontekst i zastosowanie dopasowane do fragmentu.",
+    "quickPromptsTitle": "Zacznij od tego, co dziś dzieje się w sercu",
+    "quickPromptsHint": "Wybierz drogę: studium, modlitwa, ukojenie albo rozeznanie.",
+    "quotaHint": "Limit rozmowy odświeża się każdego nowego dnia.",
+    "quickPrompts": {
+      "study": {
+        "title": "Zrozum ten fragment",
+        "subtitle": "Kontekst, sens i to, co warto zauważyć.",
+        "prompt": "Pomóż mi zrozumieć ten fragment w kontekście. Pokaż główną myśl, co ten tekst mówi o Bogu, i jedną praktyczną odpowiedź."
+      },
+      "calm": {
+        "title": "Uspokój moje serce",
+        "subtitle": "Oprzyj mnie na Piśmie i modlitwie.",
+        "prompt": "Czuję niepokój i napięcie. Daj mi krótką refleksję opartą na Piśmie, jeden uspokajający krok i krótką modlitwę."
+      },
+      "discernment": {
+        "title": "Potrzebuję kierunku",
+        "subtitle": "Rozeznanie bez presji i bez sztucznego nakręcania.",
+        "prompt": "Potrzebuję rozeznania w decyzji. Pomóż mi myśleć modlitewnie, pozostać zakorzenionym w Piśmie i zauważyć jeden mądry następny krok."
+      },
+      "forgiveness": {
+        "title": "Pomóż mi przebaczyć",
+        "subtitle": "Łaska, szczerość i mały następny krok.",
+        "prompt": "Zmagam się z przebaczeniem. Oprzyj mnie na Piśmie, pomóż nazwać jeden uczciwy następny krok i pomódl się ze mną."
+      },
+      "prayer": {
+        "title": "Pomódl się ze mną",
+        "subtitle": "Krótka i pełna czci modlitwa z miejsca, w którym jestem.",
+        "prompt": "Pomódl się ze mną prosto i z szacunkiem o tym, co dziś noszę."
+      },
+      "doubt": {
+        "title": "Zmagam się z wątpliwościami",
+        "subtitle": "Szczere pytania i spokojna nadzieja.",
+        "prompt": "Zmagam się z wątpliwościami. Odpowiedz z empatią, trzymaj się Pisma i pomóż mi zrobić jeden uczciwy następny krok."
+      }
+    },
+    "pillPrayer": "Zamień ten werset w modlitwę",
+    "pillHope": "Wydobądź nadzieję z tego wersetu",
+    "templatePrayer": "Zamień {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" w krótką modlitwę, którą mogę wypowiedzieć teraz.",
+    "templateHope": "Wydobądź nadzieję, pocieszenie i zachętę z {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" dla osoby, która dziś potrzebuje siły."
   },
   "workspace": {
     "title": "Notatki",
@@ -903,6 +1062,204 @@
       }
     }
   },
+  "fasting": {
+    "title": "40-dniowy post",
+    "subtitle": "40-dniowa droga oddania, głodu Boga i spokojnej modlitwy.",
+    "homeTileTitle": "40-dniowy post",
+    "homeTileSub": "Skupiona duchowa droga",
+    "homeTileBadge": "Nowość",
+    "startJourney": "Rozpocznij drogę",
+    "notStartedTitle": "Rozpocznij post",
+    "notStartedBody": "Ta 40-dniowa ścieżka ma pomóc Ci pozostać zakorzenionym, szczerym i modlitewnym. Otwieraj ją codziennie, czytaj wersety i rób jeden mały krok wiary.",
+    "journeyCompleteTitle": "Ukończyłeś tę drogę",
+    "journeyCompleteBody": "Możesz wracać do dowolnego dnia, zresetować plan albo pozostać przy ostatnim dniu jako miejscu modlitwy i refleksji.",
+    "dayLabel": "Dzień {{day}} z 40",
+    "weekLabel": "Tydzień {{week}} z 5",
+    "progressLabel": "Ukończono {{percent}}%",
+    "completedDays": "Ukończono {{count}} dni",
+    "verseSectionTitle": "Kotwice Pisma",
+    "practiceSectionTitle": "Codzienna praktyka",
+    "prayerSectionTitle": "Wskazówka do modlitwy",
+    "practicePrompt": "Dzisiejsza praktyka: przyjmij temat {{theme}} powoli i bez presji.",
+    "practiceBody": "Zatrzymaj się dziś dwa razy na krótką modlitwę oddechu. Nazwij jedną rzecz, którą oddajesz Bogu, a potem wykonaj następny mądry krok ze spokojem.",
+    "prayerPrompt": "Kotwica modlitwy: pozwól, aby {{theme}} kształtowało Twoje słowa przed Bogiem.",
+    "prayerBody": "Panie, spotkaj mnie w tym dniu. Uporządkuj moje pragnienia, uspokój moje ciało i ucz moje serce ufać Ci krok po kroku.",
+    "markDone": "Oznacz dzień jako ukończony",
+    "alreadyDone": "Dzień ukończony",
+    "resetJourney": "Zresetuj drogę",
+    "resetConfirmTitle": "Zresetować post?",
+    "resetConfirmBody": "To usunie datę startu i wszystkie ukończone dni tego 40-dniowego planu.",
+    "noVerseFound": "Na dziś nie wczytano jeszcze żadnych wersetów.",
+    "themes": {
+      "surrender": {
+        "title": "Oddanie",
+        "subtitle": "Otwórz dłonie zamiast próbować kontrolować wszystko."
+      },
+      "hunger": {
+        "title": "Głód",
+        "subtitle": "Niech duchowy głód uporządkuje to, po co sięgasz najpierw."
+      },
+      "silence": {
+        "title": "Cisza",
+        "subtitle": "Zrób miejsce na bezruch, zanim Bóg przemówi."
+      },
+      "repentance": {
+        "title": "Pokuta",
+        "subtitle": "Wróć szczerze, bez ukrywania się i bez samopotępienia."
+      },
+      "trust": {
+        "title": "Zaufanie",
+        "subtitle": "Wymień lękliwą kontrolę na spokojną pewność w Bogu."
+      },
+      "mercy": {
+        "title": "Miłosierdzie",
+        "subtitle": "Przyjmij łaskę, zanim spróbujesz cokolwiek udowodnić."
+      },
+      "endurance": {
+        "title": "Wytrwałość",
+        "subtitle": "Trwaj wiernie, gdy post staje się zwykły albo trudny."
+      },
+      "joy": {
+        "title": "Radość",
+        "subtitle": "Niech wdzięczność i zachwyt obudzą na nowo Twoje serce."
+      }
+    }
+  },
+  "practices": {
+    "hubTitle": "Hub duchowych praktyk",
+    "hubSubtitle": "Wybierz praktykę, która najlepiej pasuje do Twojego serca dziś.",
+    "hubIntroTitle": "Jedno miejsce dla wszystkich praktyk",
+    "hubIntroBody": "Zacznij od postu, przejdź Drogę Krzyżową albo odmawiaj różaniec w spokojnym rytmie dziesiątek.",
+    "hubTileTitle": "Hub praktyk",
+    "hubTileSub": "Post, Droga Krzyżowa lub różaniec",
+    "meta": "{{steps}} kroków · ~{{minutes}} min",
+    "streak": "Seria: {{count}} dni",
+    "progress": "Ukończono {{percent}}%",
+    "stepsPreviewTitle": "Kroki na każdy dzień",
+    "stepsPreviewHint": "{{total}} prowadzonych kroków w tej praktyce",
+    "stepsMore": "+ {{count}} kolejnych kroków",
+    "startSession": "Rozpocznij praktykę",
+    "continueSession": "Kontynuuj praktykę",
+    "listenDescription": "Posłuchaj opisu",
+    "reminderTitle": "Codzienne przypomnienie",
+    "reminderHint": "Opcjonalne powiadomienie o aktywnej praktyce",
+    "reminderOn": "Przypomnienie włączone",
+    "reminderDeniedTitle": "Brak powiadomień",
+    "reminderDeniedBody": "Zezwól na powiadomienia w ustawieniach urządzenia, aby ustawić przypomnienie.",
+    "reminderScheduledTitle": "Przypomnienie ustawione",
+    "reminderScheduledBody": "Codziennie o {{hour}}:{{minute}}",
+    "reminderBody": "Czas na {{practice}} — otwórz Biblia AI i kontynuuj praktykę.",
+    "notFound": "Nie znaleziono praktyki.",
+    "categories": {
+      "lent": "Post i Wielki Post",
+      "devotion": "Nabożeństwo",
+      "prayer": "Modlitwa"
+    },
+    "items": {
+      "fasting": {
+        "title": "40-dniowy post",
+        "subtitle": "Skupione oddanie i modlitwa",
+        "description": "Czterdzieści dni Pisma, refleksji i codziennego oddania. Oznaczaj każdy dzień, gdy trwasz w poście."
+      },
+      "stations": {
+        "title": "Droga Krzyżowa",
+        "subtitle": "Prowadzona ścieżka przez cierpienie i nadzieję",
+        "description": "Przejdź czternaście stacji z kotwicami Pisma i modlitwą. Idź powoli i pozwól, by każda stacja dotknęła Twojego życia."
+      },
+      "rosary": {
+        "title": "Różaniec",
+        "subtitle": "Pięć dziesiątek, po dziesięć pacierzy",
+        "description": "Odmawiaj pięć dziesiątek z medytacją Pisma. Licz dziesięć pacierzy na dziesiątkę w spokojnym, stałym rytmie."
+      }
+    },
+    "steps": {
+      "fasting": {
+        "day": "Dzień {{day}}"
+      },
+      "stations": {
+        "station": "Stacja {{number}}"
+      },
+      "rosary": {
+        "decade": "Dziesiątka {{decade}}"
+      }
+    },
+    "session": {
+      "notStartedTitle": "Gotowy, by zacząć?",
+      "notStartedBody": "Rozpocznij praktykę, aby odblokować prowadzenie krok po kroku, postęp i serię dni.",
+      "versesTitle": "Kotwice Pisma",
+      "noVerses": "Na ten krok nie wczytano jeszcze wersetów.",
+      "completeStep": "Oznacz krok jako ukończony",
+      "stepDone": "Krok ukończony",
+      "reset": "Zresetuj praktykę",
+      "fastingStep": "Dzień {{day}} z {{total}}",
+      "stationsStep": "Stacja {{current}} z {{total}}",
+      "rosaryStep": "{{set}} — dziesiątka {{decade}} z {{total}}"
+    }
+  },
+  "devotionals": {
+    "title": "Hub duchowych praktyk",
+    "subtitle": "Wybierz praktykę, która najlepiej pasuje do Twojego serca dziś.",
+    "introTitle": "Jedno miejsce dla wszystkich praktyk",
+    "introBody": "Zacznij od postu, przejdź Drogę Krzyżową albo odmawiaj różaniec w spokojnym rytmie dziesiątek.",
+    "hubTileTitle": "Hub praktyk",
+    "hubTileSub": "Wybierz post, Drogę Krzyżową lub różaniec",
+    "fastingTitle": "40-dniowy post",
+    "fastingSub": "Skupione oddanie i modlitwa",
+    "stationsTitle": "Droga Krzyżowa",
+    "stationsSub": "Prowadzona ścieżka przez cierpienie i nadzieję",
+    "rosaryTitle": "Różaniec",
+    "rosarySub": "Pięć dziesiątek, jeden spokojny rytm"
+  },
+  "stations": {
+    "title": "Droga Krzyżowa",
+    "subtitle": "Prowadzona ścieżka modlitwy, cierpienia i wytrwałej nadziei.",
+    "startJourney": "Rozpocznij drogę",
+    "notStartedTitle": "Rozpocznij Drogę Krzyżową",
+    "notStartedBody": "Przechodź przez kolejne stacje powoli. Czytaj kotwice, zatrzymaj się przy refleksji i pozwól, aby modlitwa dotknęła Twojego życia.",
+    "stationLabel": "Stacja {{current}} z {{total}}",
+    "progressLabel": "Ukończono {{percent}}%",
+    "completedStations": "Ukończono {{count}} stacji",
+    "currentStationHint": "Przeczytaj wersety, a potem zatrzymaj się przy sensie tego momentu.",
+    "verseSectionTitle": "Kotwice Pisma",
+    "reflectionSectionTitle": "Refleksja",
+    "prayerSectionTitle": "Wskazówka do modlitwy",
+    "reflectionBody": "Niech ta stacja przypomina Ci, że Jezus spotyka Cię w bólu, presji i słabości. Zostań przy {{station}} i zobacz, gdzie Bóg mówi do Twojej historii.",
+    "prayerBody": "Panie, w {{station}} ucz mnie trwać przy Tobie zamiast uciekać. Daj mi odwagę, współczucie i spokojne serce.",
+    "markDone": "Oznacz stację jako ukończoną",
+    "alreadyDone": "Stacja ukończona",
+    "resetJourney": "Zresetuj drogę",
+    "resetConfirmTitle": "Zresetować Drogę Krzyżową?",
+    "resetConfirmBody": "To usunie datę startu i wszystkie ukończone stacje.",
+    "journeyCompleteTitle": "Ukończyłeś Drogę Krzyżową",
+    "journeyCompleteBody": "Możesz wrócić do dowolnej stacji, zresetować drogę albo pozostać przy ostatniej jako miejscu ciszy i refleksji.",
+    "noVerseFound": "Na tę stację nie wczytano jeszcze żadnych wersetów."
+  },
+  "rosary": {
+    "title": "Różaniec",
+    "subtitle": "Spokojny rytm dziesiątek przez tajemnicę, Pismo i modlitwę.",
+    "startJourney": "Rozpocznij różaniec",
+    "notStartedTitle": "Wybierz zestaw tajemnic",
+    "notStartedBody": "Wybierz zestaw na dziś, a potem rozpocznij pięciodziesiątkowy rytm modlitwy.",
+    "setLabel": "Zestaw: {{set}}",
+    "decadeLabel": "Dziesiątka {{current}} z {{total}}",
+    "beadCountLabel": "Odmawiane pacierze: {{count}} / {{total}}",
+    "progressLabel": "Ukończono {{percent}}%",
+    "chooseSetTitle": "Wybierz zestaw",
+    "chooseSetBody": "Radosne, Światła, Bolesne albo Chwalebne — wybierz zestaw pasujący do chwili modlitwy.",
+    "verseSectionTitle": "Kotwice Pisma",
+    "meditationSectionTitle": "Medytacja",
+    "prayerSectionTitle": "Wskazówka do modlitwy",
+    "mysteryPrompt": "Zostań przy tajemnicy {{mystery}} i pozwól, aby kształtowała Twoją modlitwę.",
+    "meditationBody": "Trzymaj {{mystery}} powoli. Zauważ jedno słowo, jeden obraz i jedno zaproszenie dla swojego życia dziś.",
+    "prayerBody": "Panie, przez tajemnicę {{mystery}} kieruj moją uwagę ku Chrystusowi i ucz mnie modlić się z ufnością i czułością.",
+    "countBead": "Odmów jedną pacierzę",
+    "resetJourney": "Zresetuj różaniec",
+    "resetConfirmTitle": "Zresetować różaniec?",
+    "resetConfirmBody": "To usunie wybrany zestaw i bieżący rytm dziesiątek.",
+    "journeyCompleteTitle": "Ukończyłeś rytm różańca",
+    "journeyCompleteBody": "Możesz odmówić inny zestaw, rozpocząć od nowa albo zatrzymać się przy ostatniej tajemnicy.",
+    "noVerseFound": "Do tej tajemnicy nie wczytano jeszcze żadnych wersetów."
+  },
   "audioIntro": {
     "heroLabel": "Witaj",
     "premiumLabel": "Premium {{number}}",
@@ -917,6 +1274,10 @@
     "slide3": {
       "title": "Duchowy towarzysz",
       "body": "Zadaj pytanie o dowolny werset. Asystent oparty na Piśmie działa także offline, z wbudowanymi odpowiedziami."
+    },
+    "slide4": {
+      "title": "Twój codzienny rytm",
+      "body": "Każdego dnia czeka łagodna praktyka, werset do refleksji i jedno stuknięcie, by wrócić do Pisma."
     },
     "premium": {
       "title": "Doświadczenie premium {{number}}",
