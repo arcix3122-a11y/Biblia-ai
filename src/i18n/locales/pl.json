@@ -628,6 +628,17 @@
     "modeReasonLiveOpenai": "Odpowiedzi na żywo przez OpenAI.",
     "statusFallbackHint": "Usługa na żywo nie odpowiedziała, więc przełączyłem się na wbudowaną odpowiedź opartą na Piśmie.",
     "statusOfflineHint": "Nie ma skonfigurowanego klucza API, więc działa wbudowany towarzysz oparty na Piśmie.",
+    "devDebug": {
+      "summary": "{{provider}} · HTTP {{status}} · {{template}} · {{mode}}",
+      "providerUnknown": "brak dostawcy",
+      "statusUnknown": "—",
+      "templateYes": "szablon",
+      "templateNo": "model",
+      "modeUnknown": "bezczynny",
+      "originApi": "API",
+      "originTemplate": "szablon",
+      "traceLine": "{{hash}} · {{origin}}"
+    },
     "basisScripture": "Pismo",
     "basisPrayer": "Modlitwa",
     "basisDiscernment": "Rozeznanie",

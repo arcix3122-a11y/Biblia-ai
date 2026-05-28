@@ -628,6 +628,17 @@
     "modeReasonLiveOpenai": "Live replies via OpenAI.",
     "statusFallbackHint": "The live service did not respond, so I switched to a built-in Scripture-based reply.",
     "statusOfflineHint": "No API key is configured, so the built-in Scripture-based companion is active.",
+    "devDebug": {
+      "summary": "{{provider}} · HTTP {{status}} · {{template}} · {{mode}}",
+      "providerUnknown": "no provider",
+      "statusUnknown": "—",
+      "templateYes": "template",
+      "templateNo": "model",
+      "modeUnknown": "idle",
+      "originApi": "API",
+      "originTemplate": "template",
+      "traceLine": "{{hash}} · {{origin}}"
+    },
     "basisScripture": "Scripture",
     "basisPrayer": "Prayer",
     "basisDiscernment": "Discernment",

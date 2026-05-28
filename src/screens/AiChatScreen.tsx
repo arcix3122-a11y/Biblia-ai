@@ -20,6 +20,7 @@ import { ChatBubble } from "@/components/ChatBubble";
 import { GlassChrome } from "@/components/GlassChrome";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
+import { getAssistantRequestTrace } from "@/services/ai/assistantRequestTrace";
 import { useSpiritualAssistant } from "@/hooks/useSpiritualAssistant";
 import {
   buildQuickPromptMessage,
@@ -61,9 +62,13 @@ export default function AiChatScreen() {
     modeReason,
     lastResponseMode,
     lastLlmError,
+    lastReplyUsedTemplate,
+    provider,
+    lastLlmStatusCode,
   } = useSpiritualAssistant();
 
   const showDevLlmDebug = __DEV__;
+  const [devDebugExpanded, setDevDebugExpanded] = useState(false);
 
   const quickPrompts = useMemo(() => getAssistantQuickPrompts(), []);
   const hasUserMessages = messages.some((message) => message.role === "user");
@@ -230,12 +235,44 @@ export default function AiChatScreen() {
 
                 <Text style={styles.modeHint}>{modeReason}</Text>
 
-                {showDevLlmDebug && lastResponseMode ? (
+                {showDevLlmDebug ? (
                   <View style={styles.devLlmDebug}>
-                    <Text style={styles.devLlmDebugLabel}>
-                      {lastResponseMode}
-                      {lastLlmError ? ` · ${lastLlmError}` : ""}
-                    </Text>
+                    <Pressable
+                      onPress={() => setDevDebugExpanded((value) => !value)}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.devLlmDebugLabel}>
+                        {t("ai.devDebug.summary", {
+                          provider: provider || t("ai.devDebug.providerUnknown"),
+                          status:
+                            lastLlmStatusCode !== null
+                              ? String(lastLlmStatusCode)
+                              : t("ai.devDebug.statusUnknown"),
+                          template: lastReplyUsedTemplate
+                            ? t("ai.devDebug.templateYes")
+                            : t("ai.devDebug.templateNo"),
+                          mode: lastResponseMode ?? t("ai.devDebug.modeUnknown"),
+                        })}
+                      </Text>
+                    </Pressable>
+                    {devDebugExpanded ? (
+                      <View style={styles.devLlmDebugDetails}>
+                        {lastLlmError ? (
+                          <Text style={styles.devLlmDebugDetail}>{lastLlmError}</Text>
+                        ) : null}
+                        {getAssistantRequestTrace().map((entry) => (
+                          <Text key={entry.at} style={styles.devLlmDebugDetail}>
+                            {t("ai.devDebug.traceLine", {
+                              hash: entry.payloadHash,
+                              origin:
+                                entry.origin === "api"
+                                  ? t("ai.devDebug.originApi")
+                                  : t("ai.devDebug.originTemplate"),
+                            })}
+                          </Text>
+                        ))}
+                      </View>
+                    ) : null}
                   </View>
                 ) : null}
 
@@ -484,6 +521,15 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontFamily: Platform.select({ ios: "Menlo", android: "monospace", default: "monospace" }),
     color: colors.accent,
+  },
+  devLlmDebugDetails: {
+    marginTop: spacing.xs,
+    gap: 2,
+  },
+  devLlmDebugDetail: {
+    ...typography.caption,
+    fontFamily: Platform.select({ ios: "Menlo", android: "monospace", default: "monospace" }),
+    color: colors.textMuted,
   },
   guardrailCard: {
     flexDirection: "row",

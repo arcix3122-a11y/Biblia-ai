@@ -29,7 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
-| 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `c58ccc7` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
+| 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `1d09f77` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
 | 2026-05-28 17:05 | Cursor subagent | AI smoke harness (`npm run ai:smoke`) — wykrywanie powtarzalnych odpowiedzi LLM | *(ten commit)* | done | Pomija bez klucza; 5 promptów, overlap Jaccard |
 | 2026-05-28 16:30 | Cursor subagent | P0 retencja: DailyMissionHub + multi-streak + Home loop | *(ten commit)* | done | Audyt konkurencji P0 — wpięte na Home |
 | 2026-05-28 14:00 | Cursor subagent | Audyt konkurencji UX (YouVersion/Glorify/Hallow) — plan P0/P1/P2 | — | done | Bez kodu; sekcja „Audyt konkurencji” poniżej |
@@ -2043,7 +2043,15 @@ npx expo start
 - Zmiany: `aiChatStore.ts` (user bez source system), `useSpiritualAssistant.ts` (historia + LIVE_GROQ/OFFLINE_MOCK, max_tokens 512), `AiChatScreen.tsx` (dev pill), `llmClient.ts` (domyślne 512 tokenów).
 - Walidacja: `npm run typecheck` OK; `npm run ai:smoke` OK (5/5 distinct).
 - Weryfikacja na telefonie: Expo Go → Asystent → wyślij 2 różne pytania; w __DEV__ pod trybem widać `LIVE_GROQ` (bez błędu). Po celowym złym kluczu: `OFFLINE_MOCK` + komunikat błędu.
-- Result: done — commit `c58ccc7` (`fix(ai): stop canned replies; use live Groq with history`)
+- Result: done — commit `1d09f77` (`fix(ai): stop canned replies; use live Groq with history`)
+
+## 2026-05-28 19:15 (local)
+- Agent: Cursor subagent
+- Task: START - fix(ai): koniec szablonów w trybie live
+- Cel: Odpowiedzi z modelu na podstawie wiadomości użytkownika; tryb live nie maskuje offline; dev trace + prompt konwersacyjny.
+- Zakres: `useSpiritualAssistant.ts`, `spiritualAssistantProfile.ts`, `assistantRequestTrace.ts`, `AiChatScreen.tsx`, locale
+- Walidacja: `npm run typecheck`, `npm run ai:smoke`
+- Result: in-progress
 
 ## 2026-05-28 17:30 (local)
 - Agent: Cursor subagent

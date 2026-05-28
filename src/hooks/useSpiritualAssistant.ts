@@ -11,6 +11,9 @@ import {
 } from "@/services/ai/llmClient";
 import { useAppTranslation } from "@/hooks/useAppTranslation";
 import {
+  recordAssistantRequest,
+} from "@/services/ai/assistantRequestTrace";
+import {
   buildAssistantSystemPrompt,
   buildOfflineCompanionReply,
   buildTemplatePrompt,
@@ -40,13 +43,31 @@ function buildConversationHistory(
       if (message.role === "user") {
         return true;
       }
-      return message.role === "assistant" && message.source !== "system";
+      if (message.role !== "assistant") {
+        return false;
+      }
+      if (message.source === "system" || message.source === "offline") {
+        return false;
+      }
+      return true;
     })
     .slice(-20)
     .map((message) => ({
       role: message.role as "user" | "assistant",
       content: message.content,
     }));
+}
+
+function latestUserText(
+  history: Array<{ role: "user" | "assistant"; content: string }>
+): string {
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    const item = history[index];
+    if (item.role === "user") {
+      return item.content;
+    }
+  }
+  return "";
 }
 
 function ensureCurrentUserTurn(
@@ -72,10 +93,14 @@ async function callLiveAssistant(
   locale: "en" | "pl"
 ): Promise<string> {
   const messages: ChatCompletionMessage[] = [
-    { role: "system", content: buildAssistantSystemPrompt(locale, verse) },
+    {
+      role: "system",
+      content: buildAssistantSystemPrompt(locale, verse, latestUserText(history)),
+    },
     ...history.map((item) => ({ role: item.role, content: item.content })),
   ];
 
+  recordAssistantRequest(messages, "api");
   return callLiveChatCompletion(messages, ASSISTANT_CHAT_OPTIONS);
 }
 
@@ -98,6 +123,7 @@ export function useSpiritualAssistant() {
     null
   );
   const [lastLlmError, setLastLlmError] = useState<string | null>(null);
+  const [lastReplyUsedTemplate, setLastReplyUsedTemplate] = useState(false);
 
   useEffect(() => {
     syncDailyQuota();
@@ -116,8 +142,13 @@ export function useSpiritualAssistant() {
         return false;
       }
 
+      const useLiveApi = hasLlmApiKey();
+
       setConnectionWarning(null);
       setLastLlmError(null);
+      if (useLiveApi) {
+        setLastReplyUsedTemplate(false);
+      }
       addUserMessage(trimmed);
       setIsThinking(true);
 
@@ -125,8 +156,6 @@ export function useSpiritualAssistant() {
         buildConversationHistory(useAiChatStore.getState().messages),
         trimmed
       );
-
-      const useLiveApi = hasLlmApiKey();
 
       try {
         let reply = "";
@@ -136,8 +165,13 @@ export function useSpiritualAssistant() {
           reply = await callLiveAssistant(history, verse, locale);
           replySource = "live";
           setLastResponseMode("LIVE_GROQ");
+          setLastReplyUsedTemplate(false);
           setLastLlmError(null);
         } else {
+          const offlineMessages: ChatCompletionMessage[] = [
+            { role: "user", content: trimmed },
+          ];
+          recordAssistantRequest(offlineMessages, "template");
           const firstAid = await generateSpiritualFirstAidKit(trimmed, {
             locale,
             translation: locale,
@@ -146,6 +180,7 @@ export function useSpiritualAssistant() {
           reply = firstAid.commentary;
           replySource = firstAid.usedLiveApi ? "live" : "offline";
           setLastResponseMode(firstAid.usedLiveApi ? "LIVE_GROQ" : "OFFLINE_MOCK");
+          setLastReplyUsedTemplate(!firstAid.usedLiveApi);
           setLastLlmError(null);
         }
 
@@ -158,6 +193,16 @@ export function useSpiritualAssistant() {
           error instanceof Error ? error.message : String(error);
         setLastLlmError(errorMessage);
         setLastResponseMode("OFFLINE_MOCK");
+        setLastReplyUsedTemplate(true);
+
+        const fallbackMessages: ChatCompletionMessage[] = [
+          {
+            role: "system",
+            content: buildAssistantSystemPrompt(locale, verse, trimmed),
+          },
+          ...history.map((item) => ({ role: item.role, content: item.content })),
+        ];
+        recordAssistantRequest(fallbackMessages, "template");
 
         logError(error, "spiritual-assistant-live", {
           hasApiKey: useLiveApi,
@@ -229,11 +274,11 @@ export function useSpiritualAssistant() {
     }
   }
 
-  const assistantMode: AssistantMode = connectionWarning
-    ? "fallback"
-    : hasApiKey
-      ? "live"
-      : "offline";
+  const assistantMode: AssistantMode = !hasApiKey
+    ? "offline"
+    : connectionWarning || lastReplyUsedTemplate
+      ? "fallback"
+      : "live";
 
   const modeReason = useMemo(() => {
     if (assistantMode === "fallback") {
@@ -254,6 +299,9 @@ export function useSpiritualAssistant() {
   const modeLabel = useMemo(() => {
     if (assistantMode === "live") {
       return t("ai.statusLiveShort");
+    }
+    if (assistantMode === "fallback") {
+      return t("ai.statusFallback");
     }
     return t("ai.statusOfflineShort");
   }, [assistantMode, t]);
@@ -278,5 +326,7 @@ export function useSpiritualAssistant() {
     lastInput,
     lastResponseMode,
     lastLlmError,
+    lastReplyUsedTemplate,
+    lastLlmStatusCode: getLastLlmDebugInfo()?.statusCode ?? null,
   };
 }
