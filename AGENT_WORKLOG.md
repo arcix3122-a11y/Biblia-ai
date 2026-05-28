@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 17:05 | Cursor subagent | AI smoke harness (`npm run ai:smoke`) — wykrywanie powtarzalnych odpowiedzi LLM | *(ten commit)* | done | Pomija bez klucza; 5 promptów, overlap Jaccard |
 | 2026-05-28 16:30 | Cursor subagent | P0 retencja: DailyMissionHub + multi-streak + Home loop | *(ten commit)* | done | Audyt konkurencji P0 — wpięte na Home |
 | 2026-05-28 14:00 | Cursor subagent | Audyt konkurencji UX (YouVersion/Glorify/Hallow) — plan P0/P1/P2 | — | done | Bez kodu; sekcja „Audyt konkurencji” poniżej |
 | 2026-05-27 16:00 | Cursor subagent | Śledzenie dostawy pełnej Biblii PL+EN — koordynacja | *(ten commit)* | done | Checklist deliverable; seed nadal demo 4 ks. — **w trakcie** |
@@ -190,6 +191,13 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Walidacja:** `git log -1`; przegląd tabeli vs `git log --oneline -40`.
 
 ---
+
+## 2026-05-28 12:25 (local)
+- Agent: Antigravity
+- Task: DONE - Fix all TypeScript compile errors from VOTD modules (VotdFeedCard, VotdDevotionalScreen, VotdCreatorScreen)
+- Changes: src/components/dashboard/VotdFeedCard.tsx (ScrollView import + as any casts), src/screens/VotdDevotionalScreen.tsx (reference hoisted to useMemo), src/screens/VotdCreatorScreen.tsx (removed Slider import, fixed Ionicons names, added FONT_LABEL_KEYS map)
+- Validation: npm run typecheck → 0 errors
+- Result: done
 
 ## Archiwum — pełne wpisy START/DONE (historyczne)
 
@@ -1990,3 +1998,24 @@ npx expo start
 - Changes: pending
 - Validation: pending
 - Result: in-progress
+
+## 2026-05-28 (local)
+- Agent: Composer
+- Task: START - AI live/offline mode indicator and retry UX
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:05 (local)
+- Agent: Cursor subagent
+- Task: START - Local AI smoke harness (repetitive reply detection)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:08 (local)
+- Agent: Cursor subagent
+- Task: DONE - Local AI smoke harness (`scripts/ai-smoke-test.mjs`, `npm run ai:smoke`)
+- Changes: scripts/ai-smoke-test.mjs, package.json, AGENT_WORKLOG.md
+- Validation: `npm run ai:smoke` (pass with local key; skip path when EXPO_PUBLIC_AI_API_KEY unset)
+- Result: done — imports `callLiveChatCompletion` from `llmClient.ts`; 5 varied prompts; fails on identical or ≥85% token overlap
