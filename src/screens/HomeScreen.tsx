@@ -280,8 +280,8 @@ export default function HomeScreen() {
         <Text style={styles.sectionHeading}>{t("home.exploreHeading")}</Text>
         <ActionTile
           icon="grid-outline"
-          title={t("devotionals.hubTileTitle")}
-          subtitle={t("devotionals.hubTileSub")}
+          title={t("practices.hubTileTitle")}
+          subtitle={t("practices.hubTileSub")}
           badge={t("common.new")}
           layout="horizontal"
           imageUrl={getCategoryPhotoUrl("guidedSilence", 600, 400)}

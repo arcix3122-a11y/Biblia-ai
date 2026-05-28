@@ -94,6 +94,12 @@ function RootStack() {
       <Stack.Screen name="topic/[slug]" options={{ title: t("navigation.topic") }} />
       <Stack.Screen name="settings" options={{ title: t("navigation.settings") }} />
       <Stack.Screen name="reading-plan" options={{ headerShown: false }} />
+      <Stack.Screen name="fasting" options={{ headerShown: false }} />
+      <Stack.Screen name="devotional-hub" options={{ headerShown: false }} />
+      <Stack.Screen name="practice/[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="practice/[id]/session" options={{ headerShown: false }} />
+      <Stack.Screen name="stations" options={{ headerShown: false }} />
+      <Stack.Screen name="rosary" options={{ headerShown: false }} />
       <Stack.Screen name="stats" options={{ headerShown: false }} />
       <Stack.Screen
         name="study"
