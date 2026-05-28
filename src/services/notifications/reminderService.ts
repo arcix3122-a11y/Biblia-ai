@@ -19,10 +19,15 @@ export interface EveningRescueOptions {
   minute?: number;
 }
 
-function isExpoGoClient(): boolean {
+export function isExpoGoClient(): boolean {
   const executionEnvironment = Constants.executionEnvironment;
   const appOwnership = Constants.appOwnership;
   return executionEnvironment === "storeClient" || appOwnership === "expo";
+}
+
+/** Local notification scheduling works in dev/production builds, not in Expo Go. */
+export function canScheduleNotifications(): boolean {
+  return !isExpoGoClient() && Device.isDevice;
 }
 
 async function getNotificationsModule(): Promise<NotificationsModule | null> {

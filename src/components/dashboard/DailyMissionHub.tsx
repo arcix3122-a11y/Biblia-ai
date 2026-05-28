@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -46,11 +46,13 @@ const MISSIONS: MissionTile[] = [
 interface DailyMissionHubProps {
   onOpenReflection?: () => void;
   reflectionAvailable?: boolean;
+  onFirstMissionCompleted?: () => void;
 }
 
 export function DailyMissionHub({
   onOpenReflection,
   reflectionAvailable = false,
+  onFirstMissionCompleted,
 }: DailyMissionHubProps) {
   const { t: tAny } = useTranslation();
   const t = tAny as (key: string, options?: Record<string, unknown>) => string;
@@ -65,16 +67,22 @@ export function DailyMissionHub({
   });
   const [completedCount, setCompletedCount] = useState(0);
   const [practiceOpen, setPracticeOpen] = useState(false);
+  const prevCompletedRef = useRef(0);
 
   const loadStats = useCallback(async () => {
     try {
       const stats = await getUserStats();
+      const nextCount = stats.activitiesCompletedCount;
+      if (prevCompletedRef.current === 0 && nextCount >= 1) {
+        onFirstMissionCompleted?.();
+      }
+      prevCompletedRef.current = nextCount;
       setActivities(stats.activitiesToday);
-      setCompletedCount(stats.activitiesCompletedCount);
+      setCompletedCount(nextCount);
     } catch {
       // local-only
     }
-  }, []);
+  }, [onFirstMissionCompleted]);
 
   useEffect(() => {
     void loadStats();

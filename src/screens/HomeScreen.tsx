@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Pressable,
   RefreshControl,
@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Swipeable } from "react-native-gesture-handler";
@@ -19,6 +19,7 @@ import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
 import { HeroCard } from "@/components/dashboard/HeroCard";
 import { DailyMissionHub } from "@/components/dashboard/DailyMissionHub";
+import { DailyRhythmCard } from "@/components/dashboard/DailyRhythmCard";
 import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
 import { ReadingPlanCard } from "@/components/dashboard/ReadingPlanCard";
 import { GuidedReflectionCards } from "@/components/dashboard/GuidedReflectionCards";
@@ -41,6 +42,9 @@ import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { getCategoryPhotoUrl, HOME_TILE_PHOTOS } from "@/data/photoBackgrounds";
 import { HighlightedText } from "@/utils/highlightText";
 import { formatShortDate } from "@/utils/formatDate";
+import { getUserStats } from "@/services/stats/userStats";
+import { ReminderFunnelPrompt } from "@/components/notifications/ReminderFunnelPrompt";
+import { useReminderStore } from "@/store/reminderStore";
 import { colors, radii, spacing, typography } from "@/theme";
 
 const TESTAMENTS: readonly Testament[] = ["OT", "NT"];
@@ -92,6 +96,40 @@ export default function HomeScreen() {
   const [votdText, setVotdText] = useState("");
   const [votdRef, setVotdRef] = useState("");
   const [pendingReflection, setPendingReflection] = useState<ReflectionVariant | null>(null);
+  const [reminderFunnelVisible, setReminderFunnelVisible] = useState(false);
+  const reminderEnabled = useReminderStore((s) => s.enabled);
+  const reminderFunnelPromptSeen = useReminderStore((s) => s.reminderFunnelPromptSeen);
+  const loadReminderPrefs = useReminderStore((s) => s.load);
+  const prevMissionCountRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    void loadReminderPrefs();
+  }, [loadReminderPrefs]);
+
+  const tryShowReminderFunnel = useCallback(() => {
+    if (!reminderEnabled && !reminderFunnelPromptSeen) {
+      setReminderFunnelVisible(true);
+    }
+  }, [reminderEnabled, reminderFunnelPromptSeen]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (reminderEnabled || reminderFunnelPromptSeen) {
+        return;
+      }
+      void getUserStats().then((stats) => {
+        const count = stats.activitiesCompletedCount;
+        const prev = prevMissionCountRef.current;
+        prevMissionCountRef.current = count;
+        if (prev === null) {
+          return;
+        }
+        if (prev === 0 && count >= 1) {
+          tryShowReminderFunnel();
+        }
+      });
+    }, [reminderEnabled, reminderFunnelPromptSeen, tryShowReminderFunnel])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -272,9 +310,12 @@ export default function HomeScreen() {
 
         <MomentumDashboard />
 
+        <DailyRhythmCard />
+
         <DailyMissionHub
           reflectionAvailable={Boolean(votdText && votdRef)}
           onOpenReflection={() => setPendingReflection("meditation")}
+          onFirstMissionCompleted={tryShowReminderFunnel}
         />
 
         <ReadingPlanCard />
@@ -572,6 +613,10 @@ export default function HomeScreen() {
 
         <TopicGrid onTopicPress={openTopic} />
       </ScrollView>
+      <ReminderFunnelPrompt
+        visible={reminderFunnelVisible}
+        onClose={() => setReminderFunnelVisible(false)}
+      />
     </View>
   );
 }
