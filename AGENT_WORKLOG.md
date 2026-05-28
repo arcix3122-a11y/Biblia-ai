@@ -11,8 +11,8 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 | | |
 |---|---|
 | **Ścieżka projektu na dysku** | `C:\Users\arcix\Projects\biblia-ai` |
-| **Ostatni commit (HEAD)** | `5157d06` — *feat(bible): first-launch bulk seed with progress UI* (2026-05-27) |
-| **Push do GitHub** | **Nie** — gałąź `master` jest **13 commitów** przed `origin/master`. Aby opublikować: `git push origin master` |
+| **Ostatni commit (HEAD)** | `7920d8a` — *fix: restore typecheck green* (2026-05-28); kod: `2c37754` |
+| **Push do GitHub** | **Nie** — gałąź `master` jest **40 commitów** przed `origin/master`. Aby opublikować: `git push origin master` |
 | **Cursor — jak zobaczyć** | **File → Open Folder…** → wybierz `C:\Users\arcix\Projects\biblia-ai` (nie inny katalog). Otwórz `AGENT_WORKLOG.md` — linia 1 powinna zaczynać się od `# Agent Worklog`. |
 | **Telefon / Expo Go** | Na tym PC: `npx expo start`. Jeśli kod był na innym komputerze: `git pull` **po** `git push` z tego PC. W Expo Go: wstrząśnij → **Reload**; ewentualnie wyczyść cache. W aplikacji: **Settings → Advanced → Wyczyść bibliotekę** (nowy seed PL/EN w SQLite). |
 | **Pliki kluczowe do sprawdzenia** | `AGENT_WORKLOG.md` (linia 1), `app/_layout.tsx`, `assets/bible-seed-pl.json` |
@@ -29,7 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
-| 2026-05-28 19:00 | Cursor subagent | Stabilizacja buildu — typecheck green | *(ten commit)* | done | haptics, ui types, brakujące moduły AI/TTS |
+| 2026-05-28 19:00 | Cursor subagent | Stabilizacja buildu — typecheck green | `2c37754`, `7920d8a` | done | haptics, ui types, brakujące moduły AI/TTS |
 | 2026-05-28 16:15 | Cursor subagent | Reader — mapowanie zdjęć ksiąg | `7e68fe2` | done | photoUrl z getBookPhotoUrl jak BookTile |
 | 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | `ee709c0` | done | Photo hero + sticky bar; getBookPhotoUrl |
 | 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `1d09f77` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
@@ -194,7 +194,40 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Commity:** `8bf9c32` — docs: AGENT_WORKLOG rejestr agentów i chronologia
 - **Walidacja:** `git log -1`; przegląd tabeli vs `git log --oneline -40`.
 
+### START — Stabilizacja typecheck (HEAD green)
+
+- **Data:** 2026-05-28 19:00
+- **Agent:** Cursor subagent
+- **Cel:** Przywrócić zielony `npm run typecheck` na HEAD po serii commitów z importami bez plików źródłowych.
+- **Zakres:** `AnimatedSacredBackdrop`, `useChapterTTS`, `spiritualFirstAidKit` (data), `haptics.ts` (`hapticMedium`/`hapticError`), `types/ui.ts` (`prayer`/`hope` w `ContextPillTemplateId`).
+- **Walidacja:** `npm run typecheck`, `npm run check:locales`.
+
+### DONE — Stabilizacja typecheck (HEAD green)
+
+- **Data:** 2026-05-28 19:05
+- **Agent:** Cursor subagent
+- **Wynik:**
+  - Dodano brakujące moduły referencjonowane z `AiChatScreen`, `ReaderScreen`, `spiritualFirstAidKit` service.
+  - Rozszerzono `haptics` i `ContextPillTemplateId` zgodnie z `spiritualAssistantProfile` / `AiChatScreen`.
+  - HEAD-only typecheck: **0 błędów** (bez WIP VOTD w drzewie).
+- **Commity:** `2c37754`, `7920d8a` — fix: restore typecheck green
+- **Walidacja:** `npm run typecheck` 0 błędów; `npm run check:locales` 1223 kluczy PL=EN.
+
 ---
+
+## 2026-05-28 19:05 (local)
+- Agent: Cursor subagent
+- Task: DONE - Stabilizacja typecheck (HEAD green)
+- Changes: src/components/ai/AnimatedSacredBackdrop.tsx, src/hooks/useChapterTTS.ts, src/data/spiritualFirstAidKit.ts, src/utils/haptics.ts, src/types/ui.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (0 errors); npm run check:locales (1223 keys)
+- Result: done — commits `2c37754`, `7920d8a`
+
+## 2026-05-28 19:00 (local)
+- Agent: Cursor subagent
+- Task: START - Stabilizacja typecheck (HEAD green)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
 
 ## 2026-05-28 16:15 (local)
 - Agent: Cursor subagent
