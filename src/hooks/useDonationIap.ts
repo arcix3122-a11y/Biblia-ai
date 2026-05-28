@@ -6,6 +6,7 @@ import {
   fetchDonationProducts,
   initDonationIapConnection,
   isDonationIapAvailable,
+  recoverUnfinishedDonationPurchases,
   requestDonationPurchase,
   subscribeDonationPurchaseListeners,
   type DonationIapMessageKey,
@@ -50,6 +51,8 @@ export function useDonationIap({ onPurchaseSuccess }: UseDonationIapOptions) {
         return;
       }
 
+      await recoverUnfinishedDonationPurchases();
+
       try {
         const products = await fetchDonationProducts();
         if (cancelled) {
@@ -80,6 +83,8 @@ export function useDonationIap({ onPurchaseSuccess }: UseDonationIapOptions) {
         setActiveTierId(null);
         if (key === "donation.iap.errors.cancelled") {
           setStatus("idle");
+        } else if (key === "donation.iap.errors.pending") {
+          setStatus("idle");
         } else {
           setStatus("error");
         }
@@ -97,7 +102,7 @@ export function useDonationIap({ onPurchaseSuccess }: UseDonationIapOptions) {
   const purchaseTier = useCallback(
     async (tierId: DonorTierId) => {
       if (!iapAvailable) {
-        setErrorKey("donation.iap.expoGoNotice");
+        setErrorKey("donation.iap.playRequired");
         return;
       }
       setErrorKey(null);

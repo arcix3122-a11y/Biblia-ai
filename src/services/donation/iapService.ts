@@ -11,6 +11,7 @@ import { useDonorStore } from "@/store/donorStore";
 type IapModule = typeof import("react-native-iap");
 type IapProduct = import("react-native-iap").Product;
 type IapPurchase = import("react-native-iap").Purchase;
+type IapPurchaseError = import("react-native-iap").PurchaseError;
 type IapEventSubscription = import("react-native-iap").EventSubscription;
 
 let connectionActive = false;
@@ -19,13 +20,16 @@ let updateSubscription: IapEventSubscription | null = null;
 let errorSubscription: IapEventSubscription | null = null;
 
 export type DonationIapMessageKey =
-  | "donation.iap.expoGoNotice"
+  | "donation.iap.playRequired"
   | "donation.iap.errors.cancelled"
   | "donation.iap.errors.connectionFailed"
   | "donation.iap.errors.productsFailed"
   | "donation.iap.errors.purchaseFailed"
   | "donation.iap.errors.verifyFailed"
-  | "donation.iap.errors.unknownProduct";
+  | "donation.iap.errors.unknownProduct"
+  | "donation.iap.errors.billingUnavailable"
+  | "donation.iap.errors.pending"
+  | "donation.iap.errors.alreadyOwned";
 
 export type DonationPurchaseHandler = (tierId: DonorTierId) => void;
 export type DonationPurchaseErrorHandler = (errorKey: DonationIapMessageKey) => void;
@@ -33,6 +37,28 @@ export type DonationPurchaseErrorHandler = (errorKey: DonationIapMessageKey) => 
 /** IAP requires a dev or store build — not available in Expo Go. */
 export function isDonationIapAvailable(): boolean {
   return !isExpoGoClient() && (Platform.OS === "android" || Platform.OS === "ios");
+}
+
+function isDonationProductId(productId: string): boolean {
+  return getAllDonationProductIds().includes(productId);
+}
+
+function mapPurchaseError(error: IapPurchaseError, iap: IapModule): DonationIapMessageKey {
+  switch (error.code) {
+    case iap.ErrorCode.UserCancelled:
+      return "donation.iap.errors.cancelled";
+    case iap.ErrorCode.BillingUnavailable:
+    case iap.ErrorCode.IapNotAvailable:
+    case iap.ErrorCode.FeatureNotSupported:
+      return "donation.iap.errors.billingUnavailable";
+    case iap.ErrorCode.Pending:
+    case iap.ErrorCode.DeferredPayment:
+      return "donation.iap.errors.pending";
+    case iap.ErrorCode.AlreadyOwned:
+      return "donation.iap.errors.alreadyOwned";
+    default:
+      return "donation.iap.errors.purchaseFailed";
+  }
 }
 
 async function getIapModule(): Promise<IapModule | null> {
@@ -65,8 +91,9 @@ export async function initDonationIapConnection(): Promise<boolean> {
 
 export async function endDonationIapConnection(): Promise<void> {
   updateSubscription?.remove();
-  errorSubscription = null;
+  errorSubscription?.remove();
   updateSubscription = null;
+  errorSubscription = null;
   const iap = await getIapModule();
   if (!iap || !connectionActive) {
     return;
@@ -90,6 +117,32 @@ export async function fetchDonationProducts(): Promise<IapProduct[]> {
   return (products ?? []).filter((product): product is IapProduct => product.type === "in-app");
 }
 
+/**
+ * Finishes any unconsumed donation purchases still owned by the user.
+ * Updates donor tier silently — no UI callback.
+ */
+export async function recoverUnfinishedDonationPurchases(): Promise<void> {
+  const iap = await getIapModule();
+  if (!iap || !connectionActive) {
+    return;
+  }
+
+  try {
+    const purchases = await iap.getAvailablePurchases();
+    for (const purchase of purchases) {
+      if (!isDonationProductId(purchase.productId)) {
+        continue;
+      }
+      if (purchase.purchaseState === "pending") {
+        continue;
+      }
+      await finalizeVerifiedPurchase(purchase);
+    }
+  } catch {
+    // ignore recovery errors — user can retry purchase
+  }
+}
+
 export function subscribeDonationPurchaseListeners(
   onSuccess: DonationPurchaseHandler,
   onError: DonationPurchaseErrorHandler
@@ -107,6 +160,15 @@ export function subscribeDonationPurchaseListeners(
 
     updateSubscription = iap.purchaseUpdatedListener(async (purchase) => {
       try {
+        if (!isDonationProductId(purchase.productId)) {
+          return;
+        }
+
+        if (purchase.purchaseState === "pending") {
+          onError("donation.iap.errors.pending");
+          return;
+        }
+
         const tierId = await finalizeVerifiedPurchase(purchase);
         if (tierId) {
           onSuccess(tierId);
@@ -119,11 +181,10 @@ export function subscribeDonationPurchaseListeners(
     });
 
     errorSubscription = iap.purchaseErrorListener((error) => {
-      if (error.code === iap.ErrorCode.UserCancelled) {
-        onError("donation.iap.errors.cancelled");
-        return;
+      if (error.code === iap.ErrorCode.AlreadyOwned) {
+        void recoverUnfinishedDonationPurchases();
       }
-      onError("donation.iap.errors.purchaseFailed");
+      onError(mapPurchaseError(error, iap));
     });
   })();
 
@@ -163,6 +224,10 @@ export async function finalizeVerifiedPurchase(purchase: IapPurchase): Promise<D
 
   const tierId = getTierIdForProductId(purchase.productId);
   if (!tierId) {
+    return null;
+  }
+
+  if (purchase.purchaseState === "pending") {
     return null;
   }
 

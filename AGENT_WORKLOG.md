@@ -2263,4 +2263,18 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Task: DONE - Google Play IAP darowizny + karta wsparcia na Home
 - Changes: react-native-iap, donationProducts, iapService, useDonationIap, DonationScreen, donorStore, SupportCard, HomeScreen, SettingsScreen dev reset, i18n, migration 006, app.json plugin
 - Validation: npm run typecheck (pass)
-- Result: done — commit pending
+- Result: done — commit 488dc3e
+
+## 2026-05-28 17:30 (local)
+- Agent: Cursor subagent
+- Task: START - produkcyjny Google Play Billing (3 consumables)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 17:45 (local)
+- Agent: Cursor subagent
+- Task: DONE - produkcyjny Google Play Billing (3 consumables)
+- Changes: iapService (errors, pending, recovery), donorStore (token-only tier), DonationScreen (IAP-only), useDonationIap, app.json BILLING, eas.json, docs/GOOGLE_PLAY_IAP.md, i18n PL/EN
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1273 keys)
+- Result: done

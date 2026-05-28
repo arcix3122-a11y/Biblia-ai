@@ -45,6 +45,21 @@ function recomputeFromVerifiedPurchases(
   return { donorTier, totalDonatedPln, lastDonationAt };
 }
 
+function isVerifiedPurchaseRecord(record: VerifiedPurchaseRecord): boolean {
+  if (!record.transactionId?.trim() || !record.productId?.trim()) {
+    return false;
+  }
+
+  const isDevSimulated =
+    __DEV__ && record.productId.startsWith("dev_") && !record.purchaseToken?.trim();
+
+  if (isDevSimulated) {
+    return true;
+  }
+
+  return Boolean(record.purchaseToken?.trim());
+}
+
 export const useDonorStore = create<DonorState>()(
   persist(
     (set, get) => ({
@@ -55,8 +70,16 @@ export const useDonorStore = create<DonorState>()(
       hydrated: false,
 
       recordVerifiedPurchase: async (record) => {
+        if (!isVerifiedPurchaseRecord(record)) {
+          return get().donorTier;
+        }
+
         const duplicate = get().verifiedPurchases.some(
-          (entry) => entry.transactionId === record.transactionId
+          (entry) =>
+            entry.transactionId === record.transactionId ||
+            (record.purchaseToken &&
+              entry.purchaseToken &&
+              entry.purchaseToken === record.purchaseToken)
         );
         if (duplicate) {
           return get().donorTier;
@@ -96,24 +119,16 @@ export const useDonorStore = create<DonorState>()(
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          if (state.verifiedPurchases.length === 0) {
-            useDonorStore.setState({
-              donorTier: null,
-              totalDonatedPln: 0,
-              lastDonationAt: null,
-              verifiedPurchases: [],
-            });
-          } else {
-            useDonorStore.setState(recomputeFromVerifiedPurchases(state.verifiedPurchases));
-          }
+          const verifiedPurchases = state.verifiedPurchases.filter(isVerifiedPurchaseRecord);
+          useDonorStore.setState({
+            verifiedPurchases,
+            ...recomputeFromVerifiedPurchases(verifiedPurchases),
+          });
         }
         useDonorStore.setState({ hydrated: true });
       },
       partialize: (state) => ({
-        donorTier: state.donorTier,
-        totalDonatedPln: state.totalDonatedPln,
-        lastDonationAt: state.lastDonationAt,
-        verifiedPurchases: state.verifiedPurchases,
+        verifiedPurchases: state.verifiedPurchases.filter(isVerifiedPurchaseRecord),
       }),
     }
   )

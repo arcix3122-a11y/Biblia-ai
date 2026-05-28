@@ -1563,26 +1563,24 @@
     "chooseAmount": "Choose an amount",
     "chooseAmountHint": "Each tier unlocks a donor rank badge on your profile.",
     "amountPln": "{{amount}} PLN",
-    "secureRedirect": "You will be redirected to a secure payment page.",
     "donateNow": "Give now",
     "iap": {
+      "playRequired": "Donations require Google Play Billing. Install the Play Store version or an internal testing build — Expo Go cannot process in-app purchases.",
       "expoGoNotice": "Donations work in the Play Store build. Install the store version or an internal testing build to give a gift.",
       "playBillingHint": "One-time gifts via Google Play. Your rank unlocks only after payment is confirmed.",
       "tierCta": "Give {{amount}} — {{tier}}",
-      "devOnlyTitle": "Dev: simulate gift",
-      "devOnlyHint": "Tap a tier above to simulate a verified purchase without Play Billing. Production builds never grant rank this way.",
       "errors": {
         "cancelled": "Purchase cancelled.",
         "connectionFailed": "Could not connect to the store. Try again later.",
         "productsFailed": "Could not load donation products from the store.",
         "purchaseFailed": "Purchase failed. Please try again.",
         "verifyFailed": "Payment received but could not be verified. Contact support if you were charged.",
-        "unknownProduct": "Unknown product. Contact support if you were charged."
+        "unknownProduct": "Unknown product. Contact support if you were charged.",
+        "billingUnavailable": "Google Play Billing is unavailable on this device. Check Play Store sign-in and try again.",
+        "pending": "Payment is pending. Your donor rank will unlock when Google Play confirms the charge.",
+        "alreadyOwned": "A previous gift is still processing. We are finishing it — try again in a moment."
       }
     },
-    "confirmTitle": "Confirm your gift",
-    "confirmBody": "If you completed payment for {{amount}}, confirm below to unlock your donor rank.",
-    "confirmPaid": "I completed payment",
     "totalDonated": "Total gifted: {{amount}} PLN",
     "whyDonate": {
       "title": "Why give?",

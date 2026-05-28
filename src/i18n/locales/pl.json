@@ -1563,26 +1563,24 @@
     "chooseAmount": "Wybierz kwotę",
     "chooseAmountHint": "Każdy próg odblokowuje rangę darczyńcy na Twoim profilu.",
     "amountPln": "{{amount}} zł",
-    "secureRedirect": "Przekierowanie do bezpiecznej płatności.",
     "donateNow": "Ofiaruj teraz",
     "iap": {
+      "playRequired": "Darowizny wymagają Google Play Billing. Zainstaluj wersję ze sklepu Play lub build testowy wewnętrzny — Expo Go nie obsługuje zakupów w aplikacji.",
       "expoGoNotice": "Darowizny działają w wersji ze sklepu Play. Zainstaluj wersję ze sklepu lub build testowy wewnętrzny, aby złożyć datek.",
       "playBillingHint": "Jednorazowe datki przez Google Play. Ranga odblokowuje się dopiero po potwierdzeniu płatności.",
       "tierCta": "Ofiaruj {{amount}} — {{tier}}",
-      "devOnlyTitle": "Dev: symulacja datku",
-      "devOnlyHint": "Stuknij próg powyżej, aby symulować zweryfikowany zakup bez Play Billing. W produkcji ranga nie jest przyznawana w ten sposób.",
       "errors": {
         "cancelled": "Zakup anulowany.",
         "connectionFailed": "Nie udało się połączyć ze sklepem. Spróbuj później.",
         "productsFailed": "Nie udało się wczytać produktów darowizn ze sklepu.",
         "purchaseFailed": "Zakup nie powiódł się. Spróbuj ponownie.",
         "verifyFailed": "Płatność otrzymana, ale nie udało się jej zweryfikować. Skontaktuj się z nami, jeśli pobrano opłatę.",
-        "unknownProduct": "Nieznany produkt. Skontaktuj się z nami, jeśli pobrano opłatę."
+        "unknownProduct": "Nieznany produkt. Skontaktuj się z nami, jeśli pobrano opłatę.",
+        "billingUnavailable": "Google Play Billing jest niedostępny na tym urządzeniu. Sprawdź logowanie w Sklepie Play i spróbuj ponownie.",
+        "pending": "Płatność oczekuje. Ranga darczyńcy odblokuje się po potwierdzeniu przez Google Play.",
+        "alreadyOwned": "Poprzedni datek jest jeszcze przetwarzany. Kończymy go — spróbuj ponownie za chwilę."
       }
     },
-    "confirmTitle": "Potwierdź datek",
-    "confirmBody": "Jeśli ukończyłeś płatność {{amount}}, potwierdź poniżej, aby odblokować rangę darczyńcy.",
-    "confirmPaid": "Zapłaciłem / zapłaciłam",
     "totalDonated": "Suma datków: {{amount}} zł",
     "whyDonate": {
       "title": "Po co darowizna?",

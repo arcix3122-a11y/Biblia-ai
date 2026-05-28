@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
 import { GlassCard } from "@/components/GlassCard";
-import { DONATION_TIERS, type DonationTier, type DonorTierId } from "@/data/donationTiers";
+import { DONATION_TIERS, type DonorTierId } from "@/data/donationTiers";
 import { useDonationIap } from "@/hooks/useDonationIap";
 import type { DonationIapMessageKey } from "@/services/donation/iapService";
 import {
@@ -29,12 +29,10 @@ export default function DonationScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const recordVerifiedPurchase = useDonorStore((s) => s.recordVerifiedPurchase);
   const donorTier = useDonorStore((s) => s.donorTier);
 
   const [step, setStep] = useState<DonationStep>("select");
   const [awardedTier, setAwardedTier] = useState(donorTier);
-  const [devBusy, setDevBusy] = useState(false);
 
   const onPurchaseSuccess = useCallback((tierId: DonorTierId) => {
     setAwardedTier(tierId);
@@ -66,30 +64,6 @@ export default function DonationScreen() {
     return t(donationThankYouTierKey(awardedTier));
   }, [awardedTier, t]);
 
-  const confirmDevPayment = useCallback(
-    async (tier: DonationTier) => {
-      if (!__DEV__) {
-        return;
-      }
-      setDevBusy(true);
-      try {
-        const nextTier = await recordVerifiedPurchase({
-          productId: `dev_${tier.id}`,
-          transactionId: `dev_${Date.now()}`,
-          purchaseToken: null,
-          verifiedAt: new Date().toISOString(),
-          amountPln: tier.amountPln,
-          tierId: tier.id,
-        });
-        setAwardedTier(nextTier);
-        setStep("thanks");
-      } finally {
-        setDevBusy(false);
-      }
-    },
-    [recordVerifiedPurchase]
-  );
-
   return (
     <ScrollView
       style={styles.container}
@@ -113,7 +87,7 @@ export default function DonationScreen() {
           {!iapAvailable ? (
             <GlassCard style={styles.noticeCard}>
               <Ionicons name="storefront-outline" size={22} color={colors.accent} />
-              <Text style={styles.noticeText}>{t("donation.iap.expoGoNotice")}</Text>
+              <Text style={styles.noticeText}>{t("donation.iap.playRequired")}</Text>
             </GlassCard>
           ) : null}
 
@@ -139,16 +113,10 @@ export default function DonationScreen() {
                   <Pressable
                     key={tier.id}
                     onPress={() => {
-                      if (isBusy) {
+                      if (isBusy || !iapAvailable) {
                         return;
                       }
-                      if (iapAvailable) {
-                        void purchaseTier(tier.id);
-                        return;
-                      }
-                      if (__DEV__) {
-                        void confirmDevPayment(tier);
-                      }
+                      void purchaseTier(tier.id);
                     }}
                     style={[
                       styles.amountButton,
@@ -156,9 +124,9 @@ export default function DonationScreen() {
                         borderColor: tier.badgeBorder,
                         backgroundColor: tier.badgeGlow,
                       },
-                      isBusy && !purchasing ? styles.amountButtonDisabled : null,
+                      (isBusy && !purchasing) || !iapAvailable ? styles.amountButtonDisabled : null,
                     ]}
-                    disabled={isBusy && !purchasing}
+                    disabled={(isBusy && !purchasing) || !iapAvailable}
                     accessibilityRole="button"
                     accessibilityLabel={t("donation.iap.tierCta", {
                       tier: t(`donorTier.${tier.id}`),
@@ -187,14 +155,6 @@ export default function DonationScreen() {
             <Text style={styles.previewText}>{t("donation.whyDonate.lead")}</Text>
             <Text style={styles.body}>{t("donation.whyDonate.body")}</Text>
           </GlassCard>
-
-          {__DEV__ && !iapAvailable ? (
-            <GlassCard style={styles.devCard}>
-              <Text style={styles.sectionTitle}>{t("donation.iap.devOnlyTitle")}</Text>
-              <Text style={styles.hint}>{t("donation.iap.devOnlyHint")}</Text>
-              {devBusy ? <ActivityIndicator color={colors.accent} /> : null}
-            </GlassCard>
-          ) : null}
         </>
       ) : null}
 
@@ -302,12 +262,6 @@ const styles = StyleSheet.create({
   card: {
     padding: spacing.md,
     gap: spacing.sm,
-  },
-  devCard: {
-    padding: spacing.md,
-    gap: spacing.sm,
-    borderColor: colors.glassBorder,
-    opacity: 0.85,
   },
   sectionTitle: {
     ...typography.subtitle,
