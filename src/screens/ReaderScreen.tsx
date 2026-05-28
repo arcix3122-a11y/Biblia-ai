@@ -11,6 +11,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getBookPhotoUrl } from "@/data/photoBackgrounds";
 import { formatBookReference, getBookDisplayName } from "@/i18n/bookNames";
 import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
@@ -258,6 +259,15 @@ export default function ReaderScreen() {
     return t("reader.translationLabel", { name: translationName });
   }, [t, translation]);
 
+  const readerHeroPhotoExpanded = useMemo(
+    () => (book ? getBookPhotoUrl(book.slug, 900, 480) : ""),
+    [book?.slug]
+  );
+  const readerHeroPhotoCollapsed = useMemo(
+    () => (book ? getBookPhotoUrl(book.slug, 900, 120) : ""),
+    [book?.slug]
+  );
+
   const stickyOpacity = useMemo(
     () =>
       scrollY.interpolate({
@@ -274,7 +284,7 @@ export default function ReaderScreen() {
     }
     return (
       <ReaderHeroHeader
-        bookSlug={book.slug}
+        photoUrl={readerHeroPhotoExpanded}
         bookDisplayName={bookDisplayName}
         chapterNumber={chapterNumber}
         flowSubtitle={t("reader.flowSubtitle")}
@@ -291,6 +301,7 @@ export default function ReaderScreen() {
     chapterNumber,
     dismissKjvBanner,
     immersiveMode,
+    readerHeroPhotoExpanded,
     showEnglishNotice,
     t,
     translationLabel,
@@ -340,7 +351,7 @@ export default function ReaderScreen() {
           ]}
         >
           <ReaderHeroHeader
-            bookSlug={book.slug}
+            photoUrl={readerHeroPhotoCollapsed}
             bookDisplayName={bookDisplayName}
             chapterNumber={chapterNumber}
             flowSubtitle={t("reader.flowSubtitle")}

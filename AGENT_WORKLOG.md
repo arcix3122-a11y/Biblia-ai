@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 16:15 | Cursor subagent | Reader — mapowanie zdjęć ksiąg | `7e68fe2` | done | photoUrl z getBookPhotoUrl jak BookTile |
 | 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | `ee709c0` | done | Photo hero + sticky bar; getBookPhotoUrl |
 | 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `1d09f77` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
 | 2026-05-28 17:05 | Cursor subagent | AI smoke harness (`npm run ai:smoke`) — wykrywanie powtarzalnych odpowiedzi LLM | *(ten commit)* | done | Pomija bez klucza; 5 promptów, overlap Jaccard |
@@ -193,6 +194,20 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Walidacja:** `git log -1`; przegląd tabeli vs `git log --oneline -40`.
 
 ---
+
+## 2026-05-28 16:15 (local)
+- Agent: Cursor subagent
+- Task: START - Reader: mapowanie zdjęć ksiąg (getBookPhotoUrl)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 16:18 (local)
+- Agent: Cursor subagent
+- Task: DONE - Reader: mapowanie zdjęć ksiąg (getBookPhotoUrl)
+- Changes: src/components/reader/ReaderHeroHeader.tsx, src/screens/ReaderScreen.tsx, src/data/photoBackgrounds.ts (komentarz), AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass)
+- Result: done — commit `7e68fe2`
 
 ## 2026-05-28 15:32 (local)
 - Agent: Cursor subagent

@@ -75,7 +75,7 @@ export function getCategoryPhotoUrl(
   return seededPhoto(seed, width, height);
 }
 
-/** Dedicated photo for a Bible book tile or chapter list header. */
+/** Dedicated photo for a Bible book (Library tile, book header, Reader hero). */
 export function getBookPhotoUrl(slug: string, width = 600, height = 600): string {
   const seed = BOOK_PHOTO_SEEDS[slug] ?? `biblia-book-${slug}`;
   return seededPhoto(seed, width, height);

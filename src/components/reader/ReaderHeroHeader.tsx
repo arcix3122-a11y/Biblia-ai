@@ -2,14 +2,14 @@ import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { PhotoBackground } from "@/components/PhotoBackground";
-import { getBookPhotoUrl } from "@/data/photoBackgrounds";
 import { colors, radii, spacing, typography } from "@/theme";
 
 export const READER_HERO_EXPANDED_HEIGHT = 200;
 export const READER_HERO_COLLAPSE_SCROLL = 140;
 
 export interface ReaderHeroHeaderProps {
-  bookSlug: string;
+  /** Per-book Picsum URL from getBookPhotoUrl (same mapping as BookTile). */
+  photoUrl: string;
   bookDisplayName: string;
   chapterNumber: number;
   flowSubtitle: string;
@@ -22,7 +22,7 @@ export interface ReaderHeroHeaderProps {
 }
 
 function ReaderHeroHeaderComponent({
-  bookSlug,
+  photoUrl,
   bookDisplayName,
   chapterNumber,
   flowSubtitle,
@@ -33,7 +33,6 @@ function ReaderHeroHeaderComponent({
   dismissTranslationNoticeA11y,
   onDismissTranslationNotice,
 }: ReaderHeroHeaderProps) {
-  const photoUrl = getBookPhotoUrl(bookSlug, 900, collapsed ? 120 : 480);
   const title = `${bookDisplayName} ${chapterNumber}`;
 
   if (collapsed) {
