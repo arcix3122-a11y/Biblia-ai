@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useNavigation } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,51 +13,89 @@ import {
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from "react-i18next";
+import { AiModePill } from "@/components/ai/AiModePill";
+import { AnimatedSacredBackdrop } from "@/components/ai/AnimatedSacredBackdrop";
 import { ContextPills } from "@/components/ai/ContextPills";
 import { ChatBubble } from "@/components/ChatBubble";
 import { GlassChrome } from "@/components/GlassChrome";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 import { useSpiritualAssistant } from "@/hooks/useSpiritualAssistant";
+import {
+  buildQuickPromptMessage,
+  getAssistantQuickPrompts,
+} from "@/services/ai/spiritualAssistantProfile";
 import { useAiChatStore } from "@/store/aiChatStore";
 import { useSelectionStore } from "@/store/selectionStore";
 import { colors, radii, spacing, typography } from "@/theme";
+import { hapticError, hapticLight, hapticMedium, hapticSelection } from "@/utils/haptics";
 import type { ContextPillTemplateId } from "@/types/ui";
 
 export default function AiChatScreen() {
-  const { t: tAny } = useTranslation();
-  const t = tAny as any;
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const { t, locale } = useAppTranslation();
+  const translate = (key: string) => t(key as never);
   const { starterMood } = useLocalSearchParams<{ starterMood?: string }>();
   const [input, setInput] = useState("");
   const listRef = useRef<FlatList>(null);
   const handledStarterRef = useRef<string | null>(null);
-  const messages = useAiChatStore((s) => s.messages);
-  const selectedVerse = useSelectionStore((s) => s.selectedVerse);
-  const resetChat = useAiChatStore((s) => s.resetChat);
-  const limit = useAiChatStore((s) => s.limit);
+  const messages = useAiChatStore((state) => state.messages);
+  const clearConversation = useAiChatStore((state) => state.clearConversation);
+  const ensureWelcomeMessage = useAiChatStore((state) => state.ensureWelcomeMessage);
+  const refreshIntroMessage = useAiChatStore((state) => state.refreshIntroMessage);
+  const syncDailyQuota = useAiChatStore((state) => state.syncDailyQuota);
+  const limit = useAiChatStore((state) => state.limit);
+  const selectedVerse = useSelectionStore((state) => state.selectedVerse);
   const {
     sendMessage,
     sendWithContext,
     isThinking,
     canSend,
     remaining,
-    connectionWarning: lastError,
-    clearConnectionWarning: clearError,
+    connectionWarning,
+    clearConnectionWarning,
     lastInput,
+    assistantMode,
+    modeLabel,
+    modeReason,
   } = useSpiritualAssistant();
 
-  const showStarter = messages.length <= 1;
+  const quickPrompts = useMemo(() => getAssistantQuickPrompts(), []);
+  const hasUserMessages = messages.some((message) => message.role === "user");
+  const showQuickPrompts = !hasUserMessages;
 
-  const scrollToEnd = () => {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <AiModePill
+          mode={assistantMode}
+          label={modeLabel}
+          reason={modeReason}
+          compact
+        />
+      ),
+    });
+  }, [assistantMode, modeLabel, modeReason, navigation]);
+
+  const scrollToEnd = (animated = true) => {
     requestAnimationFrame(() => {
-      listRef.current?.scrollToEnd({ animated: true });
+      listRef.current?.scrollToEnd({ animated });
     });
   };
 
   useEffect(() => {
-    if (!isThinking) {
-      scrollToEnd();
-    }
-  }, [isThinking]);
+    syncDailyQuota();
+    ensureWelcomeMessage();
+  }, [ensureWelcomeMessage, syncDailyQuota]);
+
+  useEffect(() => {
+    refreshIntroMessage();
+  }, [locale, refreshIntroMessage]);
+
+  useEffect(() => {
+    scrollToEnd(messages.length > 2);
+  }, [messages.length]);
 
   useEffect(() => {
     const mood = typeof starterMood === "string" ? starterMood : "";
@@ -79,8 +118,8 @@ export default function AiChatScreen() {
     }
 
     handledStarterRef.current = mood;
-    const starterPrompt = starterPrompts[mood as AllowedMood];
-    void sendMessage(starterPrompt).then((sent) => {
+    void hapticMedium();
+    void sendMessage(starterPrompts[mood as AllowedMood]).then((sent) => {
       if (sent) {
         scrollToEnd();
       }
@@ -88,216 +127,457 @@ export default function AiChatScreen() {
   }, [sendMessage, starterMood, t]);
 
   const handleRetry = async () => {
-    clearError();
-    if (lastInput) {
-      const sent = await sendMessage(lastInput);
-      if (sent) {
-        scrollToEnd();
-      }
+    clearConnectionWarning();
+    void hapticLight();
+    if (!lastInput) {
+      return;
     }
-  };
 
-  const handleSend = async () => {
-    const sent = await sendMessage(input);
+    const sent = await sendMessage(lastInput, selectedVerse);
     if (sent) {
-      setInput("");
       scrollToEnd();
     }
   };
 
+  const handleSend = async () => {
+    const trimmed = input.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    void hapticSelection();
+    const sent = await sendMessage(trimmed, selectedVerse);
+    if (sent) {
+      setInput("");
+      scrollToEnd();
+      return;
+    }
+
+    void hapticError();
+  };
+
   const handlePill = async (templateId: ContextPillTemplateId) => {
+    if (!selectedVerse) {
+      return;
+    }
+
+    void hapticLight();
     const sent = await sendWithContext(templateId, selectedVerse);
     if (sent) {
       scrollToEnd();
     }
   };
 
+  const handleQuickPrompt = async (promptId: (typeof quickPrompts)[number]["id"]) => {
+    const prompt = buildQuickPromptMessage(promptId);
+    void hapticMedium();
+    const sent = await sendMessage(prompt, selectedVerse);
+    if (sent) {
+      scrollToEnd();
+    }
+  };
+
+  const handleClearChat = () => {
+    void hapticLight();
+    clearConversation();
+    scrollToEnd(false);
+  };
+
   const disabled = !canSend() || isThinking || input.trim().length === 0;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={88}
-    >
-      {selectedVerse ? (
-        <View style={styles.contextBanner}>
-          <Text style={styles.contextLabel}>{t("ai.selectedVerse")}</Text>
-          <Text style={styles.contextRef}>
-            {selectedVerse.bookName} {selectedVerse.chapter}:{selectedVerse.verse}
-          </Text>
-          <Text style={styles.contextSnippet} numberOfLines={2}>
-            {selectedVerse.text}
-          </Text>
-        </View>
-      ) : showStarter ? (
-        <View style={styles.starterArea}>
-          <View style={styles.starterIconWrap}>
-            <Ionicons name="chatbubble-ellipses-outline" size={28} color={colors.accent} />
-          </View>
-          <Text style={styles.starterTitle}>{t("ai.starterTitle")}</Text>
-          <Text style={styles.starterHint}>{t("ai.starterHint")}</Text>
-        </View>
-      ) : (
-        <Text style={styles.contextHint}>{t("ai.contextHint")}</Text>
-      )}
+    <View style={styles.screen}>
+      <AnimatedSacredBackdrop />
 
-      <FlatList
-        ref={listRef}
-        data={messages}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
-        renderItem={({ item }) => <ChatBubble message={item} />}
-        ListFooterComponent={
-          isThinking ? (
-            <View style={styles.thinking}>
-              <ActivityIndicator color={colors.accent} size="small" />
-              <Text style={styles.thinkingText}>{t("ai.reflecting")}</Text>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={88}
+      >
+        <FlatList
+          ref={listRef}
+          data={messages}
+          keyExtractor={(item) => item.id}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => <ChatBubble message={item} />}
+          ListHeaderComponent={
+            <View style={styles.headerStack}>
+              <View style={styles.heroCard}>
+                <View style={styles.heroTopRow}>
+                  <Text style={styles.heroEyebrow}>{t("ai.heroEyebrow")}</Text>
+                  <AiModePill mode={assistantMode} label={modeLabel} />
+                </View>
+
+                <Text style={styles.heroTitle}>{t("ai.heroTitle")}</Text>
+                <Text style={styles.heroBody}>{t("ai.heroBody")}</Text>
+
+                <View style={styles.basisRow}>
+                  <View style={styles.basisChip}>
+                    <Text style={styles.basisChipText}>{t("ai.basisScripture")}</Text>
+                  </View>
+                  <View style={styles.basisChip}>
+                    <Text style={styles.basisChipText}>{t("ai.basisPrayer")}</Text>
+                  </View>
+                  <View style={styles.basisChip}>
+                    <Text style={styles.basisChipText}>{t("ai.basisDiscernment")}</Text>
+                  </View>
+                </View>
+
+                <Text style={styles.modeHint}>{modeReason}</Text>
+
+                <View style={styles.guardrailCard}>
+                  <View style={styles.guardrailIcon}>
+                    <Ionicons
+                      name="shield-checkmark-outline"
+                      size={18}
+                      color={colors.accent}
+                    />
+                  </View>
+                  <View style={styles.guardrailCopy}>
+                    <Text style={styles.guardrailTitle}>{t("ai.guardrailTitle")}</Text>
+                    <Text style={styles.guardrailBody}>{t("ai.guardrailBody")}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.anchorCard}>
+                <View style={styles.anchorTitleRow}>
+                  <Ionicons
+                    name={selectedVerse ? "bookmark-outline" : "book-outline"}
+                    size={16}
+                    color={colors.accent}
+                  />
+                  <Text style={styles.anchorTitle}>
+                    {selectedVerse
+                      ? t("ai.selectedVerse")
+                      : t("ai.selectedVerseHintTitle")}
+                  </Text>
+                </View>
+
+                {selectedVerse ? (
+                  <>
+                    <Text style={styles.anchorReference}>
+                      {selectedVerse.bookName} {selectedVerse.chapter}:{selectedVerse.verse}
+                    </Text>
+                    <Text style={styles.anchorVerse} numberOfLines={4}>
+                      {selectedVerse.text}
+                    </Text>
+                    <Text style={styles.anchorHint}>{t("ai.selectedVerseActiveHint")}</Text>
+                    <ContextPills
+                      onSelectTemplate={(templateId) => void handlePill(templateId)}
+                      disabled={!canSend() || isThinking}
+                    />
+                  </>
+                ) : (
+                  <Text style={styles.anchorEmpty}>{t("ai.selectedVerseHintBody")}</Text>
+                )}
+              </View>
+
+              {showQuickPrompts ? (
+                <View style={styles.quickPromptSection}>
+                  <Text style={styles.quickPromptTitle}>{t("ai.quickPromptsTitle")}</Text>
+                  <Text style={styles.quickPromptHint}>{t("ai.quickPromptsHint")}</Text>
+
+                  <View style={styles.quickPromptGrid}>
+                    {quickPrompts.map((prompt) => (
+                      <Pressable
+                        key={prompt.id}
+                        onPress={() => void handleQuickPrompt(prompt.id)}
+                        style={styles.quickPromptCard}
+                        accessibilityRole="button"
+                      >
+                        <View style={styles.quickPromptIcon}>
+                          <Ionicons
+                            name={prompt.icon as keyof typeof Ionicons.glyphMap}
+                            size={18}
+                            color={colors.accent}
+                          />
+                        </View>
+                          <Text style={styles.quickPromptCardTitle}>
+                            {translate(prompt.titleKey)}
+                          </Text>
+                          <Text style={styles.quickPromptCardSubtitle}>
+                            {translate(prompt.subtitleKey)}
+                          </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
             </View>
-          ) : null
-        }
-      />
-
-      {!canSend() ? (
-        <View style={styles.limitBanner}>
-          <Text style={styles.limitBannerText}>{t("ai.limitReached")}</Text>
-        </View>
-      ) : null}
-
-      {lastError ? (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorBannerText}>{lastError}</Text>
-          <Pressable onPress={() => void handleRetry()} style={styles.retryButton}>
-            <Text style={styles.retryButtonText}>{t("ai.retry")}</Text>
-          </Pressable>
-        </View>
-      ) : null}
-
-      <GlassChrome style={styles.composerChrome}>
-        <View style={styles.composerMeta}>
-          <Text style={styles.quotaText}>
-            {t("ai.responsesRemaining", { remaining: remaining(), limit })}
-          </Text>
-          <Pressable
-            onPress={resetChat}
-            hitSlop={8}
-            accessibilityLabel={t("ai.clearChat")}
-          >
-            <Text style={styles.clearLink}>{t("common.clear")}</Text>
-          </Pressable>
-        </View>
-        <ContextPills
-          onSelectTemplate={(id) => void handlePill(id)}
-          disabled={!selectedVerse || !canSend() || isThinking}
+          }
+          ListFooterComponent={
+            isThinking ? (
+              <View style={styles.thinking}>
+                <ActivityIndicator color={colors.accent} size="small" />
+                <Text style={styles.thinkingText}>{t("ai.reflecting")}</Text>
+              </View>
+            ) : (
+              <View style={styles.bottomSpacer} />
+            )
+          }
         />
-        <View style={styles.composer}>
-          <TextInput
-            value={input}
-            onChangeText={setInput}
-            placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
-            placeholderTextColor={colors.textMuted}
-            style={styles.input}
-            editable={canSend() && !isThinking}
-            multiline
-            maxLength={500}
-          />
-          <Pressable
-            onPress={() => void handleSend()}
-            disabled={disabled}
-            style={[styles.send, disabled && styles.sendDisabled]}
-          >
-            <Text style={styles.sendText}>{t("common.send")}</Text>
-          </Pressable>
-        </View>
-      </GlassChrome>
-    </KeyboardAvoidingView>
+
+        <GlassChrome style={[styles.composerChrome, { paddingBottom: insets.bottom + 49 }]}>
+          <View style={styles.composerMeta}>
+            <View>
+              <Text style={styles.quotaText}>
+                {t("ai.responsesRemaining", { remaining: remaining(), limit })}
+              </Text>
+              <Text style={styles.quotaHint}>{t("ai.quotaHint")}</Text>
+            </View>
+            <Pressable
+              onPress={handleClearChat}
+              hitSlop={8}
+              accessibilityLabel={t("ai.clearChat")}
+            >
+              <Text style={styles.clearLink}>{t("common.clear")}</Text>
+            </Pressable>
+          </View>
+
+          {connectionWarning ? (
+            <View style={styles.warningBanner}>
+              <View style={styles.warningCopy}>
+                <Text style={styles.warningTitle}>{t("ai.usingOfflineCompanion")}</Text>
+                <Text style={styles.warningText}>{connectionWarning}</Text>
+              </View>
+              {lastInput ? (
+                <Pressable
+                  onPress={() => void handleRetry()}
+                  style={styles.retryButton}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.retryButtonText}>{t("ai.retry")}</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
+
+          {!canSend() ? (
+            <View style={styles.limitBanner}>
+              <Ionicons name="hourglass-outline" size={16} color={colors.accent} />
+              <Text style={styles.limitBannerText}>{t("ai.limitReached")}</Text>
+            </View>
+          ) : null}
+
+          <View style={styles.composerShell}>
+            <TextInput
+              value={input}
+              onChangeText={(value) => {
+                if (connectionWarning) {
+                  clearConnectionWarning();
+                }
+                setInput(value);
+              }}
+              placeholder={canSend() ? t("ai.inputPlaceholder") : t("ai.inputLimitReached")}
+              placeholderTextColor={colors.textMuted}
+              style={styles.input}
+              editable={canSend() && !isThinking}
+              multiline
+              maxLength={500}
+              textAlignVertical="top"
+              selectionColor={colors.accent}
+            />
+
+            <Pressable
+              onPress={() => void handleSend()}
+              disabled={disabled}
+              style={[styles.sendButton, disabled && styles.sendButtonDisabled]}
+              accessibilityRole="button"
+              accessibilityLabel={t("common.send")}
+            >
+              <Ionicons name="arrow-up" size={20} color={colors.canvas} />
+            </Pressable>
+          </View>
+        </GlassChrome>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     backgroundColor: colors.canvas,
   },
-  starterArea: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
+  container: {
+    flex: 1,
+  },
+  listContent: {
+    paddingBottom: 180,
+  },
+  headerStack: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    gap: spacing.md,
+  },
+  heroCard: {
+    borderRadius: radii.xl,
     padding: spacing.lg,
-    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: colors.glassBorder,
-    backgroundColor: colors.backgroundElevated,
+    borderColor: "rgba(229,169,60,0.12)",
+    backgroundColor: "rgba(8, 12, 21, 0.84)",
+    gap: spacing.md,
+  },
+  heroTopRow: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: spacing.sm,
   },
-  starterIconWrap: {
-    width: 52,
-    height: 52,
+  heroEyebrow: {
+    ...typography.label,
+    color: colors.textMuted,
+  },
+  heroTitle: {
+    ...typography.hero,
+    color: colors.textPrimary,
+  },
+  heroBody: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  basisRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  basisChip: {
     borderRadius: radii.pill,
-    backgroundColor: colors.accentGlow,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  basisChipText: {
+    ...typography.caption,
+    color: colors.textPrimary,
+  },
+  modeHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  guardrailCard: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: "rgba(255,255,255,0.03)",
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  guardrailIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: spacing.xs,
+    backgroundColor: colors.accentGlow,
   },
-  starterTitle: {
+  guardrailCopy: {
+    flex: 1,
+    gap: 4,
+  },
+  guardrailTitle: {
     ...typography.subtitle,
     color: colors.textPrimary,
-    textAlign: "center",
   },
-  starterHint: {
+  guardrailBody: {
+    ...typography.caption,
+    color: colors.textSecondary,
+  },
+  anchorCard: {
+    borderRadius: radii.xl,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: "rgba(8, 12, 21, 0.8)",
+    gap: spacing.sm,
+  },
+  anchorTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  anchorTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+  },
+  anchorReference: {
+    ...typography.caption,
+    color: colors.accent,
+  },
+  anchorVerse: {
     ...typography.body,
-    color: colors.textMuted,
-    textAlign: "center",
-    lineHeight: 22,
+    color: colors.textPrimary,
   },
-  contextBanner: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.sm,
+  anchorHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+  },
+  anchorEmpty: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  quickPromptSection: {
+    gap: spacing.xs,
+  },
+  quickPromptTitle: {
+    ...typography.title,
+    color: colors.textPrimary,
+  },
+  quickPromptHint: {
+    ...typography.caption,
+    color: colors.textMuted,
     marginBottom: spacing.sm,
+  },
+  quickPromptGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: spacing.sm,
+  },
+  quickPromptCard: {
+    width: "48.5%",
+    minHeight: 132,
     padding: spacing.md,
     borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    backgroundColor: colors.tile,
+    backgroundColor: "rgba(10,16,29,0.78)",
+    gap: spacing.sm,
   },
-  contextLabel: {
-    ...typography.label,
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
+  quickPromptIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.accentGlow,
   },
-  contextRef: {
+  quickPromptCardTitle: {
+    ...typography.subtitle,
+    color: colors.textPrimary,
+  },
+  quickPromptCardSubtitle: {
     ...typography.caption,
-    color: colors.accent,
-    marginBottom: spacing.xs,
-  },
-  contextSnippet: {
-    ...typography.body,
     color: colors.textSecondary,
-  },
-  contextHint: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginHorizontal: spacing.md,
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  list: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    flexGrow: 1,
   },
   thinking: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingTop: spacing.md,
     gap: spacing.sm,
   },
   thinkingText: {
     ...typography.caption,
     color: colors.textMuted,
+  },
+  bottomSpacer: {
+    height: spacing.lg,
   },
   composerChrome: {
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -307,10 +587,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: spacing.md,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
   },
   quotaText: {
+    ...typography.caption,
+    color: colors.textPrimary,
+  },
+  quotaHint: {
     ...typography.caption,
     color: colors.textMuted,
   },
@@ -318,81 +603,93 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.accent,
   },
-  composer: {
+  warningBanner: {
     flexDirection: "row",
-    alignItems: "flex-end",
-    padding: spacing.md,
-    paddingTop: spacing.sm,
-    gap: spacing.sm,
-  },
-  input: {
-    flex: 1,
-    minHeight: 44,
-    maxHeight: 120,
-    backgroundColor: colors.inputBackground,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.accentMuted,
-    color: colors.textPrimary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    ...typography.body,
-  },
-  send: {
-    backgroundColor: colors.accent,
-    borderRadius: radii.md,
-    minHeight: 44,
-    paddingHorizontal: spacing.md,
-    justifyContent: "center",
-  },
-  sendDisabled: {
-    opacity: 0.4,
-  },
-  sendText: {
-    ...typography.subtitle,
-    color: colors.canvas,
-  },
-  limitBanner: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-    backgroundColor: colors.accentGlow,
-    borderWidth: 1,
-    borderColor: colors.accentMuted,
     alignItems: "center",
+    gap: spacing.sm,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: "rgba(229,169,60,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(229,169,60,0.18)",
   },
-  limitBannerText: {
+  warningCopy: {
+    flex: 1,
+    gap: 3,
+  },
+  warningTitle: {
     ...typography.caption,
     color: colors.accent,
-    textAlign: "center",
   },
-  errorBanner: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
-    padding: spacing.md,
-    borderRadius: radii.lg,
-    backgroundColor: colors.danger,
-    borderWidth: 1,
-    borderColor: colors.danger,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  errorBannerText: {
+  warningText: {
     ...typography.caption,
-    color: colors.canvas,
-    flex: 1,
+    color: colors.textPrimary,
   },
   retryButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.canvas,
+    borderColor: colors.accent,
   },
   retryButtonText: {
     ...typography.caption,
-    color: colors.canvas,
+    color: colors.accent,
+  },
+  limitBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: "rgba(229,169,60,0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(229,169,60,0.18)",
+  },
+  limitBannerText: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    flex: 1,
+  },
+  composerShell: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+  },
+  input: {
+    flex: 1,
+    minHeight: 58,
+    maxHeight: 132,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(5, 9, 17, 0.9)",
+    color: colors.textPrimary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    ...typography.body,
+  },
+  sendButton: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.accent,
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.24,
+    shadowRadius: 18,
+    elevation: 4,
+  },
+  sendButtonDisabled: {
+    opacity: 0.45,
   },
 });

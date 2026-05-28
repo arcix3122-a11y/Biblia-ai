@@ -1,74 +1,33 @@
-import { useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAiChatStore } from "@/store/aiChatStore";
 import { logError } from "@/services/errors/errorLogger";
 import {
   buildLlmApiConfig,
   callLiveChatCompletion,
+  getLastLlmDebugInfo,
   hasLlmApiKey,
   resolveLlmProvider,
   type ChatCompletionMessage,
 } from "@/services/ai/llmClient";
-import i18n from "@/i18n";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
+import {
+  buildAssistantSystemPrompt,
+  buildOfflineCompanionReply,
+  buildTemplatePrompt,
+} from "@/services/ai/spiritualAssistantProfile";
 import type { SelectedVerse } from "@/store/selectionStore";
 import type { ContextPillTemplateId } from "@/types/ui";
+import { generateSpiritualFirstAidKit } from "@/services/ai/spiritualFirstAidKit";
 
-const BASE_SYSTEM_PROMPT =
-  "You are a warm, scholarly spiritual companion helping users engage with Scripture. Offer concise and practical guidance grounded in biblical text, with pastoral sensitivity and theological care.";
-
-const FALLBACK_KEYS = [
-  "ai.fallback1",
-  "ai.fallback2",
-  "ai.fallback3",
-  "ai.fallback4",
-  "ai.fallback5",
-] as const;
-
-function buildTemplatePrompt(templateId: ContextPillTemplateId, verse: SelectedVerse): string {
-  const key =
-    templateId === "historical"
-      ? "ai.templateHistorical"
-      : templateId === "application"
-        ? "ai.templateApplication"
-        : "ai.templateOriginalLanguage";
-
-  return i18n.t(key, {
-    bookName: verse.bookName,
-    chapter: verse.chapter,
-    verse: verse.verse,
-    text: verse.text,
-  });
-}
-
-function hashString(value: string): number {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash;
-}
-
-function buildSystemPrompt(verse: SelectedVerse | null): string {
-  if (!verse) {
-    return BASE_SYSTEM_PROMPT;
-  }
-
-  return `${BASE_SYSTEM_PROMPT}\n\nSelected verse context:\nReference: ${verse.bookName} ${verse.chapter}:${verse.verse}\nText: "${verse.text}"\n\nUse this context naturally where relevant.`;
-}
-
-function localFallback(userText: string): string {
-  const idx = Math.abs(hashString(userText)) % FALLBACK_KEYS.length;
-  const key = FALLBACK_KEYS[idx] ?? FALLBACK_KEYS[0];
-  return i18n.t(key);
-}
+export type AssistantMode = "live" | "offline" | "fallback";
 
 async function callLiveAssistant(
   history: Array<{ role: "user" | "assistant"; content: string }>,
-  verse: SelectedVerse | null
+  verse: SelectedVerse | null,
+  locale: "en" | "pl"
 ): Promise<string> {
   const messages: ChatCompletionMessage[] = [
-    { role: "system", content: buildSystemPrompt(verse) },
+    { role: "system", content: buildAssistantSystemPrompt(locale, verse) },
     ...history.map((item) => ({ role: item.role, content: item.content })),
   ];
 
@@ -76,12 +35,25 @@ async function callLiveAssistant(
 }
 
 export function useSpiritualAssistant() {
-  const { t } = useTranslation();
-  const { messages: chatMessages, addUserMessage, addAssistantMessage, consumeMessageQuota, canSend, remaining, messageCount, limit } =
-    useAiChatStore();
+  const { t, locale } = useAppTranslation();
+  const {
+    messages: chatMessages,
+    addUserMessage,
+    addAssistantMessage,
+    consumeMessageQuota,
+    canSend,
+    remaining,
+    messageCount,
+    limit,
+    syncDailyQuota,
+  } = useAiChatStore();
   const [isThinking, setIsThinking] = useState(false);
   const [connectionWarning, setConnectionWarning] = useState<string | null>(null);
   const [lastInput, setLastInput] = useState<string | null>(null);
+
+  useEffect(() => {
+    syncDailyQuota();
+  }, [syncDailyQuota]);
 
   const clearConnectionWarning = useCallback(() => {
     setConnectionWarning(null);
@@ -89,24 +61,42 @@ export function useSpiritualAssistant() {
 
   const sendMessage = useCallback(
     async (text: string, verse: SelectedVerse | null = null): Promise<boolean> => {
+      syncDailyQuota();
+
       const trimmed = text.trim();
-      if (!trimmed || !canSend()) return false;
+      if (!trimmed || !canSend()) {
+        return false;
+      }
 
       setConnectionWarning(null);
       addUserMessage(trimmed);
       setIsThinking(true);
 
       const history = chatMessages
-        .filter((m) => m.role === "user" || m.role === "assistant")
+        .filter((message) => message.role === "user" || message.role === "assistant")
         .slice(-20)
-        .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+        .map((message) => ({
+          role: message.role as "user" | "assistant",
+          content: message.content,
+        }));
       history.push({ role: "user", content: trimmed });
 
       const useLiveApi = hasLlmApiKey();
 
       try {
-        const reply = useLiveApi ? await callLiveAssistant(history, verse) : localFallback(trimmed);
-        addAssistantMessage(reply);
+        let reply = "";
+        if (useLiveApi) {
+          reply = await callLiveAssistant(history, verse, locale);
+        } else {
+          const firstAid = await generateSpiritualFirstAidKit(trimmed, {
+            locale,
+            translation: locale,
+            verse,
+          });
+          reply = firstAid.commentary;
+        }
+
+        addAssistantMessage(reply, useLiveApi ? "live" : "offline");
         if (useLiveApi) {
           consumeMessageQuota();
         }
@@ -117,10 +107,22 @@ export function useSpiritualAssistant() {
           hasApiKey: useLiveApi,
           provider: resolveLlmProvider(),
           hasVerseContext: Boolean(verse),
+          locale,
         });
 
-        const fallback = localFallback(trimmed);
-        addAssistantMessage(fallback);
+        let fallback = "";
+        try {
+          const firstAid = await generateSpiritualFirstAidKit(trimmed, {
+            locale,
+            translation: locale,
+            verse,
+          });
+          fallback = firstAid.commentary;
+        } catch {
+          fallback = buildOfflineCompanionReply(trimmed, verse);
+        }
+
+        addAssistantMessage(fallback, "offline");
 
         if (useLiveApi) {
           setConnectionWarning(t("ai.connectionFallback"));
@@ -132,12 +134,24 @@ export function useSpiritualAssistant() {
         setIsThinking(false);
       }
     },
-    [addAssistantMessage, addUserMessage, canSend, chatMessages, consumeMessageQuota, t]
+    [
+      addAssistantMessage,
+      addUserMessage,
+      canSend,
+      chatMessages,
+      consumeMessageQuota,
+      locale,
+      syncDailyQuota,
+      t,
+    ]
   );
 
   const sendWithContext = useCallback(
     async (templateId: ContextPillTemplateId, verse: SelectedVerse | null): Promise<boolean> => {
-      if (!verse || !canSend()) return false;
+      if (!verse || !canSend()) {
+        return false;
+      }
+
       const prompt = buildTemplatePrompt(templateId, verse);
       return sendMessage(prompt, verse);
     },
@@ -156,9 +170,38 @@ export function useSpiritualAssistant() {
       model = config.model;
       endpoint = config.endpoint;
     } catch {
-      // Ignored
+      // Ignored: UI falls back to offline mode copy.
     }
   }
+
+  const assistantMode: AssistantMode = connectionWarning
+    ? "fallback"
+    : hasApiKey
+      ? "live"
+      : "offline";
+
+  const modeReason = useMemo(() => {
+    if (assistantMode === "fallback") {
+      return t("ai.statusFallbackHint");
+    }
+    if (assistantMode === "offline") {
+      return t("ai.statusOfflineHint");
+    }
+    if (provider === "groq") {
+      return t("ai.modeReasonLiveGroq");
+    }
+    if (provider === "openai") {
+      return t("ai.modeReasonLiveOpenai");
+    }
+    return t("ai.statusLiveHint");
+  }, [assistantMode, provider, t]);
+
+  const modeLabel = useMemo(() => {
+    if (assistantMode === "live") {
+      return t("ai.statusLiveShort");
+    }
+    return t("ai.statusOfflineShort");
+  }, [assistantMode, t]);
 
   return {
     sendMessage,
@@ -169,6 +212,9 @@ export function useSpiritualAssistant() {
     messageCount,
     limit,
     hasApiKey,
+    assistantMode,
+    modeLabel,
+    modeReason,
     provider,
     model,
     endpoint,
