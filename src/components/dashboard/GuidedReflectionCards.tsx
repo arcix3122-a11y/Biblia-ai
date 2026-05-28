@@ -9,6 +9,8 @@ import { spacing, typography, colors } from "@/theme";
 interface Props {
   verseText: string;
   verseReference: string;
+  openVariant?: ReflectionVariant | null;
+  onOpenVariantHandled?: () => void;
 }
 
 interface CardConfig {
@@ -42,10 +44,22 @@ const CARDS: CardConfig[] = [
   },
 ];
 
-export function GuidedReflectionCards({ verseText, verseReference }: Props) {
+export function GuidedReflectionCards({
+  verseText,
+  verseReference,
+  openVariant,
+  onOpenVariantHandled,
+}: Props) {
   const { t: tAny } = useTranslation();
   const t = tAny as (key: string, options?: Record<string, unknown>) => string;
   const [activeVariant, setActiveVariant] = useState<ReflectionVariant | null>(null);
+
+  React.useEffect(() => {
+    if (openVariant) {
+      setActiveVariant(openVariant);
+      onOpenVariantHandled?.();
+    }
+  }, [onOpenVariantHandled, openVariant]);
 
   if (!verseText || !verseReference) return null;
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, AppState, LogBox, Platform, View } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
@@ -40,6 +41,15 @@ function isBenignNetworkError(error: Error): boolean {
     msg.includes("Failed to fetch") ||
     msg.includes("AbortError")
   );
+}
+
+async function shouldAttemptNetworkStartup(): Promise<boolean> {
+  try {
+    const state = await NetInfo.fetch();
+    return Boolean(state.isConnected && state.isInternetReachable !== false);
+  } catch {
+    return false;
+  }
 }
 
 function installGlobalErrorHandler(): void {
@@ -160,11 +170,26 @@ export default function RootLayout() {
     initSyncEngine();
 
     void ensureAnonymousSession()
-      .then(() => {
-        scheduleSync();
-        void flushPendingComments();
+      .then(async (sessionReady) => {
+        const online = await shouldAttemptNetworkStartup();
+        if (!online) {
+          return;
+        }
+
+        if (sessionReady) {
+          scheduleSync();
+          void flushPendingComments().catch((err: unknown) => {
+            if (err instanceof Error && isBenignNetworkError(err)) {
+              return;
+            }
+            logError(err, "FlushPendingCommentsInit");
+          });
+        }
       })
       .catch((err: unknown) => {
+        if (err instanceof Error && isBenignNetworkError(err)) {
+          return;
+        }
         logError(err, "AnonymousAuthInit");
       });
 
@@ -187,7 +212,11 @@ export default function RootLayout() {
             hour,
             minute,
             i18n.t("common.appName"),
-            i18n.t("settings.notificationsHint")
+            i18n.t("settings.notificationsHint"),
+            {
+              title: i18n.t("settings.eveningRescueTitle"),
+              body: i18n.t("settings.eveningRescueBody"),
+            }
           );
         });
         void useYearPlanStore.getState().load();

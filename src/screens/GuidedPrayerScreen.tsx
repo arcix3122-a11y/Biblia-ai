@@ -308,6 +308,8 @@ Do NOT use markdown styles (bold, italics) or introductory greetings; return ONL
 
   const handleFinishFlow = async () => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    const { recordActivity } = await import("@/services/stats/userStats");
+    void recordActivity("prayer");
     router.back();
   };
 

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Accordion } from "@/components/layout/Accordion";
+import { useAppTranslation } from "@/hooks/useAppTranslation";
 import { useReaderStore } from "@/store/readerStore";
 import { useAiChatStore } from "@/store/aiChatStore";
 import {
@@ -28,14 +28,15 @@ import { requestNotificationPermission, scheduleDailyReminder, cancelDailyRemind
 import { EcosystemModal } from "@/components/EcosystemModal";
 
 export default function SettingsScreen() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation();
   const locale = useLocaleStore((s) => s.locale);
   const translationPreference = useTranslationStore((s) => s.preference);
   const setTranslationPreference = useTranslationStore((s) => s.setPreference);
   const supabaseConfigured = Boolean(getSupabaseClient());
   const { fontSize, increaseFont, decreaseFont, immersiveMode, toggleImmersiveMode } =
     useReaderStore();
-  const resetChat = useAiChatStore((s) => s.resetChat);
+  const resetQuotaAndChat = useAiChatStore((s) => s.resetQuotaAndChat);
+  const syncDailyQuota = useAiChatStore((s) => s.syncDailyQuota);
   const limit = useAiChatStore((s) => s.limit);
   const messageCount = useAiChatStore((s) => s.messageCount);
   const remainingCount = Math.max(0, limit - messageCount);
@@ -46,6 +47,10 @@ export default function SettingsScreen() {
   const [dailyGoal, setDailyGoalState] = useState(1);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [ecosystemVisible, setEcosystemVisible] = useState(false);
+
+  useEffect(() => {
+    syncDailyQuota();
+  }, [syncDailyQuota]);
 
   useEffect(() => {
     void getUserStats().then((stats) => setDailyGoalState(stats.dailyGoal));
@@ -80,7 +85,10 @@ export default function SettingsScreen() {
         return;
       }
       const paddedMin = String(minute).padStart(2, "0");
-      await scheduleDailyReminder(hour, minute, t("common.appName"), t("settings.notificationsHint"));
+      await scheduleDailyReminder(hour, minute, t("common.appName"), t("settings.notificationsHint"), {
+        title: t("settings.eveningRescueTitle"),
+        body: t("settings.eveningRescueBody"),
+      });
       setEnabled(true);
       Alert.alert(t("settings.notifications"), t("settings.notificationsScheduled", { hour, minute: paddedMin }));
     } else {
@@ -94,7 +102,10 @@ export default function SettingsScreen() {
     setTime(newHour, minute);
     if (reminderEnabled) {
       const paddedMin = String(minute).padStart(2, "0");
-      await scheduleDailyReminder(newHour, minute, t("common.appName"), t("settings.notificationsHint"));
+      await scheduleDailyReminder(newHour, minute, t("common.appName"), t("settings.notificationsHint"), {
+        title: t("settings.eveningRescueTitle"),
+        body: t("settings.eveningRescueBody"),
+      });
       Alert.alert(t("settings.notifications"), t("settings.notificationsScheduled", { hour: newHour, minute: paddedMin }));
     }
   }, [hour, minute, reminderEnabled, setTime, t]);
@@ -140,7 +151,7 @@ export default function SettingsScreen() {
         text: t("common.clear"),
         style: "destructive",
         onPress: () => {
-          resetChat();
+          resetQuotaAndChat();
           Alert.alert(t("common.success"), t("settings.resetQuotaSuccess"));
         },
       },

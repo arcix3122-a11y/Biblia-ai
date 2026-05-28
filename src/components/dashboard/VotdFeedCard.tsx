@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { captureRef } from "react-native-view-shot";
 import { shareVerse } from "@/services/share/shareVerse";
 import { getVerseOfTheDay } from "@/services/db/scriptureRepository";
-import { getUserStats, recordDailyRead } from "@/services/stats/userStats";
+import { getUserStats } from "@/services/stats/userStats";
 import {
   buildVerseRef,
   getCommentCount,
@@ -90,7 +90,6 @@ export function VotdFeedCard({ onVerse }: VotdFeedCardProps) {
             formatBookReference(votd.book_slug, votd.chapter_number, votd.number, locale, votd.book_name)
           );
         }
-        await recordDailyRead();
       } catch {
         // local DB only — no UI surfacing
       }

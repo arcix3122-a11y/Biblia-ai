@@ -97,6 +97,17 @@
     "todaySection": "Na dziś",
     "verseReflectionSection": "Refleksja nad wersem dnia",
     "verseReflectionDone": "Refleksja ukończona",
+    "dailyMission": {
+      "sectionTitle": "Dzisiejsze misje",
+      "progress": "{{done}}/{{total}} ukończone",
+      "done": "Gotowe",
+      "scriptureTitle": "Pismo",
+      "scriptureSub": "Przeczytaj rozdział",
+      "prayerTitle": "Modlitwa",
+      "prayerSub": "Codzienna praktyka",
+      "reflectionTitle": "Refleksja",
+      "reflectionSub": "Refleksja nad wersetem dnia"
+    },
     "exploreHeading": "Odkryj",
     "libraryHeading": "Biblioteka",
     "discoveryHeading": "Twoja droga",
@@ -197,6 +208,9 @@
     "preparingShare": "Przygotowywanie…",
     "preparing": "Przygotowywanie…",
     "dailyGoal": "Cel dzienny",
+    "dailyMission": "Misje dnia",
+    "viewStats": "Zobacz statystyki czytania",
+    "freezeAvailable": "1 zamrożenie streaku dostępne w tym tygodniu",
     "tapToRead": "Stuknij, aby otworzyć w czytniku"
   },
   "viralFeed": {
@@ -693,6 +707,8 @@
     "increaseGoal": "Zwiększ cel dzienny",
     "notifications": "Dzienne przypomnienie",
     "notificationsHint": "Otrzymuj codzienne przypomnienie o czytaniu Pisma.",
+    "eveningRescueTitle": "Nie strać streaku",
+    "eveningRescueBody": "Ukończ jedną misję dnia przed północą, aby zachować streak.",
     "notificationsEnabled": "Przypomnienie włączone",
     "notificationsDisabled": "Przypomnienie wyłączone",
     "notificationsTime": "Godzina przypomnienia: {{hour}}:{{minute}}",

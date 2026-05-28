@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 16:30 | Cursor subagent | P0 retencja: DailyMissionHub + multi-streak + Home loop | *(ten commit)* | done | Audyt konkurencji P0 — wpięte na Home |
 | 2026-05-28 14:00 | Cursor subagent | Audyt konkurencji UX (YouVersion/Glorify/Hallow) — plan P0/P1/P2 | — | done | Bez kodu; sekcja „Audyt konkurencji” poniżej |
 | 2026-05-27 16:00 | Cursor subagent | Śledzenie dostawy pełnej Biblii PL+EN — koordynacja | *(ten commit)* | done | Checklist deliverable; seed nadal demo 4 ks. — **w trakcie** |
 | 2026-05-27 15:45 | User (arcix) | Skarga: demo 4 ks. niewystarczające — wymagany pełny E2E | — | open | Numbers 20 / pusty rozdział; pełna Biblia PL+EN w SQLite |
@@ -1835,26 +1836,6 @@ npx expo start
 5. **Plany czytania z postępem widocznym** (YouVersion, Hallow BIAY) — struktura + win → `ReadingPlanCard` na Home (komponent gotowy!), pasek % w Hero.
 6. **Push + „11:58 PM” nudge** (Hallow, Glorify reminders) — ratuje streak → `reminderService` + wieczorny push „Jeszcze X min do północy”; onboarding w guided prayer już prosi o czas.
 7. **Practice / Daily Mission Hub** (YouVersion activity cards) — jeden ekran „co dziś” → `DailyMissionHub` pod Hero: 3 kafle (Pismo / Modlitwa / Refleksja) ze stanem done/pending.
-8. **Guided audio prayer** (Hallow sesje 5–15 min) — immersja bez czytania → rozbudowa `GuidedPrayerScreen` + ambient z `audioStore`; offline TTS gdy brak streamu.
-9. **Afirmacje / deklaracje** (Glorify, Hallow) — emocjonalny hook → `AffirmationsScreen` już jest; dodać „Dzisiejsza afirmacja” na Home + liczy do streak.
-10. **Share loop (story + zaproszenie)** (YouVersion share card) — wiralowość → `VotdFeedCard` ma share; dodać watermark + deep link `biblia-ai://votd` + „Podziel się streak”.
-11. **Dashboard postępu OT/NT** (YouVersion plans) — długoterminowa motywacja → `StatsScreen` istnieje; wpiąć mini-ring na Home (`ProgressRing`).
-12. **Memory verse / gamifikacja** (YouVersion Bible Loop) — mikro-cel → `MemoryVerseScreen` + spaced repetition lokalnie (SQLite/AsyncStorage).
-13. **Community modlitewna** (Hallow campaigns; YouVersion friends) — więź → VOTD comments już są; P1: anonimowe „Prośby modlitewne” (Supabase opcjonalnie, kolejka offline).
-14. **Wyzwania sezonowe** (Hallow Pray40, YouVersion 30-day) — szczyty engagement → `FastingScreen` 40 dni to start; ujednolicić jako `SeasonalChallengeCard` (Wielki Post / Adwent).
-15. **Continue reading one-tap** (wszyscy) — redukcja tarcia → `HeroCard` już działa; dodać „Następny rozdział planu” obok resume.
-
-### Plan priorytetów (implementacja)
-
-| Priorytet | Zakres | Ekrany / komponenty |
-|-----------|--------|---------------------|
-| **P0** (2–3 tyg.) | Daily loop + streak + Home | `DailyMissionHub`, wpięcie `MomentumDashboard` + `ReadingPlanCard` na `HomeScreen`, multi-aktywność w `userStats.ts`, `StreakDashboardScreen` (freeze + kalendarz), wieczorny nudge w `reminderService`, `DailyRhythmScreen` (4 kroki) |
-| **P1** (4–6 tyg.) | Głębia + share + sezon | `MemoryVerseScreen`, `ProgressRing` na Home, share streak + deep link, rozbudowa `GuidedPrayerScreen` (offline TTS), `SeasonalChallengeCard`, opcjonalne `PrayerRequestsSheet` |
-| **P2** (backlog) | Skala + platforma | Widget VOTD (Expo widget), bundled photo assets (offline), worship ambient playlist, grupy studyjne, cele tygodniowe modlitwy (Hallow-style), eksport PDF notatek |
-
-### Różnicowanie Cyber-Monastery (vs klonowanie)
-
-- **Bez konta obowiązkowego** — streak, plany, notatki w AsyncStorage; sync anonimowy opcjonalny (już jest).
 - **Offline-first** — TTS, plany, afirmacje, Pismo PL+EN lokalnie; social VOTD graceful degrade (kolejka jak komentarze).
 - **AI jako przewodnik, nie centrum** — Companion wspiera Daily Rhythm, nie zastępuje Pisma.
 - **Estetyka:** pełnoekranowe zdjęcia + scrim, serif na wersecie, brak reklam, brak paywall na codziennym rytmie (zgodnie z AGENTS.md UX principles).
@@ -1871,4 +1852,39 @@ npx expo start
 - Task: DONE - Home: codzienna praktyka + refleksja nad wersem, personalizacja feedu, onboarding
 - Changes: src/data/dailyPractice.ts, src/store/dailyEngagementStore.ts, src/components/dashboard/DailyPracticeCard.tsx, src/components/dashboard/DailyPracticeSheet.tsx, src/screens/HomeScreen.tsx, src/components/dashboard/GuidedReflectionCards.tsx, src/components/dashboard/GuidedReflectionSheet.tsx, src/components/AudioOnboarding.tsx, src/data/audioOnboardingSlides.ts, src/data/photoBackgrounds.ts, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
 - Validation: npm run check:locales (pass, 1020 kl.); npm run typecheck — błędy w Practice Hub (app/practice/*, nie w zakresie tego commitu); nowe pliki Home/onboarding bez błędów TS
+- Result: done
+
+## 2026-05-28 16:00 (local)
+- Agent: Cursor subagent (retention P0)
+- Task: START - Audyt konkurencji P0: DailyMissionHub, multi-streak, Home loop, wieczorny nudge
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 16:30 (local)
+- Agent: Cursor subagent (retention P0)
+- Task: PROGRESS - DailyMissionHub + userStats multi-aktywność + MomentumDashboard/ReadingPlanCard na Home; wieczorny push 20:30
+- Changes: src/services/stats/userStats.ts, src/components/dashboard/DailyMissionHub.tsx, MomentumDashboard.tsx, HomeScreen.tsx, reminderService.ts, dailyEngagementStore.ts, VotdFeedCard.tsx (usunięto fałszywy recordDailyRead), GuidedReflectionCards.tsx, GuidedPrayerScreen.tsx, SettingsScreen.tsx, app/_layout.tsx, en.json, pl.json
+- Validation: npm run typecheck (pass), npm run check:locales (pass, 1034 kl.)
+- Result: in-progress
+
+## 2026-05-28 16:45 (local)
+- Agent: Cursor subagent (retention P0)
+- Task: DONE - Audyt konkurencji P0: spójny daily loop na Home (Hero → Momentum → MissionHub → Plan → VOTD → Refleksja); streak z 4 aktywności + freeze 1/tydz.; wieczorny nudge
+- Changes: jak PROGRESS + AGENT_WORKLOG.md; commit `feat(retention): daily mission hub and multi-activity streak`
+- Validation: npm run typecheck (pass), npm run check:locales (pass)
+- Result: done — **co wdrożono vs audyt P0:** (1) DailyMissionHub 3 kafle Pismo/Modlitwa/Refleksja ze stanem done, (2) MomentumDashboard + ReadingPlanCard w sekcji „Na dziś”, (3) multi-aktywność streak w userStats (rozdział, praktyka, refleksja, modlitwa) + auto-freeze przy 1 dniu przerwy/tydz., (4) wieczorny push „Nie strać streaku” o 20:30 gdy przypomnienia włączone. **Pozostałe P0:** StreakDashboardScreen (freeze UI), DailyRhythmScreen 4 kroki — backlog P1.
+
+## 2026-05-28 12:54
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: START - stabilizacja startupu Expo Go (Network request failed spam).
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 12:34
+- Agent: GitHub Copilot (GPT-5.3-Codex)
+- Task: DONE - stabilizacja startupu Expo Go (Network request failed spam).
+- Changes: app/_layout.tsx, src/services/sync/syncEngine.ts, AGENT_WORKLOG.md
+- Validation: npm run typecheck (pass), npm run check:locales (pass), npx expo start --lan --clear --port 8082 -> Metro online on exp://192.168.101.30:8083
 - Result: done

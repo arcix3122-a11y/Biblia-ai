@@ -17,8 +17,18 @@ export const useDailyEngagementStore = create<DailyEngagementState>()(
     (set, get) => ({
       lastPracticeCompletedDate: null,
       lastReflectionCompletedDate: null,
-      markPracticeComplete: () => set({ lastPracticeCompletedDate: todayIsoDate() }),
-      markReflectionComplete: () => set({ lastReflectionCompletedDate: todayIsoDate() }),
+      markPracticeComplete: () => {
+        set({ lastPracticeCompletedDate: todayIsoDate() });
+        void import("@/services/stats/userStats").then(({ recordActivity }) => {
+          void recordActivity("practice");
+        });
+      },
+      markReflectionComplete: () => {
+        set({ lastReflectionCompletedDate: todayIsoDate() });
+        void import("@/services/stats/userStats").then(({ recordActivity }) => {
+          void recordActivity("reflection");
+        });
+      },
       isPracticeCompleteToday: () => get().lastPracticeCompletedDate === todayIsoDate(),
       isReflectionCompleteToday: () => get().lastReflectionCompletedDate === todayIsoDate(),
     }),

@@ -18,8 +18,11 @@ import { BookTile } from "@/components/BookTile";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { GlassCard } from "@/components/GlassCard";
 import { HeroCard } from "@/components/dashboard/HeroCard";
-import { DailyPracticeCard } from "@/components/dashboard/DailyPracticeCard";
+import { DailyMissionHub } from "@/components/dashboard/DailyMissionHub";
+import { MomentumDashboard } from "@/components/dashboard/MomentumDashboard";
+import { ReadingPlanCard } from "@/components/dashboard/ReadingPlanCard";
 import { GuidedReflectionCards } from "@/components/dashboard/GuidedReflectionCards";
+import type { ReflectionVariant } from "@/components/dashboard/GuidedReflectionSheet";
 import { LoadingState } from "@/components/layout/LoadingState";
 import { VotdFeedCard } from "@/components/dashboard/VotdFeedCard";
 import { TopicGrid } from "@/components/topics/TopicGrid";
@@ -88,6 +91,7 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [votdText, setVotdText] = useState("");
   const [votdRef, setVotdRef] = useState("");
+  const [pendingReflection, setPendingReflection] = useState<ReflectionVariant | null>(null);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -266,7 +270,14 @@ export default function HomeScreen() {
           onPress={startReading}
         />
 
-        <DailyPracticeCard />
+        <MomentumDashboard />
+
+        <DailyMissionHub
+          reflectionAvailable={Boolean(votdText && votdRef)}
+          onOpenReflection={() => setPendingReflection("meditation")}
+        />
+
+        <ReadingPlanCard />
 
         <VotdFeedCard
           onVerse={(text, ref) => {
@@ -275,7 +286,12 @@ export default function HomeScreen() {
           }}
         />
 
-        <GuidedReflectionCards verseText={votdText} verseReference={votdRef} />
+        <GuidedReflectionCards
+          verseText={votdText}
+          verseReference={votdRef}
+          openVariant={pendingReflection}
+          onOpenVariantHandled={() => setPendingReflection(null)}
+        />
 
         <Text style={styles.sectionHeading}>{t("home.exploreHeading")}</Text>
         <ActionTile
