@@ -29,6 +29,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | *(ten commit)* | in-progress | START |
 | 2026-05-28 18:30 | Cursor subagent | E2E AI: live Groq + historia czatu (koniec szablonów) | `1d09f77` | done | Bug: `user` miał `source: system` → historia pusta; dev pill LIVE_GROQ/OFFLINE_MOCK |
 | 2026-05-28 17:05 | Cursor subagent | AI smoke harness (`npm run ai:smoke`) — wykrywanie powtarzalnych odpowiedzi LLM | *(ten commit)* | done | Pomija bez klucza; 5 promptów, overlap Jaccard |
 | 2026-05-28 16:30 | Cursor subagent | P0 retencja: DailyMissionHub + multi-streak + Home loop | *(ten commit)* | done | Audyt konkurencji P0 — wpięte na Home |
@@ -192,6 +193,13 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Walidacja:** `git log -1`; przegląd tabeli vs `git log --oneline -40`.
 
 ---
+
+## 2026-05-28 15:32 (local)
+- Agent: Cursor subagent
+- Task: START - Zdjęcie w czytniku (ReaderHeroHeader)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
 
 ## 2026-05-28 12:25 (local)
 - Agent: Antigravity
@@ -2053,6 +2061,15 @@ npx expo start
 - Walidacja: `npm run typecheck`, `npm run ai:smoke`
 - Result: in-progress
 
+## 2026-05-28 19:25 (local)
+- Agent: Cursor subagent
+- Task: DONE - fix(ai): koniec szablonów w trybie live
+- Przyczyna: (1) historia live zawierała odpowiedzi offline ze stałymi sekcjami → model je kopiował; (2) `spiritualAssistantProfile.ts` nie był w repo mimo importu; (3) UI „Na żywo” tylko po kluczu API, nie po źródle ostatniej odpowiedzi.
+- Zmiany: `spiritualAssistantProfile.ts` (prompt konwersacyjny PL/EN, First-Aid tylko gdy trzeba), `useSpiritualAssistant.ts` (historia tylko live + trace), `assistantRequestTrace.ts`, `AiChatScreen.tsx` (dev panel), locale `ai.devDebug.*`.
+- Walidacja: `npm run typecheck` OK; `npm run ai:smoke` OK (5/5 distinct).
+- Weryfikacja telefon: Expo Go __DEV__ → tap dev pill → `groq · HTTP 200 · model · LIVE_GROQ`; wyślij „Elo siema co tam” vs „Wyjaśnij Jan 3:16” — różne odpowiedzi po polsku.
+- Result: done — commit `be1eae3`
+
 ## 2026-05-28 17:30 (local)
 - Agent: Cursor subagent
 - Task: START - Naprawa jakości czatu Groq
@@ -2066,3 +2083,37 @@ npx expo start
 - Changes: llmClient.ts, useSpiritualAssistant.ts, spiritualFirstAidKit.ts, scripts/test-groq-chat.mjs, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass), node scripts/test-groq-chat.mjs (pass)
 - Result: done — commit 473441d
+## 2026-05-28 15:04 (local)
+- Agent: Codex
+- Task: START - poprawa modlitwy z przewodnikiem: grafiki i muzyka
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 15:24 (local)
+- Agent: Codex
+- Task: DONE - poprawa modlitwy z przewodnikiem: grafiki i muzyka
+- Changes: src/screens/GuidedPrayerScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, assets/guided-prayer/*, assets/audio/prayer-ambient-loop.wav, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass), npm run typecheck (pass), npx expo start --port 8081 --host localhost (running at http://localhost:8081)
+- Result: done
+
+## 2026-05-28 15:33 (local)
+- Agent: Cursor subagent
+- Task: START - Tab Biblioteka (siatka ksiąg w dolnym pasku)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 15:30 (local)
+- Agent: Codex
+- Task: START - mocniejsze uwidocznienie grafik w modlitwie z przewodnikiem
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-28 16:00 (local)
+- Agent: Composer
+- Task: DONE - Dedykowane zdjęcia
+- Changes: src/data/photoBackgrounds.ts, src/components/PhotoBackground.tsx, src/components/BookTile.tsx, src/components/topics/TopicGrid.tsx, app/book/[bookSlug].tsx, src/screens/BookScreen.tsx, src/screens/HomeScreen.tsx, src/screens/TopicResultsScreen.tsx, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass), typecheck on changed files (pass); repo-wide typecheck blocked by pre-existing GuidedPrayerScreen.tsx errors
+- Result: done

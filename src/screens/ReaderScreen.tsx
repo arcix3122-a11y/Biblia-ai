@@ -17,6 +17,10 @@ import { useActiveTranslation } from "@/store/translationStore";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { LoadingState } from "@/components/layout/LoadingState";
 import { FontControls } from "@/components/reader/FontControls";
+import {
+  READER_HERO_COLLAPSE_SCROLL,
+  ReaderHeroHeader,
+} from "@/components/reader/ReaderHeroHeader";
 import { ReadingCanvas } from "@/components/reader/ReadingCanvas";
 import { VerseRow } from "@/components/VerseRow";
 import { useChrome } from "@/context/ChromeContext";
@@ -70,12 +74,18 @@ export default function ReaderScreen() {
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
 
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlatList<Verse>>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
   const shareRef = useRef<View>(null);
   const [sharing, setSharing] = useState(false);
 
   const chapterKey = `${slug}-${chapterNumber}`;
   const tts = useChapterTTS(verses, translation, chapterKey);
+
+  useEffect(() => {
+    scrollY.setValue(0);
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [chapterKey, scrollY]);
 
   useEffect(() => {
     setTabBarHidden(immersiveMode);
@@ -235,6 +245,65 @@ export default function ReaderScreen() {
     ]
   );
 
+  const bookDisplayName = book
+    ? getBookDisplayName(book.slug, locale, book.name)
+    : "";
+  const showEnglishNotice =
+    book != null && translation === "en" && locale === "pl" && !hasDismissedKjvBanner;
+  const translationLabel = useMemo(() => {
+    const translationName =
+      translation === "pl"
+        ? t("settings.translation.plName")
+        : t("settings.translation.enName");
+    return t("reader.translationLabel", { name: translationName });
+  }, [t, translation]);
+
+  const stickyOpacity = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [READER_HERO_COLLAPSE_SCROLL, READER_HERO_COLLAPSE_SCROLL + 48],
+        outputRange: [0, 1],
+        extrapolate: "clamp",
+      }),
+    [scrollY]
+  );
+
+  const listHeader = useMemo(() => {
+    if (!book || immersiveMode) {
+      return null;
+    }
+    return (
+      <ReaderHeroHeader
+        bookSlug={book.slug}
+        bookDisplayName={bookDisplayName}
+        chapterNumber={chapterNumber}
+        flowSubtitle={t("reader.flowSubtitle")}
+        translationLabel={translationLabel}
+        showTranslationNotice={showEnglishNotice}
+        translationNoticeText={t("reader.scriptureTranslationNoticeShort")}
+        dismissTranslationNoticeA11y={t("reader.dismissTranslationNotice")}
+        onDismissTranslationNotice={dismissKjvBanner}
+      />
+    );
+  }, [
+    book,
+    bookDisplayName,
+    chapterNumber,
+    dismissKjvBanner,
+    immersiveMode,
+    showEnglishNotice,
+    t,
+    translationLabel,
+  ]);
+
+  const onScroll = useMemo(
+    () =>
+      Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: true,
+      }),
+    [scrollY]
+  );
+
   if (!ready || bookLoading || versesLoading) {
     return (
       <View style={styles.centered}>
@@ -255,12 +324,31 @@ export default function ReaderScreen() {
     );
   }
 
-  const bookDisplayName = getBookDisplayName(book.slug, locale, book.name);
-  const showEnglishNotice = translation === "en" && locale === "pl" && !hasDismissedKjvBanner;
-
   return (
     <View style={[styles.container, { paddingTop: immersiveMode ? insets.top : 0 }]}>
       <Stack.Screen options={{ headerShown: false }} />
+
+      {!immersiveMode ? (
+        <Animated.View
+          pointerEvents="box-none"
+          style={[
+            styles.stickyHeroBar,
+            {
+              opacity: stickyOpacity,
+              paddingTop: insets.top + 40,
+            },
+          ]}
+        >
+          <ReaderHeroHeader
+            bookSlug={book.slug}
+            bookDisplayName={bookDisplayName}
+            chapterNumber={chapterNumber}
+            flowSubtitle={t("reader.flowSubtitle")}
+            translationLabel={translationLabel}
+            collapsed
+          />
+        </Animated.View>
+      ) : null}
 
       {!immersiveMode ? (
         <Animated.View
@@ -307,7 +395,7 @@ export default function ReaderScreen() {
       ) : null}
 
       <ReadingCanvas fontSize={fontSize} style={styles.canvas}>
-        <FlatList
+        <Animated.FlatList
           ref={flatListRef}
           data={verses}
           keyExtractor={(item) => String(item.id)}
@@ -316,40 +404,11 @@ export default function ReaderScreen() {
           maxToRenderPerBatch={8}
           windowSize={7}
           removeClippedSubviews
+          onScroll={onScroll}
+          scrollEventThrottle={16}
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
-          ListHeaderComponent={
-            <View style={styles.flowHeader}>
-              <Text style={styles.flowTitle}>
-                {bookDisplayName} {chapterNumber}
-              </Text>
-              <Text style={styles.flowSubtitle}>{t("reader.flowSubtitle")}</Text>
-              <Text style={styles.translationLabel}>
-                {t("reader.translationLabel", {
-                  name:
-                    translation === "pl"
-                      ? t("settings.translation.plName")
-                      : t("settings.translation.enName"),
-                })}
-              </Text>
-              {!immersiveMode && showEnglishNotice ? (
-                <View style={styles.translationNotice}>
-                  <Text style={styles.translationNoticeText} numberOfLines={2}>
-                    {t("reader.scriptureTranslationNoticeShort")}
-                  </Text>
-                  <Pressable
-                    onPress={dismissKjvBanner}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={t("reader.dismissTranslationNotice")}
-                  >
-                    <Ionicons name="close" size={16} color={colors.textMuted} />
-                  </Pressable>
-                </View>
-              ) : null}
-              <View style={styles.flowDivider} />
-            </View>
-          }
+          ListHeaderComponent={listHeader}
           onScrollToIndexFailed={(info) => {
             setTimeout(() => {
               flatListRef.current?.scrollToIndex({
@@ -526,37 +585,17 @@ const styles = StyleSheet.create({
   ttsButtonTextActive: {
     color: colors.canvas,
   },
+  stickyHeroBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 6,
+  },
   verseList: {
     paddingTop: spacing.xl * 2,
     paddingBottom: spacing.xxl * 2.2,
     paddingHorizontal: spacing.sm,
-  },
-  flowHeader: {
-    paddingHorizontal: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  flowTitle: {
-    ...typography.title,
-    color: colors.textPrimary,
-    marginBottom: 2,
-    textAlign: "center",
-  },
-  flowSubtitle: {
-    ...typography.caption,
-    color: colors.textMuted,
-    textAlign: "center",
-    marginBottom: spacing.xs,
-  },
-  translationLabel: {
-    ...typography.caption,
-    color: colors.accent,
-    textAlign: "center",
-    marginBottom: spacing.sm,
-  },
-  flowDivider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.glassBorder,
-    marginTop: spacing.sm,
   },
   floatingBottom: {
     position: "absolute",
@@ -650,23 +689,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.canvas,
     alignItems: "center",
     justifyContent: "center",
-  },
-  translationNotice: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radii.md,
-    backgroundColor: colors.backgroundElevated,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-  },
-  translationNoticeText: {
-    ...typography.caption,
-    color: colors.textMuted,
-    flex: 1,
   },
   offscreen: {
     position: "absolute",
