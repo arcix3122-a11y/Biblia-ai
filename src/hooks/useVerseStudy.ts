@@ -1,8 +1,10 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
+import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { logError } from "@/services/errors/errorLogger";
 import type { SelectedVerse } from "@/store/selectionStore";
+import type { ScriptureTranslation, VerseWithReference } from "@/types/scripture";
 
 export interface VerseTranslation {
   name: string;
@@ -23,97 +25,86 @@ export interface VerseStudyDetails {
   commentary: string[];
 }
 
-const MOCK_STUDY_DATA: Record<string, VerseStudyDetails> = {
-  "genesis-1-1": {
-    translations: [
-      { name: "ESV", lang: "en", text: "In the beginning, God created the heavens and the earth." },
-      { name: "NIV", lang: "en", text: "In the beginning God created the heavens and the earth." },
-      { name: "BT", lang: "pl", text: "Na początku Bóg stworzył niebo i ziemię." },
-      { name: "UBG", lang: "pl", text: "Na początku Bóg stworzył niebo i ziemię." },
-    ],
-    interlinear: [
-      { original: "בְּרֵאשִׁ֖ית", transliteration: "Bereshit", translation: "In the beginning", strong: "H7225" },
-      { original: "בָּרָ֣א", transliteration: "Bara", translation: "created", strong: "H1254" },
-      { original: "אֱלֹהִ֑ים", transliteration: "Elohim", translation: "God", strong: "H430" },
-    ],
-    commentary: [
-      "Indicates the absolute beginning of time, space, and matter by a sovereign Creator.",
-      "The plural name 'Elohim' hints at the majesty and triune nature of God.",
-      "Establishes a foundational cosmic order separating the heavens (spiritual) and earth (physical)."
-    ]
-  },
-  "psalms-23-1": {
-    translations: [
-      { name: "ESV", lang: "en", text: "The LORD is my shepherd; I shall not want." },
-      { name: "NIV", lang: "en", text: "The LORD is my shepherd, I lack nothing." },
-      { name: "BT", lang: "pl", text: "Pan jest moim pasterzem, nie brak mi niczego." },
-      { name: "UBG", lang: "pl", text: "Pan jest moim pasterzem, niczego mi nie zabraknie." },
-    ],
-    interlinear: [
-      { original: "יְהוָ֥ה", transliteration: "Yahweh", translation: "The LORD", strong: "H3068" },
-      { original: "רֹ֝עִ֗י", transliteration: "Roi", translation: "my shepherd", strong: "H7462" },
-      { original: "אֶחְסָֽר", transliteration: "Echsar", translation: "I shall want/lack", strong: "H2637" },
-    ],
-    commentary: [
-      "Depicts an intimate covenant relationship using the ancient Near Eastern image of a protective shepherd.",
-      "Declares absolute contentment and security under divine providence.",
-      "Written by David, drawing from his own years as a humble shepherd in Judea."
-    ]
-  },
-  "john-1-1": {
-    translations: [
-      { name: "ESV", lang: "en", text: "In the beginning was the Word, and the Word was with God, and the Word was God." },
-      { name: "NIV", lang: "en", text: "In the beginning was the Word, and the Word was with God, and the Word was God." },
-      { name: "BT", lang: "pl", text: "Na początku było Słowo, a Słowo było u Boga, i Bogiem było Słowo." },
-      { name: "UBG", lang: "pl", text: "Na początku było Słowo, a Słowo było u Boga, i Bogiem było Słowo." },
-    ],
-    interlinear: [
-      { original: "ἀρχῇ", transliteration: "Arche", translation: "beginning", strong: "G746" },
-      { original: "λόγος", transliteration: "Logos", translation: "the Word", strong: "G3056" },
-      { original: "Θεόν", transliteration: "Theon", translation: "God", strong: "G2316" },
-    ],
-    commentary: [
-      "Directly echoes Genesis 1:1, establishing the pre-existence of Christ before creation.",
-      "Uses 'Logos' to bridge Jewish theological thought (the creative Word of God) and Greek philosophy (cosmic reason).",
-      "Asserts both the distinct personhood of the Word ('with God') and essential divinity ('was God')."
-    ]
-  },
-  "romans-8-28": {
-    translations: [
-      { name: "ESV", lang: "en", text: "And we know that for those who love God all things work together for good, for those who are called according to his purpose." },
-      { name: "NIV", lang: "en", text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose." },
-      { name: "BT", lang: "pl", text: "Wiemy też, że Bóg z tymi, którzy Go miłują, współdziała we wszystkim dla ich dobra, z tymi, którzy są powołani według [Jego] zamiaru." },
-      { name: "UBG", lang: "pl", text: "A wiemy, że wszystkim współdziała ku dobremu dla tych, którzy miłują Boga, to jest dla tych, którzy są powołani według jego postanowienia." },
-    ],
-    interlinear: [
-      { original: "συνεργεῖ", transliteration: "Synergei", translation: "work together", strong: "G4903" },
-      { original: "ἀγαθόν", transliteration: "Agathon", translation: "for good", strong: "G18" },
-      { original: "πρόθεσιν", transliteration: "Prothesin", translation: "purpose / plan", strong: "G4286" },
-    ],
-    commentary: [
-      "The verb 'synergei' indicates active divine weaving of both trials and triumphs for a holy resolution.",
-      "Limits this promise to those who love God and are aligned with His redemptive decrees.",
-      "Reassures believers that no event in their life is random or outside sovereign oversight."
-    ]
-  }
-};
+async function getLocalVerse(
+  verse: SelectedVerse,
+  translation: ScriptureTranslation
+): Promise<VerseWithReference | null> {
+  return scriptureRepo.getVerseByReference(
+    verse.bookSlug,
+    verse.chapter,
+    verse.verse,
+    translation
+  );
+}
 
-function buildGenericStudyData(verse: SelectedVerse): VerseStudyDetails {
+function fallbackTextForTranslation(
+  requested: ScriptureTranslation,
+  selected: SelectedVerse,
+  local: VerseWithReference | null
+): string {
+  if (local?.text) {
+    return local.text;
+  }
+
+  if (requested === "en") {
+    return selected.text;
+  }
+
+  return i18n.t("study.translationUnavailable");
+}
+
+async function buildLocalStudyData(verse: SelectedVerse): Promise<VerseStudyDetails> {
+  const [english, polish, before, after] = await Promise.all([
+    getLocalVerse(verse, "en"),
+    getLocalVerse(verse, "pl"),
+    scriptureRepo.getVerseByReference(verse.bookSlug, verse.chapter, verse.verse - 1, "en"),
+    scriptureRepo.getVerseByReference(verse.bookSlug, verse.chapter, verse.verse + 1, "en"),
+  ]);
+  const reference = i18n.t("study.sourceReference", {
+    book: verse.bookName,
+    chapter: verse.chapter,
+    verse: verse.verse,
+    translation: i18n.t("settings.translation.enName"),
+  });
+
   return {
     translations: [
-      { name: "ESV", lang: "en", text: verse.text },
-      { name: "NIV", lang: "en", text: verse.text },
-      { name: "BT", lang: "pl", text: i18n.t("study.translationUnavailable") },
-      { name: "UBG", lang: "pl", text: i18n.t("study.translationUnavailable") },
+      {
+        name: i18n.t("settings.translation.enName"),
+        lang: "en",
+        text: fallbackTextForTranslation("en", verse, english),
+      },
+      {
+        name: i18n.t("settings.translation.plName"),
+        lang: "pl",
+        text: fallbackTextForTranslation("pl", verse, polish),
+      },
     ],
     interlinear: [
-      { original: "Scripture", transliteration: verse.bookSlug, translation: "Chapter " + verse.chapter, strong: "Verse " + verse.verse },
+      {
+        original: i18n.t("study.localOriginalUnavailable"),
+        transliteration: i18n.t("study.localOriginalSource"),
+        translation: i18n.t("study.localOriginalMeaning"),
+        strong: i18n.t("study.localOriginalStrong"),
+      },
     ],
     commentary: [
-      i18n.t("study.offlineCommentary1"),
-      i18n.t("study.offlineCommentary2"),
-    ]
+      i18n.t("study.localCommentaryReference", { reference }),
+      i18n.t("study.localCommentaryContext", {
+        before: before?.text ?? i18n.t("study.contextBoundaryBefore"),
+        after: after?.text ?? i18n.t("study.contextBoundaryAfter"),
+      }),
+      i18n.t("study.localCommentaryPractice"),
+    ],
   };
+}
+
+function hasRequiredStudyFields(details: VerseStudyDetails): boolean {
+  return (
+    Array.isArray(details.translations) &&
+    Array.isArray(details.interlinear) &&
+    Array.isArray(details.commentary)
+  );
 }
 
 export function useVerseStudy() {
@@ -126,37 +117,20 @@ export function useVerseStudy() {
     setLoading(true);
     setError(null);
 
-    const slugKey = `${verse.bookSlug}-${verse.chapter}-${verse.verse}`;
-    const mock = MOCK_STUDY_DATA[slugKey];
-
-    // Try mock first for premium local experience
-    if (mock) {
-      setTimeout(() => {
-        setDetails(mock);
-        setLoading(false);
-      }, 500);
-      return;
-    }
-
     const apiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
     if (!apiKey) {
-      // Local fallback if no key
-      setTimeout(() => {
-        setDetails(buildGenericStudyData(verse));
-        setLoading(false);
-      }, 400);
+      setDetails(await buildLocalStudyData(verse));
+      setLoading(false);
       return;
     }
 
-    // Build the prompt for AI scholarly generation
-    const prompt = `You are a scholarly Bible professor. Return a strict JSON object containing a deep study guide for ${verse.bookName} ${verse.chapter}:${verse.verse} ("${verse.text}").
+    const prompt = `You are a scholarly Bible professor. Return a strict JSON object containing a study guide for ${verse.bookName} ${verse.chapter}:${verse.verse} ("${verse.text}").
+Use KJV and Biblia Gdanska 1881 as the comparison translation labels unless the local text is unavailable.
 JSON format:
 {
   "translations": [
-    {"name": "ESV", "lang": "en", "text": "English text"},
-    {"name": "NIV", "lang": "en", "text": "English text"},
-    {"name": "BT", "lang": "pl", "text": "Polish translation"},
-    {"name": "UBG", "lang": "pl", "text": "Polish translation"}
+    {"name": "KJV", "lang": "en", "text": "English text"},
+    {"name": "Biblia Gdanska 1881", "lang": "pl", "text": "Polish text or unavailable note"}
   ],
   "interlinear": [
     {"original": "Greek/Hebrew word", "transliteration": "Transliteration", "translation": "Literal meaning", "strong": "Strong number"}
@@ -192,7 +166,10 @@ Do not return any other text, markdown wrapper, or formatting except the raw JSO
           max_tokens: 1000,
           response_format: { type: "json_object" },
           messages: [
-            { role: "system", content: "You are a biblical scholar. Always reply in strict JSON format." },
+            {
+              role: "system",
+              content: "You are a biblical scholar. Always reply in strict JSON format.",
+            },
             { role: "user", content: prompt },
           ],
         }),
@@ -209,15 +186,15 @@ Do not return any other text, markdown wrapper, or formatting except the raw JSO
       }
 
       const parsed = JSON.parse(rawContent) as VerseStudyDetails;
-      if (parsed.translations && parsed.interlinear && parsed.commentary) {
-        setDetails(parsed);
-      } else {
+      if (!hasRequiredStudyFields(parsed)) {
         throw new Error("JSON missing required schema fields");
       }
-    } catch (err: any) {
+
+      setDetails(parsed);
+    } catch (err: unknown) {
       logError(err, "verse-study-fetch-failed", { verse });
       setError(t("errors.studyFetchFailed"));
-      setDetails(buildGenericStudyData(verse));
+      setDetails(await buildLocalStudyData(verse));
     } finally {
       setLoading(false);
     }

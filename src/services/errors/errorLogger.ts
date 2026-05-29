@@ -6,6 +6,7 @@ import type { QueuedErrorLog } from "@/types/errors";
 
 const APP_NAME = "biblia-ai" as const;
 const QUEUE_KEY = "@biblia-ai/error-log-queue";
+let flushInterval: ReturnType<typeof setInterval> | null = null;
 
 function buildDeviceInfo(metadata?: Record<string, unknown>): Record<string, unknown> {
   return {
@@ -130,7 +131,12 @@ export function initializeErrorLogger(): void {
   void flushQueue().catch(() => {
     // never surface to RN bridge
   });
-  setInterval(() => {
+
+  if (flushInterval) {
+    return;
+  }
+
+  flushInterval = setInterval(() => {
     void flushQueue().catch(() => {
       // never surface to RN bridge
     });

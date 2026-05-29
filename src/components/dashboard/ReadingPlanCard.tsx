@@ -1,19 +1,17 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { PhotoBackground } from "@/components/PhotoBackground";
+import { getAssignmentsForDay, PLAN_TOTAL_DAYS } from "@/data/readingPlan";
+import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
+import { useFullBibleAvailable } from "@/hooks/useScripture";
 import { getBookDisplayName } from "@/i18n/bookNames";
+import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { useLocaleStore } from "@/store/localeStore";
 import { useActiveTranslation } from "@/store/translationStore";
-import { PhotoBackground } from "@/components/PhotoBackground";
-import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
-import {
-  FOUNDATION_WEEK_PLAN,
-  getActivePlanDay,
-} from "@/data/readingPlans";
-import * as scriptureRepo from "@/services/db/scriptureRepository";
-import { useReadingPlanStore } from "@/store/readingPlanStore";
+import { useYearPlanStore } from "@/store/yearPlanStore";
 import { colors, radii, spacing, typography } from "@/theme";
 
 interface ReadingPlanCardProps {
@@ -25,51 +23,69 @@ export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
   const locale = useLocaleStore((s) => s.locale);
   const translation = useActiveTranslation(locale);
   const router = useRouter();
-  const completedDays = useReadingPlanStore((s) => s.completedDays);
-  const loadProgress = useReadingPlanStore((s) => s.loadProgress);
-  const markDayComplete = useReadingPlanStore((s) => s.markDayComplete);
-  const isDayComplete = useReadingPlanStore((s) => s.isDayComplete);
+  const fullBibleAvailable = useFullBibleAvailable();
+  const startDate = useYearPlanStore((s) => s.startDate);
+  const completedDays = useYearPlanStore((s) => s.completedDays);
+  const loaded = useYearPlanStore((s) => s.loaded);
+  const load = useYearPlanStore((s) => s.load);
+  const startPlan = useYearPlanStore((s) => s.startPlan);
+  const isDayComplete = useYearPlanStore((s) => s.isDayComplete);
+  const getCurrentDay = useYearPlanStore((s) => s.getCurrentDay);
+  const getProgress = useYearPlanStore((s) => s.getProgress);
+  const [bookLabel, setBookLabel] = useState("");
 
   useEffect(() => {
-    void loadProgress();
-  }, [loadProgress]);
+    void load();
+  }, [load]);
 
-  const activeDay = getActivePlanDay(FOUNDATION_WEEK_PLAN, completedDays);
-  const totalDays = FOUNDATION_WEEK_PLAN.days.length;
-  const completedCount = completedDays.length;
-  const allComplete = completedCount >= totalDays;
-  const dayComplete = isDayComplete(activeDay.day);
-  const [bookLabel, setBookLabel] = useState(activeDay.bookSlug);
+  const currentDay = getCurrentDay();
+  const assignments = useMemo(() => getAssignmentsForDay(currentDay), [currentDay]);
+  const firstAssignment = assignments[0] ?? null;
+  const todayDone = isDayComplete(currentDay);
+  const progress = getProgress();
 
   useEffect(() => {
-    void scriptureRepo.getBookBySlug(activeDay.bookSlug).then((book) => {
-      setBookLabel(getBookDisplayName(activeDay.bookSlug, locale, book?.name));
+    if (!firstAssignment) {
+      setBookLabel("");
+      return;
+    }
+
+    void scriptureRepo.getBookBySlug(firstAssignment.bookSlug).then((book) => {
+      setBookLabel(
+        getBookDisplayName(firstAssignment.bookSlug, locale, book?.name ?? firstAssignment.bookName)
+      );
     });
-  }, [activeDay.bookSlug, locale]);
+  }, [firstAssignment, locale]);
+
+  const openPlan = useCallback(() => {
+    router.push("/reading-plan");
+  }, [router]);
 
   const openReading = useCallback(() => {
     void (async () => {
+      if (!fullBibleAvailable || !firstAssignment) {
+        openPlan();
+        return;
+      }
+
+      if (!startDate) {
+        await startPlan();
+      }
+
       const available = await scriptureRepo.isChapterAvailable(
-        activeDay.bookSlug,
-        activeDay.chapter,
+        firstAssignment.bookSlug,
+        firstAssignment.chapter,
         translation
       );
       if (!available) {
         Alert.alert(t("readingPlan.chapterUnavailableTitle"), t("reader.chapterUnavailable"));
         return;
       }
-      await markDayComplete(activeDay.day);
-      router.push(`/reader/${activeDay.bookSlug}/${activeDay.chapter}`);
+      router.push(`/reader/${firstAssignment.bookSlug}/${firstAssignment.chapter}`);
     })();
-  }, [
-    activeDay.bookSlug,
-    activeDay.chapter,
-    activeDay.day,
-    markDayComplete,
-    router,
-    t,
-    translation,
-  ]);
+  }, [firstAssignment, fullBibleAvailable, openPlan, router, startDate, startPlan, t, translation]);
+
+  const completedCount = completedDays.length;
 
   return (
     <PhotoBackground
@@ -84,48 +100,72 @@ export function ReadingPlanCard({ style }: ReadingPlanCardProps) {
             <Ionicons name="calendar-outline" size={18} color={colors.accent} />
           </View>
           <View style={styles.headerText}>
-            <Text style={styles.title}>{t("readingPlan.foundationTitle")}</Text>
-            <Text style={styles.subtitle}>{t("readingPlan.foundationSubtitle")}</Text>
+            <Text style={styles.title}>{t("readingPlan.yearTitle")}</Text>
+            <Text style={styles.subtitle}>
+              {fullBibleAvailable
+                ? t("readingPlan.yearSubtitle")
+                : t("readingPlan.fullBibleRequiredShort")}
+            </Text>
           </View>
         </View>
 
         <View style={styles.progressRow}>
           <Text style={styles.progressLabel}>
-            {allComplete
-              ? t("readingPlan.planComplete")
-              : t("readingPlan.dayProgress", {
-                  current: activeDay.day,
-                  total: totalDays,
-                })}
+            {startDate
+              ? t("readingPlan.dayProgress", {
+                  current: currentDay,
+                  total: PLAN_TOTAL_DAYS,
+                })
+              : t("readingPlan.notStarted")}
           </Text>
           <Text style={styles.progressMeta}>
-            {t("readingPlan.completedCount", { count: completedCount, total: totalDays })}
+            {loaded
+              ? t("readingPlan.progressPercent", { percent: progress })
+              : t("common.loading")}
           </Text>
         </View>
 
-        {!allComplete ? (
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progress}%` as `${number}%` }]} />
+        </View>
+
+        {firstAssignment ? (
           <>
-            <Text style={styles.readingLabel}>{t("readingPlan.todaysReading")}</Text>
+            <Text style={styles.readingLabel}>
+              {t("readingPlan.assignmentsCount", { count: assignments.length })}
+            </Text>
             <Text style={styles.readingRef}>
               {t("readingPlan.chapterRef", {
-                book: bookLabel,
-                chapter: activeDay.chapter,
+                book: bookLabel || firstAssignment.bookName,
+                chapter: firstAssignment.chapter,
               })}
             </Text>
-            <Pressable onPress={openReading} style={styles.readButton}>
-              <Ionicons
-                name={dayComplete ? "checkmark-circle" : "book-outline"}
-                size={16}
-                color={colors.accent}
-              />
-              <Text style={styles.readButtonText}>
-                {dayComplete ? t("readingPlan.readAgain") : t("readingPlan.readNow")}
-              </Text>
-            </Pressable>
           </>
         ) : (
           <Text style={styles.completeMessage}>{t("readingPlan.planCompleteHint")}</Text>
         )}
+
+        <View style={styles.actions}>
+          <Pressable onPress={openReading} style={styles.readButton}>
+            <Ionicons
+              name={todayDone ? "checkmark-circle" : startDate ? "book-outline" : "play-outline"}
+              size={16}
+              color={colors.accent}
+            />
+            <Text style={styles.readButtonText}>
+              {!fullBibleAvailable
+                ? t("readingPlan.openPlan")
+                : !startDate
+                  ? t("readingPlan.startPlan")
+                  : todayDone
+                    ? t("readingPlan.readAgain")
+                    : t("readingPlan.readNow")}
+            </Text>
+          </Pressable>
+          <Pressable onPress={openPlan} style={styles.secondaryButton}>
+            <Text style={styles.secondaryButtonText}>{t("readingPlan.openPlan")}</Text>
+          </Pressable>
+        </View>
       </View>
     </PhotoBackground>
   );
@@ -135,7 +175,7 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
     borderColor: colors.glassBorder,
-    minHeight: 220,
+    minHeight: 230,
   },
   content: {
     padding: spacing.lg,
@@ -170,7 +210,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   progressLabel: {
     ...typography.label,
@@ -179,6 +219,18 @@ const styles = StyleSheet.create({
   progressMeta: {
     ...typography.caption,
     color: colors.textMuted,
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: radii.pill,
+    overflow: "hidden",
+    backgroundColor: "rgba(255,255,255,0.12)",
+    marginBottom: spacing.sm,
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: radii.pill,
+    backgroundColor: colors.accent,
   },
   readingLabel: {
     ...typography.caption,
@@ -189,6 +241,12 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textPrimary,
     marginBottom: spacing.md,
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    flexWrap: "wrap",
   },
   readButton: {
     flexDirection: "row",
@@ -205,9 +263,20 @@ const styles = StyleSheet.create({
   readButtonText: {
     ...typography.caption,
     color: colors.textPrimary,
+    fontWeight: "700",
+  },
+  secondaryButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  secondaryButtonText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "700",
   },
   completeMessage: {
     ...typography.body,
     color: colors.textSecondary,
+    marginBottom: spacing.md,
   },
 });

@@ -7,4 +7,11 @@ config.resolver.extraNodeModules = {
   "@": path.resolve(__dirname, "src"),
 };
 
+// Ignore transient native build trees that can disappear while Metro is watching.
+config.resolver.blockList = [
+  /android[\\/]+app[\\/]+\.cxx[\\/]+.*/,
+  /android[\\/]+app[\\/]+build[\\/]+.*/,
+  /android[\\/]+build[\\/]+.*/,
+];
+
 module.exports = config;

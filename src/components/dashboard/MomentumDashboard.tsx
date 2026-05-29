@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -12,41 +12,27 @@ import { useTranslation } from "react-i18next";
 import { PhotoBackground } from "@/components/PhotoBackground";
 import { getCategoryPhotoUrl } from "@/data/photoBackgrounds";
 import { shareStreak } from "@/services/share/shareInvite";
-import { getUserStats } from "@/services/stats/userStats";
+import { useUserStatsStore } from "@/store/userStatsStore";
 import { colors, radii, spacing, typography } from "@/theme";
 import type { MomentumDashboardProps } from "@/types/ui";
 
 export function MomentumDashboard({ style }: MomentumDashboardProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const [streakDays, setStreakDays] = useState(0);
-  const [chaptersReadToday, setChaptersReadToday] = useState(0);
-  const [dailyGoal, setDailyGoal] = useState(1);
-  const [goalMetToday, setGoalMetToday] = useState(false);
-  const [missionsDone, setMissionsDone] = useState(0);
-  const [freezeAvailable, setFreezeAvailable] = useState(true);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const stats = await getUserStats();
-      setStreakDays(stats.streakDays);
-      setChaptersReadToday(stats.chaptersReadToday);
-      setDailyGoal(stats.dailyGoal);
-      setGoalMetToday(stats.goalMetToday);
-      setMissionsDone(stats.activitiesCompletedCount);
-      setFreezeAvailable(stats.freezeAvailable);
-    } catch {
-      // local-only fallback
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const stats = useUserStatsStore((s) => s.stats);
+  const loadStats = useUserStatsStore((s) => s.load);
+  const loading = useUserStatsStore((s) => s.loading);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void loadStats();
+  }, [loadStats]);
+
+  const streakDays = stats?.streakDays ?? 0;
+  const chaptersReadToday = stats?.chaptersReadToday ?? 0;
+  const dailyGoal = stats?.dailyGoal ?? 1;
+  const goalMetToday = stats?.goalMetToday ?? false;
+  const missionsDone = stats?.activitiesCompletedCount ?? 0;
+  const freezeAvailable = stats?.freezeAvailable ?? true;
 
   const handleShareStreak = useCallback(async () => {
     if (streakDays < 1) {
@@ -59,7 +45,7 @@ export function MomentumDashboard({ style }: MomentumDashboardProps) {
     }
   }, [streakDays]);
 
-  if (loading) {
+  if (loading && !stats) {
     return (
       <View style={[styles.loadingCard, style]}>
         <ActivityIndicator color={colors.accent} />

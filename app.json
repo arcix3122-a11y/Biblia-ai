@@ -2,6 +2,7 @@
   "expo": {
     "name": "Biblia AI",
     "slug": "biblia-ai",
+    "owner": "ekk6616",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "biblia-ai",
@@ -9,7 +10,7 @@
     "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.solidcodeapps.bibliaai"
+      "bundleIdentifier": "com.solidcodesoftware.bibliaasystent"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +19,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.solidcodeapps.bibliaai",
+      "package": "com.solidcodesoftware.bibliaasystent",
       "permissions": [
         "com.android.vending.BILLING"
       ],
@@ -47,11 +48,24 @@
       "expo-sqlite",
       "expo-asset",
       "@react-native-community/datetimepicker",
-      "react-native-iap"
+      "react-native-iap",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f6e61838-d610-4633-911e-ed482847b2ea"
+      }
     }
   }
 }

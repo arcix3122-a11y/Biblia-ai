@@ -41,21 +41,25 @@ export function ReminderFunnelPrompt({ visible, onClose }: ReminderFunnelPromptP
     <Modal visible={visible} transparent animationType="fade" onRequestClose={dismiss}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
+          <View style={styles.badgeRow}>
+            <View style={styles.badgeDot} />
+            <Text style={styles.badgeText}>{t("home.reminderFunnelBadge")}</Text>
+          </View>
           <Text style={styles.title}>{t("home.reminderFunnelTitle")}</Text>
           <Text style={styles.body}>{t("home.reminderFunnelBody")}</Text>
           {!canSchedule ? (
             <Text style={styles.note}>{t("settings.notificationsExpoGoNote")}</Text>
           ) : null}
           <View style={styles.actions}>
+            <Pressable onPress={dismiss} style={styles.secondaryButton} accessibilityRole="button">
+              <Text style={styles.secondaryText}>{t("home.reminderFunnelLater")}</Text>
+            </Pressable>
             <Pressable
               onPress={() => void handleEnable()}
               style={styles.primaryButton}
               accessibilityRole="button"
             >
               <Text style={styles.primaryText}>{t("home.reminderFunnelEnable")}</Text>
-            </Pressable>
-            <Pressable onPress={dismiss} style={styles.secondaryButton} accessibilityRole="button">
-              <Text style={styles.secondaryText}>{t("home.reminderFunnelLater")}</Text>
             </Pressable>
           </View>
         </View>
@@ -67,41 +71,79 @@ export function ReminderFunnelPrompt({ visible, onClose }: ReminderFunnelPromptP
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.72)",
+    backgroundColor: "rgba(0,0,0,0.76)",
     justifyContent: "center",
     padding: spacing.lg,
   },
   card: {
-    borderRadius: radii.lg,
+    borderRadius: radii.xl,
     borderWidth: 1,
     borderColor: colors.glassBorder,
     backgroundColor: colors.backgroundElevated,
-    padding: spacing.lg,
-    gap: spacing.md,
+    padding: spacing.xl,
+    gap: spacing.sm,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 440,
+  },
+  badgeRow: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.accentGlow,
+    backgroundColor: colors.accentMuted,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+  },
+  badgeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: radii.pill,
+    backgroundColor: colors.accent,
+  },
+  badgeText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "700",
   },
   title: {
-    ...typography.subtitle,
-    color: colors.accent,
+    ...typography.title,
+    color: colors.textPrimary,
+    marginTop: spacing.xs,
   },
   body: {
     ...typography.body,
-    color: colors.textSecondary,
+    color: colors.textPrimary,
     lineHeight: 22,
   },
   note: {
     ...typography.caption,
-    color: colors.textMuted,
+    color: colors.textSecondary,
+    backgroundColor: colors.glassOverlay,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     lineHeight: 18,
   },
   actions: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
     gap: spacing.sm,
-    marginTop: spacing.xs,
   },
   primaryButton: {
     backgroundColor: colors.accent,
-    borderRadius: radii.md,
+    borderRadius: radii.pill,
     paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    minHeight: 52,
   },
   primaryText: {
     ...typography.body,
@@ -109,11 +151,20 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   secondaryButton: {
-    paddingVertical: spacing.sm,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.textMuted,
+    backgroundColor: colors.glassOverlay,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+    minHeight: 52,
   },
   secondaryText: {
     ...typography.body,
-    color: colors.textMuted,
+    color: colors.textPrimary,
+    fontWeight: "600",
   },
 });

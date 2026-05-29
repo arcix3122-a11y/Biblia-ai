@@ -138,6 +138,10 @@
     "reminderFunnelBody": "Turn on one daily reminder. It takes a second and helps you keep your rhythm and streak.",
     "reminderFunnelEnable": "Enable reminders",
     "reminderFunnelLater": "Not now",
+    "ratingPromptTitle": "Help others find God's Word",
+    "ratingPromptBody": "If this app helps you, leave us a 5-star rating. It helps more people discover the Bible.",
+    "ratingPromptRateNow": "Give 5 stars",
+    "ratingPromptLater": "Not now",
     "exploreHeading": "Explore",
     "tileLibrary": "Scripture library",
     "tileLibrarySub": "Browse all 66 books",
@@ -146,7 +150,9 @@
     "tileCompanion": "AI Companion",
     "tileCompanionSub": "Ask about a verse",
     "tilePlan": "Reading plan",
-    "tilePlanSub": "Foundation week",
+    "tilePlanSub": "Bible-in-a-year progress",
+    "tileReview": "Verse review",
+    "tileReviewSub": "Repeat saved verses",
     "tilePrayer": "Prayer",
     "tilePrayerSub": "Guided session",
     "tileStats": "Stats",
@@ -324,6 +330,12 @@
     "post": "Send",
     "you": "You",
     "reader": "Reader",
+    "notificationTitle": "New reflection comment",
+    "notificationBody": "Someone commented on today's verse: {{reference}}",
+    "reply": "Reply",
+    "replyTo": "Reply to {{reader}}",
+    "replyingTo": "Replying to {{reader}}",
+    "cancelReply": "Cancel reply",
     "emptyTitle": "Be the first",
     "emptyHint": "Share what this verse means to you. Your comment can encourage others in the community.",
     "loadError": "Could not load comments. Check your connection.",
@@ -428,6 +440,18 @@
   "readingPlan": {
     "foundationTitle": "Foundation week",
     "foundationSubtitle": "Seven guided chapters — stored locally, no account needed.",
+    "yearTitle": "Bible in a year",
+    "yearSubtitle": "One shared progress track across Home and the full plan.",
+    "fullBibleRequiredShort": "Import the full Bible to unlock the 365-day plan.",
+    "notStarted": "Ready to begin",
+    "progressPercent": "{{percent}}%",
+    "assignmentsCount": "{{count}} chapter today",
+    "assignmentsCount_one": "{{count}} chapter today",
+    "assignmentsCount_few": "{{count}} chapters today",
+    "assignmentsCount_many": "{{count}} chapters today",
+    "assignmentsCount_other": "{{count}} chapters today",
+    "openPlan": "Open plan",
+    "startPlan": "Start plan",
     "dayProgress": "Day {{current}} of {{total}}",
     "completedCount": "{{count}} / {{total}} done",
     "todaysReading": "Today's reading",
@@ -542,10 +566,20 @@
     "crossReferences": "Related passages",
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "No related passages for this chapter.",
-    "deepStudy": "Deep Scripture Study"
+    "deepStudy": "Deep Scripture Study",
+    "aiChapterFollowUp": "Reflect with Companion",
+    "aiChapterFollowUpSub": "Ask one grounded follow-up from this chapter."
   },
   "ai": {
     "responsesRemaining": "Remaining today: {{remaining}} of {{limit}} replies",
+    "quota": {
+      "dailyRemaining": "Remaining today: {{remaining}} of {{limit}} replies",
+      "unlimited": "Unlimited daily replies (supporter perk)",
+      "tierBonus": "{{tier}} tier - expanded daily AI limit",
+      "limitReachedTitle": "Daily AI limit reached",
+      "limitReachedBody": "You used today's free replies. Supporters get more companion conversations each day.",
+      "upgradeCta": "Unlock more replies"
+    },
     "clearChat": "Clear chat history",
     "clear": "Clear",
     "selectedVerse": "Selected verse",
@@ -713,7 +747,8 @@
     "pillPrayer": "Turn this verse into a prayer",
     "pillHope": "Speak hope from this verse",
     "templatePrayer": "Turn {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" into a short prayer I can pray right now.",
-    "templateHope": "Draw out the hope, comfort, and encouragement in {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" for someone who needs strength today."
+    "templateHope": "Draw out the hope, comfort, and encouragement in {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" for someone who needs strength today.",
+    "chapterReflectionStarter": "Help me reflect on the chapter I just read. Show the main theme, one honest question to carry, and one next step of prayer or obedience."
   },
   "workspace": {
     "title": "Workspace",
@@ -849,6 +884,9 @@
     "immersiveOn": "Immersive mode: on",
     "immersiveOff": "Immersive mode: off",
     "language": "Language",
+    "privacyPolicy": "Privacy policy",
+    "privacyPolicyHint": "Read how Biblia AI protects your data and what services are used.",
+    "privacyPolicyView": "View policy",
     "languageHint": "Choose the app interface language.",
     "languagePl": "Polish",
     "languageEn": "English",
@@ -1013,6 +1051,15 @@
     "translationUnavailable": "Translation comparison requires an internet connection.",
     "offlineCommentary1": "Consider this verse in the context of the whole chapter — how it fits the larger story of Scripture.",
     "offlineCommentary2": "Reflect on how this word touches your life today.",
+    "localOriginalUnavailable": "Original-language data unavailable offline",
+    "localOriginalSource": "Local library",
+    "localOriginalMeaning": "Use the live study service for Greek or Hebrew parsing.",
+    "localOriginalStrong": "Offline",
+    "localCommentaryReference": "Start with the immediate text: {{reference}} sits inside this chapter, so read the paragraph before drawing conclusions.",
+    "localCommentaryContext": "Nearby context: before - {{before}} / after - {{after}}",
+    "localCommentaryPractice": "Write one sentence about what the verse says, one about what it reveals about God, and one faithful step for today.",
+    "contextBoundaryBefore": "This is the first verse available in the chapter.",
+    "contextBoundaryAfter": "This is the last verse available in the chapter.",
     "studyAction": "Study",
     "sourceReference": "{{book}} {{chapter}}:{{verse}} ({{translation}})"
   },
@@ -1562,6 +1609,10 @@
     "subtitle": "Your gift helps us build Scripture tools for Polish and English readers — no ads, no paywall on the Word.",
     "chooseAmount": "Choose an amount",
     "chooseAmountHint": "Each tier unlocks a donor rank badge on your profile.",
+    "perks": {
+      "aiUnlimited": "Unlimited AI companion replies",
+      "aiQuota": "{{count}} AI companion replies per day"
+    },
     "amountPln": "{{amount}} PLN",
     "donateNow": "Give now",
     "iap": {
@@ -1600,6 +1651,37 @@
       "shareMessage": "I support {{brand}} — Scripture, prayer, and a spiritual companion in Polish and English. If you would like to help keep the app free for others:\n\n{{link}}",
       "settingsBanner": "Thank you — you are a {{tier}}"
     }
+  },
+  "audio": {
+    "nowPlaying": "Now playing: {{reference}}",
+    "play": "Play chapter",
+    "pause": "Pause chapter",
+    "previousChapter": "Previous chapter",
+    "nextChapter": "Next chapter",
+    "verseSpoken": "Verse {{number}}. {{text}}",
+    "chapterSpoken": "Chapter {{chapter}} of the Book of {{book}}."
+  },
+  "review": {
+    "title": "Verse Review",
+    "subtitle": "Repeat verses saved from bookmarks and highlights.",
+    "loading": "Preparing review deck...",
+    "emptyTitle": "No verses to review yet",
+    "emptyBody": "Bookmark or highlight verses in the reader and they will become flashcards here.",
+    "openWorkspace": "Open saved verses",
+    "progress": "{{current}} / {{total}}",
+    "sourceBookmark": "Bookmark",
+    "sourceHighlight": "Highlight",
+    "hiddenHint": "Tap to reveal the verse.",
+    "cardRevealed": "Verse revealed",
+    "reveal": "Reveal",
+    "reviewLater": "Review later",
+    "remembered": "I remember",
+    "openInReader": "Open in reader"
+  },
+  "ad": {
+    "sponsorLabel": "AD",
+    "fallbackTitle": "Ad slot unavailable here",
+    "fallbackBody": "Real AdMob banners render in dev, preview, or store builds with the native ads module."
   },
   "donorTier": {
     "supporter": "Supporter",

@@ -11,7 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AiModePill } from "@/components/ai/AiModePill";
 import { AnimatedSacredBackdrop } from "@/components/ai/AnimatedSacredBackdrop";
@@ -35,6 +35,7 @@ import type { ContextPillTemplateId } from "@/types/ui";
 
 export default function AiChatScreen() {
   const navigation = useNavigation();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { paddingBottom: tabBarScrollPadding, tabBarHeight } = useTabBarInset();
   const { t, locale } = useAppTranslation();
@@ -48,7 +49,6 @@ export default function AiChatScreen() {
   const ensureWelcomeMessage = useAiChatStore((state) => state.ensureWelcomeMessage);
   const refreshIntroMessage = useAiChatStore((state) => state.refreshIntroMessage);
   const syncDailyQuota = useAiChatStore((state) => state.syncDailyQuota);
-  const limit = useAiChatStore((state) => state.limit);
   const selectedVerse = useSelectionStore((state) => state.selectedVerse);
   const {
     sendMessage,
@@ -56,6 +56,9 @@ export default function AiChatScreen() {
     isThinking,
     canSend,
     remaining,
+    limit,
+    isUnlimitedQuota,
+    donorTier,
     connectionWarning,
     clearConnectionWarning,
     lastInput,
@@ -75,6 +78,9 @@ export default function AiChatScreen() {
   const quickPrompts = useMemo(() => getAssistantQuickPrompts(), []);
   const hasUserMessages = messages.some((message) => message.role === "user");
   const showQuickPrompts = !hasUserMessages;
+  const remainingCount = remaining();
+  const quotaExhausted = !canSend();
+  const showLowQuotaWarning = !quotaExhausted && remainingCount <= 3 && remainingCount > 0;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -110,7 +116,7 @@ export default function AiChatScreen() {
 
   useEffect(() => {
     const mood = typeof starterMood === "string" ? starterMood : "";
-    const allowedMoods = ["love", "anxiety", "healing", "anger"] as const;
+    const allowedMoods = ["love", "anxiety", "healing", "anger", "chapter"] as const;
     type AllowedMood = (typeof allowedMoods)[number];
 
     const starterPrompts: Record<AllowedMood, string> = {
@@ -118,6 +124,7 @@ export default function AiChatScreen() {
       anxiety: t("home.emotionPrompts.anxiety"),
       healing: t("home.emotionPrompts.healing"),
       anger: t("home.emotionPrompts.anger"),
+      chapter: t("ai.chapterReflectionStarter"),
     };
 
     if (
@@ -130,12 +137,12 @@ export default function AiChatScreen() {
 
     handledStarterRef.current = mood;
     void hapticMedium();
-    void sendMessage(starterPrompts[mood as AllowedMood]).then((sent) => {
+    void sendMessage(starterPrompts[mood as AllowedMood], selectedVerse).then((sent) => {
       if (sent) {
         scrollToEnd();
       }
     });
-  }, [sendMessage, starterMood, t]);
+  }, [selectedVerse, sendMessage, starterMood, t]);
 
   const handleRetry = async () => {
     clearConnectionWarning();
@@ -377,9 +384,18 @@ export default function AiChatScreen() {
           <View style={styles.composerMeta}>
             <View>
               <Text style={styles.quotaText}>
-                {t("ai.responsesRemaining", { remaining: remaining(), limit })}
+                {isUnlimitedQuota
+                  ? t("ai.quota.unlimited")
+                  : t("ai.quota.dailyRemaining", {
+                      remaining: remainingCount,
+                      limit,
+                    })}
               </Text>
-              <Text style={styles.quotaHint}>{t("ai.quotaHint")}</Text>
+              <Text style={styles.quotaHint}>
+                {donorTier
+                  ? t("ai.quota.tierBonus", { tier: t(`donorTier.${donorTier}`) })
+                  : t("ai.quotaHint")}
+              </Text>
             </View>
             <Pressable
               onPress={handleClearChat}
@@ -408,10 +424,31 @@ export default function AiChatScreen() {
             </View>
           ) : null}
 
-          {!canSend() ? (
+          {showLowQuotaWarning ? (
+            <View style={styles.lowQuotaBanner}>
+              <Ionicons name="alert-circle-outline" size={16} color={colors.accent} />
+              <Text style={styles.lowQuotaBannerText}>
+                {t("ai.quota.dailyRemaining", {
+                  remaining: remainingCount,
+                  limit,
+                })}
+              </Text>
+            </View>
+          ) : null}
+
+          {quotaExhausted ? (
             <View style={styles.limitBanner}>
-              <Ionicons name="hourglass-outline" size={16} color={colors.accent} />
-              <Text style={styles.limitBannerText}>{t("ai.limitReached")}</Text>
+              <View style={styles.limitBannerCopy}>
+                <Text style={styles.limitBannerTitle}>{t("ai.quota.limitReachedTitle")}</Text>
+                <Text style={styles.limitBannerText}>{t("ai.quota.limitReachedBody")}</Text>
+              </View>
+              <Pressable
+                onPress={() => router.push("/donate")}
+                style={styles.upgradeButton}
+                accessibilityRole="button"
+              >
+                <Text style={styles.upgradeButtonText}>{t("ai.quota.upgradeCta")}</Text>
+              </Pressable>
             </View>
           ) : null}
 
@@ -713,9 +750,6 @@ const styles = StyleSheet.create({
     color: colors.accent,
   },
   limitBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
     marginHorizontal: spacing.md,
     marginTop: spacing.sm,
     padding: spacing.md,
@@ -723,11 +757,51 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(229,169,60,0.12)",
     borderWidth: 1,
     borderColor: "rgba(229,169,60,0.18)",
+    gap: spacing.sm,
+  },
+  limitBannerCopy: {
+    gap: 4,
+  },
+  limitBannerTitle: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "600",
   },
   limitBannerText: {
     ...typography.caption,
     color: colors.textPrimary,
+  },
+  lowQuotaBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radii.lg,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+  },
+  lowQuotaBannerText: {
+    ...typography.caption,
+    color: colors.textMuted,
     flex: 1,
+  },
+  upgradeButton: {
+    alignSelf: "flex-start",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    backgroundColor: "rgba(229,169,60,0.08)",
+  },
+  upgradeButtonText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "600",
   },
   composerShell: {
     flexDirection: "row",

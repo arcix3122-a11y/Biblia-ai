@@ -28,10 +28,12 @@ import {
 import { removePendingComment } from "@/services/social/commentQueue";
 import {
   ensureAnonymousSession,
+  getSupabaseClient,
   getSessionUserId,
   getSessionUserIdAsync,
   isAnonymousAuthBlocked,
 } from "@/services/supabase/supabaseClient";
+import { presentLocalNotification } from "@/services/notifications/reminderService";
 import { useLocaleStore } from "@/store/localeStore";
 import { getDeviceLocale } from "@/i18n";
 import { formatNoteDate } from "@/utils/formatDate";
@@ -66,10 +68,15 @@ export function VotdCommentsSheet({
   const [error, setError] = useState<string | null>(null);
   const [queuedNotice, setQueuedNotice] = useState(false);
   const [authReady, setAuthReady] = useState(false);
+  const [replyTarget, setReplyTarget] = useState<VotdComment | null>(null);
   const inputRef = useRef<TextInput>(null);
   const myUserId = getSessionUserId();
   const commentsEnabled = isCommentsEnabled();
   const postingAvailable = isCommentsPostingAvailable();
+  const commentsById = useMemo(
+    () => new Map(comments.map((comment) => [comment.id, comment])),
+    [comments]
+  );
 
   const refresh = useCallback(async () => {
     if (!verseRef || !commentsEnabled) return;
@@ -92,9 +99,54 @@ export function VotdCommentsSheet({
     if (visible && verseRef) {
       setQueuedNotice(false);
       setAuthReady(false);
+      setReplyTarget(null);
       void refresh();
     }
   }, [refresh, verseRef, visible]);
+
+  useEffect(() => {
+    if (!visible || !verseRef || !commentsEnabled) {
+      return;
+    }
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return;
+    }
+
+    const channel = supabase
+      .channel(`votd-comments-${verseRef}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "votd_comments",
+          filter: `verse_ref=eq.${verseRef}`,
+        },
+        (payload) => {
+          void refresh();
+          const nextComment = payload.new as Partial<VotdComment> | null;
+          if (
+            payload.eventType === "INSERT" &&
+            nextComment?.user_id &&
+            nextComment.user_id !== getSessionUserId()
+          ) {
+            void presentLocalNotification(
+              `votd-comment-${nextComment.id ?? Date.now()}`,
+              t("votdComments.notificationTitle"),
+              t("votdComments.notificationBody", { reference }),
+              "biblia-ai://(tabs)"
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [commentsEnabled, reference, refresh, t, verseRef, visible]);
 
   const handleSend = useCallback(async () => {
     if (!verseRef || !commentsEnabled) return;
@@ -103,11 +155,14 @@ export function VotdCommentsSheet({
 
     const userId = (await getSessionUserIdAsync()) ?? "offline";
     const optimisticId = `local-opt-${Date.now()}`;
+    const parentCommentId =
+      replyTarget && !isPendingCommentId(replyTarget.id) ? replyTarget.id : null;
     const optimistic: VotdComment = {
       id: optimisticId,
       user_id: userId,
       verse_ref: verseRef,
       body: trimmed,
+      parent_comment_id: parentCommentId,
       created_at: new Date().toISOString(),
     };
 
@@ -117,9 +172,10 @@ export function VotdCommentsSheet({
     setComments((prev) => [optimistic, ...prev]);
     onCountChange?.(comments.length + 1);
     setDraft("");
+    setReplyTarget(null);
 
     try {
-      const created = await postComment(verseRef, trimmed);
+      const created = await postComment(verseRef, trimmed, parentCommentId);
       setComments((prev) => prev.map((c) => (c.id === optimisticId ? created : c)));
       if (isPendingCommentId(created.id)) {
         setQueuedNotice(true);
@@ -133,7 +189,20 @@ export function VotdCommentsSheet({
     } finally {
       setPosting(false);
     }
-  }, [comments.length, commentsEnabled, draft, onCountChange, posting, t, verseRef]);
+  }, [comments.length, commentsEnabled, draft, onCountChange, posting, replyTarget, t, verseRef]);
+
+  const handleReply = useCallback(
+    (comment: VotdComment) => {
+      const tag = authorTag(comment.user_id);
+      setReplyTarget(comment);
+      setDraft((value) => {
+        const prefix = `@${tag} `;
+        return value.trim().length > 0 ? value : prefix;
+      });
+      requestAnimationFrame(() => inputRef.current?.focus());
+    },
+    []
+  );
 
   const handleDelete = useCallback(
     (commentId: string) => {
@@ -171,17 +240,25 @@ export function VotdCommentsSheet({
         item.user_id === "offline" ||
         isPendingCommentId(item.id);
       const pending = isPendingCommentId(item.id);
+      const displayTag = authorTag(item.user_id);
+      const parent = item.parent_comment_id ? commentsById.get(item.parent_comment_id) : null;
       return (
-        <View style={[styles.commentRow, mine && styles.commentRowMine]}>
+        <View
+          style={[
+            styles.commentRow,
+            item.parent_comment_id && styles.commentRowReply,
+            mine && styles.commentRowMine,
+          ]}
+        >
           <View style={styles.commentHeader}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{authorTag(item.user_id).slice(0, 2)}</Text>
+              <Text style={styles.avatarText}>{displayTag.slice(0, 2)}</Text>
             </View>
             <View style={styles.commentMeta}>
               <Text style={styles.commentAuthor}>
                 {mine
                   ? t("votdComments.you")
-                  : `${t("votdComments.reader")} #${authorTag(item.user_id)}`}
+                  : `${t("votdComments.reader")} #${displayTag}`}
               </Text>
               <Text style={styles.commentTime}>
                 {pending
@@ -199,11 +276,28 @@ export function VotdCommentsSheet({
               </Pressable>
             ) : null}
           </View>
+          {parent ? (
+            <Text style={styles.replyContext}>
+              {t("votdComments.replyTo", {
+                reader: `${t("votdComments.reader")} #${authorTag(parent.user_id)}`,
+              })}
+            </Text>
+          ) : null}
           <Text style={styles.commentBody}>{item.body}</Text>
+          <Pressable
+            onPress={() => handleReply(item)}
+            hitSlop={8}
+            style={styles.replyButton}
+            accessibilityRole="button"
+            accessibilityLabel={t("votdComments.reply")}
+          >
+            <Ionicons name="return-up-forward-outline" size={13} color={colors.accent} />
+            <Text style={styles.replyButtonText}>{t("votdComments.reply")}</Text>
+          </Pressable>
         </View>
       );
     },
-    [handleDelete, locale, myUserId, t]
+    [commentsById, handleDelete, handleReply, locale, myUserId, t]
   );
 
   const remaining = useMemo(() => COMMENT_MAX - draft.length, [draft.length]);
@@ -312,6 +406,32 @@ export function VotdCommentsSheet({
                 ) : null}
 
                 <View style={styles.composer}>
+                  {replyTarget ? (
+                    <View style={styles.replyBanner}>
+                      <Ionicons name="return-up-forward-outline" size={14} color={colors.accent} />
+                      <Text style={styles.replyBannerText} numberOfLines={1}>
+                        {t("votdComments.replyingTo", {
+                          reader: `${t("votdComments.reader")} #${authorTag(replyTarget.user_id)}`,
+                        })}
+                      </Text>
+                      <Pressable
+                        onPress={() => {
+                          const replyPrefix = `@${authorTag(replyTarget.user_id)} `;
+                          setDraft((value) =>
+                            value === replyPrefix || value.trim() === replyPrefix.trim()
+                              ? ""
+                              : value
+                          );
+                          setReplyTarget(null);
+                        }}
+                        hitSlop={8}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("votdComments.cancelReply")}
+                      >
+                        <Ionicons name="close" size={16} color={colors.textMuted} />
+                      </Pressable>
+                    </View>
+                  ) : null}
                   <TextInput
                     ref={inputRef}
                     value={draft}
@@ -499,6 +619,11 @@ const styles = StyleSheet.create({
     borderColor: colors.accentMuted,
     backgroundColor: colors.accentGlow,
   },
+  commentRowReply: {
+    marginLeft: spacing.lg,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accentMuted,
+  },
   commentHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -533,10 +658,29 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 11,
   },
+  replyContext: {
+    ...typography.caption,
+    color: colors.accent,
+    fontSize: 11,
+    fontWeight: "700",
+  },
   commentBody: {
     ...typography.body,
     color: colors.textSecondary,
     lineHeight: 22,
+  },
+  replyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    paddingTop: spacing.xs,
+  },
+  replyButtonText: {
+    ...typography.caption,
+    color: colors.accent,
+    fontWeight: "700",
+    fontSize: 11,
   },
   inlineErrorRow: {
     flexDirection: "row",
@@ -573,6 +717,22 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.glassBorder,
     gap: spacing.xs,
+  },
+  replyBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    backgroundColor: colors.accentGlow,
+  },
+  replyBannerText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    flex: 1,
   },
   input: {
     backgroundColor: colors.inputBackground,

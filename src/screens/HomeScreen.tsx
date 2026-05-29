@@ -40,7 +40,7 @@ import { AdMobBannerCard } from "@/components/dashboard/AdMobBannerCard";
 import { ReminderFunnelPrompt } from "@/components/notifications/ReminderFunnelPrompt";
 import { RatingPrompt } from "@/components/feedback/RatingPrompt";
 import { SupportCard } from "@/components/dashboard/SupportCard";
-import { tryShowCoreInterstitial } from "@/services/ads/interstitialAdService";
+import { primeInterstitialAds, tryShowCoreInterstitial } from "@/services/ads/interstitialAdService";
 import { useDonorStore } from "@/store/donorStore";
 import { useReminderStore } from "@/store/reminderStore";
 import { useRatingPromptStore } from "@/store/ratingPromptStore";
@@ -76,6 +76,7 @@ export default function HomeScreen() {
   const { contentContainerStyle: tabBarScrollInset } = useTabBarInset();
   const locale = useLocaleStore((s) => s.locale) ?? getDeviceLocale();
   const router = useRouter();
+  const donorTier = useDonorStore((s) => s.donorTier);
   const { ready, error, retry } = useDatabaseReady();
   const lastRead = useHistoryStore((s) => s.lastRead);
   const recent = useHistoryStore((s) => s.recent);
@@ -88,7 +89,6 @@ export default function HomeScreen() {
   const [pendingReflection, setPendingReflection] = useState<ReflectionVariant | null>(null);
   const [reminderFunnelVisible, setReminderFunnelVisible] = useState(false);
   const [ratingPromptVisible, setRatingPromptVisible] = useState(false);
-  const donorTier = useDonorStore((s) => s.donorTier);
   const reminderEnabled = useReminderStore((s) => s.enabled);
   const reminderFunnelPromptSeen = useReminderStore((s) => s.reminderFunnelPromptSeen);
   const loadReminderPrefs = useReminderStore((s) => s.load);
@@ -125,6 +125,12 @@ export default function HomeScreen() {
   useEffect(() => {
     void loadReminderPrefs();
   }, [loadReminderPrefs]);
+
+  useEffect(() => {
+    if (donorTier === null) {
+      primeInterstitialAds();
+    }
+  }, [donorTier]);
 
   useEffect(() => {
     void loadRatingPromptState();
@@ -248,8 +254,9 @@ export default function HomeScreen() {
           ? `/reader/${bookSlug}/${chapter}?verse=${verseNumber}`
           : `/reader/${bookSlug}/${chapter}`
       );
+      tryShowCoreInterstitial({ isAdFree: donorTier !== null });
     },
-    [locale, router, setSelectedVerse]
+    [donorTier, locale, router, setSelectedVerse]
   );
 
   const resumeReading = useCallback(() => {
@@ -259,13 +266,12 @@ export default function HomeScreen() {
   }, [lastRead, openReader]);
 
   const startReading = useCallback(() => {
-    void tryShowCoreInterstitial({ isAdFree: donorTier !== null });
     if (lastRead?.book_slug) {
       resumeReading();
       return;
     }
     router.push("/(tabs)/library");
-  }, [donorTier, lastRead, resumeReading, router]);
+  }, [lastRead, resumeReading, router]);
 
   const openTopic = useCallback(
     (slug: string) => {
@@ -426,6 +432,16 @@ export default function HomeScreen() {
             imageUrl={HOME_TILE_PHOTOS.plan}
             onPress={() => router.push("/reading-plan")}
           />
+          <ActionTile
+            icon="albums-outline"
+            title={t("home.tileReview")}
+            subtitle={t("home.tileReviewSub")}
+            badge={t("common.new")}
+            imageUrl={getCategoryPhotoUrl("scriptureStudy", 600, 400)}
+            onPress={() => router.push("/review")}
+          />
+        </View>
+        <View style={styles.tileRow}>
           <ActionTile
             icon="heart-outline"
             title={t("home.tilePrayer")}

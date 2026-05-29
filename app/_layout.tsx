@@ -5,13 +5,14 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 import { AppDeepLinkBridge } from "@/components/AppDeepLinkBridge";
-import { GlobalAudioBar } from "@/components/audio/GlobalAudioBar";
 import { AudioOnboarding } from "@/components/AudioOnboarding";
+import { GlobalAudioBar } from "@/components/GlobalAudioBar";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 import { ScriptureImportScreen } from "@/components/ScriptureImportScreen";
 import { ChromeProvider } from "@/context/ChromeContext";
 import { initI18n } from "@/i18n";
 import i18n from "@/i18n";
+import { initializeCrashDiagnostics, shutdownCrashDiagnostics } from "@/services/errors/crashDiagnostics";
 import { initializeErrorLogger, logError } from "@/services/errors/errorLogger";
 import { getDatabase, resetDatabaseInit } from "@/services/db/database";
 import { ensureAnonymousSession } from "@/services/supabase/supabaseClient";
@@ -25,7 +26,7 @@ import { useLocaleStore } from "@/store/localeStore";
 import { useReminderStore } from "@/store/reminderStore";
 import { useSeedProgressStore } from "@/store/seedProgressStore";
 import { useYearPlanStore } from "@/store/yearPlanStore";
-import { scheduleDailyReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
+import { scheduleDailyReminder, requestNotificationPermission, updateEveningRescueStatus } from "@/services/notifications/reminderService";
 import { colors } from "@/theme";
 
 LogBox.ignoreLogs([
@@ -105,6 +106,7 @@ function RootStack() {
       <Stack.Screen name="topic/[slug]" options={{ title: t("navigation.topic") }} />
       <Stack.Screen name="settings" options={{ title: t("navigation.settings") }} />
       <Stack.Screen name="reading-plan" options={{ headerShown: false }} />
+      <Stack.Screen name="review" options={{ headerShown: false }} />
       <Stack.Screen name="fasting" options={{ headerShown: false }} />
       <Stack.Screen name="devotional-hub" options={{ headerShown: false }} />
       <Stack.Screen name="practice/[id]" options={{ headerShown: false }} />
@@ -172,6 +174,7 @@ export default function RootLayout() {
     }
 
     installGlobalErrorHandler();
+    initializeCrashDiagnostics();
     initializeErrorLogger();
     initSyncEngine();
 
@@ -224,6 +227,7 @@ export default function RootLayout() {
               body: i18n.t("settings.eveningRescueBody"),
             }
           );
+          void updateEveningRescueStatus();
         });
         void useYearPlanStore.getState().load();
       })
@@ -239,7 +243,10 @@ export default function RootLayout() {
       }
     });
 
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+      shutdownCrashDiagnostics();
+    };
   }, [i18nReady]);
 
   if (!i18nReady || !storesReady || !dbBootstrapped) {
@@ -289,8 +296,8 @@ export default function RootLayout() {
         <StatusBar style="light" />
         <View style={{ flex: 1, backgroundColor: colors.canvas }} key={locale ?? "en"}>
           <RootStack />
-          <AppDeepLinkBridge />
           <GlobalAudioBar />
+          <AppDeepLinkBridge />
         </View>
       </ChromeProvider>
     </GlobalErrorBoundary>

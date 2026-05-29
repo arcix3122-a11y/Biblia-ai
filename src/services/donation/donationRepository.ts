@@ -9,9 +9,21 @@ export interface DonationRecord {
   purchaseToken?: string | null;
 }
 
+/**
+ * Records a donation remotely via the `verify-donation` Edge Function, which
+ * confirms the Google Play purchase token server-side before inserting a row.
+ * Clients can no longer insert directly (migration 007), so a purchase token is
+ * required. Best-effort: the local donor store stays the source of truth for the
+ * badge, so any failure here is silent.
+ */
 export async function recordDonationRemote(record: DonationRecord): Promise<void> {
   const supabase = getSupabaseClient();
   if (!supabase) {
+    return;
+  }
+
+  // Only server-verifiable Google Play purchases can be recorded remotely.
+  if (!record.productId || !record.purchaseToken) {
     return;
   }
 
@@ -20,24 +32,14 @@ export async function recordDonationRemote(record: DonationRecord): Promise<void
     return;
   }
 
-  const payload: Record<string, unknown> = {
-    user_id: userId,
-    amount_pln: record.amountPln,
-    tier: record.tier,
-    created_at: record.createdAt,
-  };
-
-  if (record.productId) {
-    payload.product_id = record.productId;
-  }
-  if (record.purchaseToken) {
-    payload.purchase_token = record.purchaseToken;
-  }
-
-  const { error } = await supabase.from("donations").insert(payload);
-
-  if (error) {
-    // Offline-first: local verifiedPurchases remain source of truth for Phase 1.
-    return;
+  try {
+    await supabase.functions.invoke("verify-donation", {
+      body: {
+        productId: record.productId,
+        purchaseToken: record.purchaseToken,
+      },
+    });
+  } catch {
+    // Offline-first: local verifiedPurchases remain the source of truth.
   }
 }

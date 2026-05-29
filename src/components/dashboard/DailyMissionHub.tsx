@@ -6,11 +6,8 @@ import { useTranslation } from "react-i18next";
 import { DailyPracticeSheet } from "@/components/dashboard/DailyPracticeSheet";
 import { getDailyPracticeForDate } from "@/data/dailyPractice";
 import { useHistoryStore } from "@/store/historyStore";
-import {
-  getUserStats,
-  isMissionComplete,
-  type DailyActivities,
-} from "@/services/stats/userStats";
+import { useUserStatsStore } from "@/store/userStatsStore";
+import { isMissionComplete } from "@/services/stats/userStats";
 import { colors, radii, spacing, typography } from "@/theme";
 
 type MissionId = "scripture" | "prayer" | "reflection";
@@ -59,34 +56,33 @@ export function DailyMissionHub({
   const router = useRouter();
   const lastRead = useHistoryStore((s) => s.lastRead);
   const practice = useMemo(() => getDailyPracticeForDate(), []);
-  const [activities, setActivities] = useState<DailyActivities>({
+  const stats = useUserStatsStore((s) => s.stats);
+  const loadStats = useUserStatsStore((s) => s.load);
+  const [practiceOpen, setPracticeOpen] = useState(false);
+  const prevCompletedRef = useRef(0);
+
+  useEffect(() => {
+    void loadStats();
+  }, [loadStats]);
+
+  const activities = stats?.activitiesToday ?? {
     scripture: false,
     practice: false,
     reflection: false,
     prayer: false,
-  });
-  const [completedCount, setCompletedCount] = useState(0);
-  const [practiceOpen, setPracticeOpen] = useState(false);
-  const prevCompletedRef = useRef(0);
+  };
+  const completedCount = stats?.activitiesCompletedCount ?? 0;
 
-  const loadStats = useCallback(async () => {
-    try {
-      const stats = await getUserStats();
+  // Track completion events for the rating funnel / morning checklist triggers
+  useEffect(() => {
+    if (stats) {
       const nextCount = stats.activitiesCompletedCount;
       if (prevCompletedRef.current === 0 && nextCount >= 1) {
         onFirstMissionCompleted?.();
       }
       prevCompletedRef.current = nextCount;
-      setActivities(stats.activitiesToday);
-      setCompletedCount(nextCount);
-    } catch {
-      // local-only
     }
-  }, [onFirstMissionCompleted]);
-
-  useEffect(() => {
-    void loadStats();
-  }, [loadStats]);
+  }, [stats, onFirstMissionCompleted]);
 
   const handleScripture = useCallback(() => {
     if (lastRead?.book_slug) {

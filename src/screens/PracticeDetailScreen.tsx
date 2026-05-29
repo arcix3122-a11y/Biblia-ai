@@ -12,7 +12,7 @@ import { useAppTranslation } from "@/hooks/useAppTranslation";
 import { usePracticeAudio } from "@/hooks/usePracticeAudio";
 import {
   requestNotificationPermission,
-  scheduleDailyReminder,
+  schedulePracticeReminder,
 } from "@/services/notifications/reminderService";
 import { useReminderStore } from "@/store/reminderStore";
 import { useFastingPlanStore } from "@/store/fastingPlanStore";
@@ -119,7 +119,8 @@ export default function PracticeDetailScreen() {
         return;
       }
 
-      await scheduleDailyReminder(
+      await schedulePracticeReminder(
+        practice.id,
         hour,
         minute,
         t("common.appName"),

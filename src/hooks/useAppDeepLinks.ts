@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
+import * as Notifications from "expo-notifications";
 import { parseAppDeepLink, readerHref } from "@/utils/deepLinks";
 
 function navigateFromDeepLink(url: string, router: ReturnType<typeof useRouter>): void {
@@ -21,6 +22,9 @@ function navigateFromDeepLink(url: string, router: ReturnType<typeof useRouter>)
       break;
     case "practice":
       router.push(`/practice/${target.practiceId}`);
+      break;
+    case "guided-prayer":
+      router.push("/guided-prayer");
       break;
     default:
       break;
@@ -46,6 +50,17 @@ export function useAppDeepLinks(): void {
       handleUrl(url);
     });
 
-    return () => subscription.remove();
+    const notificationSubscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const url = response.notification.request.content.data?.url;
+      if (typeof url === "string" && url) {
+        handleUrl(url);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+      notificationSubscription.remove();
+    };
   }, [router]);
 }
+

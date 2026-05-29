@@ -17,17 +17,19 @@ Create **three consumables** with these exact product IDs (defaults in app code)
 
 | Product ID | Suggested name | Tier | Suggested price |
 |------------|----------------|------|-----------------|
-| `biblia_donate_10` | Supporter gift | Supporter | 10 PLN |
-| `biblia_donate_30` | Patron gift | Patron | 30 PLN |
-| `biblia_donate_50` | Benefactor gift | Benefactor | 50 PLN |
+| `biblia_donate_10` | Supporter badge | Supporter | 10 PLN |
+| `biblia_donate_30` | Patron badge | Patron | 30 PLN |
+| `biblia_donate_50` | Benefactor badge | Benefactor | 50 PLN |
+
+> **Play policy framing:** these are sold as **digital products** (a profile supporter badge), not charitable donations. Keep all Console names/descriptions and in-app copy in "supporter badge / unlock a badge" language. A purchase must grant the digital benefit (the badge) — which it does. Do not describe them as "donations", "charity", or "tax-deductible".
 
 For each product:
 
 1. **Product ID** — use the table above (must match exactly).
-2. **Name** — short display name (localized PL + EN if offered).
-3. **Description** — one-time voluntary gift; unlocks a supporter badge.
+2. **Name** — short display name (localized PL + EN if offered), e.g. "Supporter badge".
+3. **Description** — one-time purchase that unlocks a digital supporter badge on the user's profile.
 4. **Status** — set to **Active** after saving.
-5. **Product type** — **Consumable** (one-time; user can donate again).
+5. **Product type** — **Consumable** (one-time; user can buy again to keep supporting).
 
 Optional: override IDs via env vars in EAS secrets or `.env`:
 
@@ -95,13 +97,49 @@ Or upload the AAB manually in Play Console → **Release** → **Testing** → *
 - [ ] Prices set for target countries (PL primary)
 - [ ] Internal testing purchase successful on physical device
 - [ ] Closed testing (optional) with real payment profile
-- [ ] Privacy policy URL set (donations = payments)
+- [x] Privacy policy UI integrated in app (Settings screen)
+- [ ] Privacy policy URL set in Play Console (donations = payments) — e.g. hosted at `https://biblia-asystent-privacy.surge.sh/privacy-policy.html` (via Surge static web publishing)
 - [ ] App content / target audience forms complete
 - [ ] Production release promoted after QA
 
-## 8. Server-side (optional)
+## 8. Server-side verification (Supabase Edge Functions)
 
-Verified purchases optionally log to Supabase `donations` with `product_id` and `purchase_token` (migration `006_donations_iap_fields.sql`). Play server verification can be added later; client-side finish + token persistence is sufficient for launch.
+The donor **badge** is granted locally as soon as Google Play confirms the purchase (requires a real `purchaseToken`). The **remote** `donations` table is now write-protected: clients can no longer insert (migration `007_donations_verification.sql`). All remote records go through the `verify-donation` Edge Function, which confirms the token with the Google Play Developer API before inserting a `verified` row and refreshing the donor summary on `user_profiles`.
+
+> Until the service account below is configured, `verify-donation` returns `verification_not_configured` and **no remote rows are written** — the in-app badge still works (it is local). Configure the secrets to enable remote logging + analytics.
+
+### 8.1 Create a service account (one-time)
+
+1. Google Play Console → **Setup → API access** → link a Google Cloud project.
+2. In Google Cloud → **IAM & Admin → Service accounts** → create one, no roles needed.
+3. Create a **JSON key** for it (you will use `client_email` and `private_key`).
+4. Back in Play Console → **API access** → grant the service account access with permission **View financial data, orders, and cancellation survey responses** (enough for `purchases.products.get`).
+5. Enable the **Google Play Android Developer API** in the Cloud project.
+
+### 8.2 Set Edge Function secrets
+
+Supabase → **Project Settings → Edge Functions → Secrets** (or `supabase secrets set`):
+
+```bash
+GOOGLE_PLAY_SA_CLIENT_EMAIL=<service-account>@<project>.iam.gserviceaccount.com
+GOOGLE_PLAY_SA_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+# optional, defaults to com.solidcodeapps.bibliaai
+ANDROID_PACKAGE_NAME=com.solidcodeapps.bibliaai
+```
+
+The app calls the function automatically after a successful purchase (`recordDonationRemote` → `supabase.functions.invoke("verify-donation")`).
+
+### 8.3 Refunds / chargebacks (RTDN webhook — optional)
+
+The `play-rtdn` Edge Function marks a donation `refunded` and recomputes the profile summary when Google reports a voided purchase. Wire it up with Real-time Developer Notifications:
+
+1. Set a secret `RTDN_SHARED_SECRET=<random-string>` in Edge Function secrets.
+2. Google Cloud → **Pub/Sub** → create a topic; add a **push subscription** with endpoint:
+   `https://<project-ref>.supabase.co/functions/v1/play-rtdn?secret=<RTDN_SHARED_SECRET>`
+3. Play Console → **Monetization setup → Real-time developer notifications** → set the topic.
+4. Grant `google-play-developer-notifications@system.gserviceaccount.com` the **Pub/Sub Publisher** role on the topic.
+
+> The local badge is offline-first and is **not** removed retroactively on refund; the webhook keeps the server record (donations + profile summary) accurate.
 
 ## Troubleshooting
 

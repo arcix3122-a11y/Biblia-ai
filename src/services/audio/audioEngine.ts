@@ -1,4 +1,5 @@
 import * as Speech from "expo-speech";
+import i18n from "@/i18n";
 import type { AudioTrack } from "@/store/audioStore";
 import { useAudioStore } from "@/store/audioStore";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
@@ -39,12 +40,16 @@ class SpeechAudioEngine implements AudioEngine {
         track.chapter,
         translation
       );
-      this.verseTexts = verses.map((v) => `Verse ${v.number}. ${v.text}`);
+      this.verseTexts = verses.map((v) =>
+        i18n.t("audio.verseSpoken", { number: v.number, text: v.text })
+      );
       // Estimate duration: ~150 words per minute, avg 20 words per verse
       const estimatedMs = verses.length * 8_000;
       store.setDuration(estimatedMs > 0 ? estimatedMs : 180_000);
     } catch {
-      this.verseTexts = [`${track.bookName} chapter ${track.chapter}`];
+      this.verseTexts = [
+        i18n.t("audio.chapterSpoken", { book: track.bookName, chapter: track.chapter }),
+      ];
       store.setDuration(30_000);
     }
     store.setStatus("paused");

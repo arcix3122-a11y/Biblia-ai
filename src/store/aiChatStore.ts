@@ -2,14 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import i18n from "@/i18n";
+import { getEffectiveLimit } from "@/data/aiQuotaTiers";
+import type { DonorTierId } from "@/data/donationTiers";
 import type { ChatMessage, ChatRole, ChatSource } from "@/types/chat";
-
-const FREE_MESSAGE_LIMIT = 20;
 
 interface AiChatState {
   messages: ChatMessage[];
   messageCount: number;
   limit: number;
+  donorTier: DonorTierId | null;
   quotaDayKey: string;
   addUserMessage: (content: string) => ChatMessage;
   addAssistantMessage: (content: string, source?: ChatSource) => void;
@@ -21,6 +22,7 @@ interface AiChatState {
   ensureWelcomeMessage: () => void;
   refreshIntroMessage: () => void;
   syncDailyQuota: () => void;
+  syncLimitFromDonorTier: (donorTier: DonorTierId | null) => void;
 }
 
 function getTodayQuotaKey(): string {
@@ -59,8 +61,9 @@ function needsWelcomeMessage(messages: ChatMessage[]): boolean {
 }
 
 function syncPersistedState(
-  state: Pick<AiChatState, "messages" | "messageCount" | "quotaDayKey">
-): Pick<AiChatState, "messages" | "messageCount" | "quotaDayKey"> {
+  state: Pick<AiChatState, "messages" | "messageCount" | "quotaDayKey">,
+  donorTier: DonorTierId | null
+): Pick<AiChatState, "messages" | "messageCount" | "quotaDayKey" | "limit"> {
   const today = getTodayQuotaKey();
   const nextMessages = needsWelcomeMessage(state.messages)
     ? [welcomeMessage(), ...state.messages]
@@ -70,6 +73,7 @@ function syncPersistedState(
     messages: nextMessages,
     messageCount: state.quotaDayKey === today ? state.messageCount : 0,
     quotaDayKey: today,
+    limit: getEffectiveLimit(donorTier),
   };
 }
 
@@ -78,7 +82,8 @@ export const useAiChatStore = create<AiChatState>()(
     (set, get) => ({
       messages: [welcomeMessage()],
       messageCount: 0,
-      limit: FREE_MESSAGE_LIMIT,
+      limit: getEffectiveLimit(null),
+      donorTier: null,
       quotaDayKey: getTodayQuotaKey(),
 
       addUserMessage: (content) => {
@@ -144,6 +149,13 @@ export const useAiChatStore = create<AiChatState>()(
         }
         set({ messageCount: 0, quotaDayKey: today });
       },
+
+      syncLimitFromDonorTier: (donorTier) => {
+        set({
+          donorTier,
+          limit: getEffectiveLimit(donorTier),
+        });
+      },
     }),
     {
       name: "@biblia-ai/chat",
@@ -158,16 +170,23 @@ export const useAiChatStore = create<AiChatState>()(
           return;
         }
 
-        const synced = syncPersistedState({
-          messages: state.messages,
-          messageCount: state.messageCount,
-          quotaDayKey: state.quotaDayKey ?? getTodayQuotaKey(),
-        });
+        const donorTier = state.donorTier ?? null;
+        const synced = syncPersistedState(
+          {
+            messages: state.messages,
+            messageCount: state.messageCount,
+            quotaDayKey: state.quotaDayKey ?? getTodayQuotaKey(),
+          },
+          donorTier
+        );
 
         state.messages = synced.messages;
         state.messageCount = synced.messageCount;
         state.quotaDayKey = synced.quotaDayKey;
+        state.limit = synced.limit;
       },
     }
   )
 );
+
+export { getEffectiveLimit };

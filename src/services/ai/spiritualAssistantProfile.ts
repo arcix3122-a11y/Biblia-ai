@@ -1,4 +1,5 @@
 import i18n, { type AppLocale } from "@/i18n";
+import type { AssistantContextSnapshot } from "@/services/ai/assistantContextSnapshot";
 import type { SelectedVerse } from "@/store/selectionStore";
 import type { ContextPillTemplateId } from "@/types/ui";
 
@@ -310,10 +311,45 @@ export function shouldUseStructuredFirstAidFormat(text: string): boolean {
   return STRUCTURED_FIRST_AID_HINTS.some((hint) => normalized.includes(hint));
 }
 
+function buildContextPromptLines(context: AssistantContextSnapshot | null): string[] {
+  if (!context) {
+    return [];
+  }
+
+  const lines: string[] = ["", "User journey context (reference when relevant — do not force it):"];
+
+  if (context.readingPlan) {
+    const plan = context.readingPlan;
+    const progressLine = plan.allComplete
+      ? `Foundation Week plan: all ${plan.totalDays} days complete.`
+      : `Foundation Week plan: day ${plan.activeDay} of ${plan.totalDays} (${plan.completedDays.length} completed). Today's reading: ${plan.bookReference}.`;
+    lines.push(`Reading plan: ${progressLine}`);
+  }
+
+  if (context.yearPlan) {
+    const year = context.yearPlan;
+    lines.push(
+      `Year Bible plan: day ${year.currentDay} of 365 (${year.progressPercent}% complete, ${year.completedCount} days marked).`
+    );
+  }
+
+  if (context.memoryVerse) {
+    lines.push(
+      `Verse of the day / memory anchor: ${context.memoryVerse.reference} — "${context.memoryVerse.text}"`
+    );
+    lines.push(
+      "When the user's question touches daily rhythm, encouragement, or memorization, you may gently connect to this verse — but prioritize their selected verse and latest message first."
+    );
+  }
+
+  return lines;
+}
+
 export function buildAssistantSystemPrompt(
   locale: AppLocale,
   verse: SelectedVerse | null,
-  latestUserMessage?: string
+  latestUserMessage?: string,
+  context?: AssistantContextSnapshot | null
 ): string {
   const languageName = locale === "pl" ? "Polish" : "English";
   const userText = latestUserMessage?.trim() ?? "";
@@ -345,12 +381,15 @@ export function buildAssistantSystemPrompt(
     "If you are not sure, say so plainly and stay conservative.",
   ].filter((line): line is string => Boolean(line));
 
+  const contextLines = buildContextPromptLines(context ?? null);
+
   if (!verse) {
-    return instructions.join("\n");
+    return [...instructions, ...contextLines].join("\n");
   }
 
   return [
     ...instructions,
+    ...contextLines,
     "",
     "Selected verse context:",
     `Reference: ${getVerseReference(verse)}`,

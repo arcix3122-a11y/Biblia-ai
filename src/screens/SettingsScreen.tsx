@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
@@ -227,6 +227,21 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const handleOpenPrivacyPolicy = useCallback(async () => {
+    const url = process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL || "https://biblia-asystent-privacy.surge.sh/privacy-policy.html";
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(t("errors.somethingWrong"), t("errors.generic"));
+      }
+    } catch (err) {
+      console.warn("Failed to open privacy policy:", err);
+      Alert.alert(t("errors.somethingWrong"), t("errors.generic"));
+    }
+  }, [t]);
+
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
   const buildNumber = Constants.nativeBuildVersion ?? null;
 
@@ -391,6 +406,20 @@ export default function SettingsScreen() {
             </Pressable>
           </>
         ) : null}
+      </GlassCard>
+
+      <GlassCard style={styles.card}>
+        <Text style={styles.sectionTitle}>{t("settings.privacyPolicy")}</Text>
+        <Text style={styles.hint}>{t("settings.privacyPolicyHint")}</Text>
+        <Pressable
+          onPress={handleOpenPrivacyPolicy}
+          style={styles.ecosystemButton}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.privacyPolicyView")}
+        >
+          <Ionicons name="document-text-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
+          <Text style={styles.ecosystemButtonText}>{t("settings.privacyPolicyView")}</Text>
+        </Pressable>
       </GlassCard>
 
       <GlassCard style={styles.card}>

@@ -138,6 +138,10 @@
     "reminderFunnelBody": "Włącz jedno codzienne przypomnienie. To tylko chwila, a pomaga trzymać rytm i nie gubić streaku.",
     "reminderFunnelEnable": "Włącz przypomnienia",
     "reminderFunnelLater": "Nie teraz",
+    "ratingPromptTitle": "Pomóż innym znaleźć Słowo Boże",
+    "ratingPromptBody": "Jeśli aplikacja Ci pomaga, zostaw ocenę 5 gwiazdek. Dzięki temu więcej osób trafi do Biblii.",
+    "ratingPromptRateNow": "Daj 5 gwiazdek",
+    "ratingPromptLater": "Nie teraz",
     "exploreHeading": "Odkryj",
     "tileLibrary": "Biblioteka Pisma",
     "tileLibrarySub": "Przeglądaj wszystkie 66 ksiąg",
@@ -146,7 +150,9 @@
     "tileCompanion": "Asystent AI",
     "tileCompanionSub": "Zapytaj o werset",
     "tilePlan": "Plan czytania",
-    "tilePlanSub": "Tydzień fundamentów",
+    "tilePlanSub": "Postęp rocznego planu",
+    "tileReview": "Powtórki wersetów",
+    "tileReviewSub": "Wracaj do zapisanych",
     "tilePrayer": "Modlitwa",
     "tilePrayerSub": "Z przewodnikiem",
     "tileStats": "Statystyki",
@@ -324,6 +330,12 @@
     "post": "Wyślij",
     "you": "Ty",
     "reader": "Czytelnik",
+    "notificationTitle": "Nowy komentarz do refleksji",
+    "notificationBody": "Ktoś skomentował dzisiejszy werset: {{reference}}",
+    "reply": "Odpowiedz",
+    "replyTo": "Odpowiedź do {{reader}}",
+    "replyingTo": "Odpowiedź dla {{reader}}",
+    "cancelReply": "Anuluj odpowiedź",
     "emptyTitle": "Bądź pierwszy",
     "emptyHint": "Podziel się tym, co ten werset znaczy dla ciebie. Twój komentarz może zachęcić innych w społeczności.",
     "loadError": "Nie udało się załadować komentarzy. Sprawdź połączenie.",
@@ -428,6 +440,18 @@
   "readingPlan": {
     "foundationTitle": "Tydzień fundamentów",
     "foundationSubtitle": "Siedem rozdziałów z przewodnikiem — lokalnie, bez konta.",
+    "yearTitle": "Biblia w rok",
+    "yearSubtitle": "Jeden wspólny postęp na ekranie głównym i w pełnym planie.",
+    "fullBibleRequiredShort": "Zaimportuj pełną Biblię, aby odblokować plan 365 dni.",
+    "notStarted": "Gotowy do startu",
+    "progressPercent": "{{percent}}%",
+    "assignmentsCount": "{{count}} rozdział dziś",
+    "assignmentsCount_one": "{{count}} rozdział dziś",
+    "assignmentsCount_few": "{{count}} rozdziały dziś",
+    "assignmentsCount_many": "{{count}} rozdziałów dziś",
+    "assignmentsCount_other": "{{count}} rozdziału dziś",
+    "openPlan": "Otwórz plan",
+    "startPlan": "Rozpocznij plan",
     "dayProgress": "Dzień {{current}} z {{total}}",
     "completedCount": "{{count}} / {{total}} ukończone",
     "todaysReading": "Dzisiejsze czytanie",
@@ -542,10 +566,20 @@
     "crossReferences": "Powiązane fragmenty",
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "Brak powiązanych fragmentów dla tego rozdziału.",
-    "deepStudy": "Głębokie studium Pisma"
+    "deepStudy": "Głębokie studium Pisma",
+    "aiChapterFollowUp": "Porozmawiaj z Towarzyszem",
+    "aiChapterFollowUpSub": "Zadaj jedno spokojne pytanie po tym rozdziale."
   },
   "ai": {
     "responsesRemaining": "Pozostało dziś {{remaining}} z {{limit}} odpowiedzi",
+    "quota": {
+      "dailyRemaining": "Pozostało dziś {{remaining}} z {{limit}} odpowiedzi",
+      "unlimited": "Nielimitowane odpowiedzi dziennie (przywilej wspierającego)",
+      "tierBonus": "Poziom {{tier}} - rozszerzony dzienny limit AI",
+      "limitReachedTitle": "Osiągnięto dzienny limit AI",
+      "limitReachedBody": "Wykorzystałeś darmowe odpowiedzi na dziś. Wspierający otrzymują więcej rozmów z towarzyszem każdego dnia.",
+      "upgradeCta": "Odblokuj więcej odpowiedzi"
+    },
     "clearChat": "Wyczyść historię czatu",
     "clear": "Wyczyść",
     "selectedVerse": "Wybrany werset",
@@ -713,7 +747,8 @@
     "pillPrayer": "Zamień ten werset w modlitwę",
     "pillHope": "Wydobądź nadzieję z tego wersetu",
     "templatePrayer": "Zamień {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" w krótką modlitwę, którą mogę wypowiedzieć teraz.",
-    "templateHope": "Wydobądź nadzieję, pocieszenie i zachętę z {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" dla osoby, która dziś potrzebuje siły."
+    "templateHope": "Wydobądź nadzieję, pocieszenie i zachętę z {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" dla osoby, która dziś potrzebuje siły.",
+    "chapterReflectionStarter": "Pomóż mi rozważyć rozdział, który właśnie przeczytałem. Pokaż główny temat, jedno uczciwe pytanie do zabrania ze sobą i jeden następny krok modlitwy albo posłuszeństwa."
   },
   "workspace": {
     "title": "Notatki",
@@ -849,6 +884,9 @@
     "immersiveOn": "Tryb immersyjny: wł.",
     "immersiveOff": "Tryb immersyjny: wył.",
     "language": "Język",
+    "privacyPolicy": "Polityka prywatności",
+    "privacyPolicyHint": "Zobacz, jak Biblia AI chroni dane i z jakich usług korzysta.",
+    "privacyPolicyView": "Otwórz politykę",
     "languageHint": "Wybierz język interfejsu aplikacji.",
     "languagePl": "Polski",
     "languageEn": "Angielski",
@@ -1013,6 +1051,15 @@
     "translationUnavailable": "Porównanie przekładów wymaga połączenia z internetem.",
     "offlineCommentary1": "Rozważ ten werset w kontekście całego rozdziału — jak wpisuje się w większą całość Pisma.",
     "offlineCommentary2": "Zastanów się, jak to Słowo dotyka Twojego życia dziś.",
+    "localOriginalUnavailable": "Dane języków oryginalnych są niedostępne offline",
+    "localOriginalSource": "Lokalna biblioteka",
+    "localOriginalMeaning": "Użyj usługi analizy online, aby uzyskać dostęp do gramatyki greckiej lub hebrajskiej.",
+    "localOriginalStrong": "Offline",
+    "localCommentaryReference": "Zacznij od bezpośredniego tekstu: {{reference}} znajduje się w tym rozdziale, więc przeczytaj cały akapit przed wyciągnięciem wniosków.",
+    "localCommentaryContext": "Kontekst wersetu: przed - {{before}} / po - {{after}}",
+    "localCommentaryPractice": "Napisz jedno zdanie o tym, co mówi ten werset, jedno o tym, co objawia o Bogu, i jeden wierny krok do zrobienia dzisiaj.",
+    "contextBoundaryBefore": "To jest pierwszy dostępny werset w tym rozdziale.",
+    "contextBoundaryAfter": "To jest ostatni dostępny werset w tym rozdziale.",
     "studyAction": "Studium",
     "sourceReference": "{{book}} {{chapter}}:{{verse}} ({{translation}})"
   },
@@ -1562,6 +1609,10 @@
     "subtitle": "Twój datek pomaga rozwijać narzędzia do Pisma po polsku i po angielsku — bez reklam i bez paywalla na Słowo.",
     "chooseAmount": "Wybierz kwotę",
     "chooseAmountHint": "Każdy próg odblokowuje rangę darczyńcy na Twoim profilu.",
+    "perks": {
+      "aiUnlimited": "Nielimitowane odpowiedzi Towarzysza AI",
+      "aiQuota": "{{count}} odpowiedzi Towarzysza AI dziennie"
+    },
     "amountPln": "{{amount}} zł",
     "donateNow": "Ofiaruj teraz",
     "iap": {
@@ -1600,6 +1651,37 @@
       "shareMessage": "Wspieram {{brand}} — Pismo, modlitwa i towarzysz duchowy po polsku i po angielsku. Jeśli chcesz pomóc utrzymać aplikację dla innych:\n\n{{link}}",
       "settingsBanner": "Dziękujemy — jesteś {{tier}}"
     }
+  },
+  "audio": {
+    "nowPlaying": "Teraz odtwarzane: {{reference}}",
+    "play": "Odtwórz rozdział",
+    "pause": "Pauza",
+    "previousChapter": "Poprzedni rozdział",
+    "nextChapter": "Następny rozdział",
+    "verseSpoken": "Werset {{number}}. {{text}}",
+    "chapterSpoken": "Rozdział {{chapter}} Księgi {{book}}."
+  },
+  "review": {
+    "title": "Powtórki wersetów",
+    "subtitle": "Powtarzaj wersety zapisane w zakładkach i podświetleniach.",
+    "loading": "Przygotowuję talię powtórek...",
+    "emptyTitle": "Nie ma jeszcze wersetów do powtórki",
+    "emptyBody": "Dodaj zakładkę albo podświetlenie w czytniku, a werset stanie się tutaj fiszką.",
+    "openWorkspace": "Otwórz zapisane wersety",
+    "progress": "{{current}} / {{total}}",
+    "sourceBookmark": "Zakładka",
+    "sourceHighlight": "Podświetlenie",
+    "hiddenHint": "Stuknij, aby odkryć werset.",
+    "cardRevealed": "Werset odkryty",
+    "reveal": "Odkryj",
+    "reviewLater": "Powtórz później",
+    "remembered": "Pamiętam",
+    "openInReader": "Otwórz w czytniku"
+  },
+  "ad": {
+    "sponsorLabel": "REKLAMA",
+    "fallbackTitle": "Miejsce na reklamę niedostępne",
+    "fallbackBody": "Prawdziwe bannery AdMob renderują się w buildzie dev, preview albo sklepowym z modułem natywnym."
   },
   "donorTier": {
     "supporter": "Wspierający",

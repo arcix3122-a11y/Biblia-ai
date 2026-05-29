@@ -43,6 +43,12 @@ export const useDailyRhythmStore = create<DailyRhythmState>()(
           completedDate: allDone ? today : get().completedDate,
         });
 
+        if (allDone) {
+          void import("@/services/notifications/reminderService").then(({ updateEveningRescueStatus }) => {
+            void updateEveningRescueStatus();
+          });
+        }
+
         void import("@/services/stats/userStats").then(({ recordActivity }) => {
           if (step === "votd") void recordActivity("scripture");
           else if (step === "reflection") void recordActivity("reflection");

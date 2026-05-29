@@ -29,6 +29,8 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-29 19:58 | Antigravity | Polityka prywatności — hosting na Supabase Edge Functions | local | done | wdrożona funkcja Edge na Supabase (Response.html) |
+| 2026-05-29 19:40 | Antigravity | Polityka prywatności — integracja UI (PL/EN) i hosting | local | done | integracja z SettingsScreen, Linking, i18n |
 | 2026-05-28 19:00 | Cursor subagent | Stabilizacja buildu — typecheck green | `2c37754`, `7920d8a` | done | haptics, ui types, brakujące moduły AI/TTS |
 | 2026-05-28 16:15 | Cursor subagent | Reader — mapowanie zdjęć ksiąg | `7e68fe2` | done | photoUrl z getBookPhotoUrl jak BookTile |
 | 2026-05-28 15:32 | Cursor subagent | Zdjęcie w czytniku — ReaderHeroHeader | `ee709c0` | done | Photo hero + sticky bar; getBookPhotoUrl |
@@ -214,6 +216,55 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Walidacja:** `npm run typecheck` 0 błędów; `npm run check:locales` 1223 kluczy PL=EN.
 
 ---
+
+## 2026-05-29 19:58 (local)
+- Agent: Antigravity
+- Task: DONE - Hosting Polityki Prywatności na Supabase Edge Functions & Response.html Fix
+- Changes: supabase/functions/privacy-policy/index.ts, src/screens/SettingsScreen.tsx, docs/GOOGLE_PLAY_IAP.md, .env
+- Validation: npm run typecheck (0 errors); Deno Response.html helper (Success); live URL check (OK)
+- Result: done
+
+## 2026-05-29 19:55 (local)
+- Agent: Antigravity
+- Task: DONE - Hosting Polityki Prywatności na Supabase Edge Functions & Headers Fix
+- Changes: supabase/functions/privacy-policy/index.ts, src/screens/SettingsScreen.tsx, docs/GOOGLE_PLAY_IAP.md, .env
+- Validation: npm run typecheck (0 errors); Deno serve Headers (fixed to new Headers); live URL check (OK)
+- Result: done
+
+## 2026-05-29 19:50 (local)
+- Agent: Antigravity
+- Task: DONE - Hosting Polityki Prywatności na Supabase Edge Functions & BOM Bugfix
+- Changes: supabase/functions/privacy-policy/index.ts, src/screens/SettingsScreen.tsx, docs/GOOGLE_PLAY_IAP.md, .env
+- Validation: npm run typecheck (0 errors); supabase functions deploy (success); live URL check (OK)
+- Result: done
+
+## 2026-05-29 19:45 (local)
+- Agent: Antigravity
+- Task: DONE - Hosting Polityki Prywatności na Supabase Edge Functions
+- Changes: supabase/functions/privacy-policy/index.ts, src/screens/SettingsScreen.tsx, docs/GOOGLE_PLAY_IAP.md
+- Validation: npm run typecheck (0 errors); npm run check:locales (1281 keys, parity OK)
+- Result: done
+
+## 2026-05-29 19:42 (local)
+- Agent: Antigravity
+- Task: START - Hosting Polityki Prywatności na Supabase Edge Functions
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-29 19:40 (local)
+- Agent: Antigravity
+- Task: DONE - Integracja Polityki Prywatności w Ustawieniach (PL/EN) i przygotowanie URL pod Play Console
+- Changes: src/screens/SettingsScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, docs/GOOGLE_PLAY_IAP.md
+- Validation: npm run typecheck (0 errors); npm run check:locales (1281 keys, parity OK)
+- Result: done
+
+## 2026-05-29 19:35 (local)
+- Agent: Antigravity
+- Task: START - Integracja Polityki Prywatności w Ustawieniach (PL/EN) i przygotowanie URL pod Play Console
+- Changes: pending
+- Validation: pending
+- Result: in-progress
 
 ## 2026-05-28 19:05 (local)
 - Agent: Cursor subagent
@@ -2456,4 +2507,46 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Task: DONE - wdrozenie AdMob end-to-end (banner + interstitial + konfiguracja build).
 - Changes: package.json, package-lock.json, app.json, .env.example, src/services/ads/adConfig.ts, src/services/ads/interstitialAdService.ts, src/components/dashboard/AdMobBannerCard.tsx, src/screens/HomeScreen.tsx, app/_layout.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
 - Validation: npm run typecheck (pass); npm run check:locales (pass, 1278 keys); npm exec expo config -- --json (EXPO_CONFIG_OK).
+- Result: done
+
+## 2026-05-29 19:36
+- Agent: Codex
+- Task: START - audyt aplikacji pod zaangazowanie i identyfikacje wydmuszek modulow.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-29 19:47
+- Agent: Codex
+- Task: DONE - audyt aplikacji pod zaangazowanie i identyfikacje wydmuszek modulow.
+- Changes: AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass, 1281 keys); npm run typecheck (pass); przeglad app/src/services/store/data.
+- Result: done
+
+## 2026-05-29 19:50
+- Agent: Codex
+- Task: START - end-to-end naprawa wydmuszek i dodatki zwiekszajace zaangazowanie.
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-29 20:15
+- Agent: Cursor Agent
+- Task: START - Phase 1 AI chat quota tiers + context injection + UI/i18n
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-29 20:35
+- Agent: Cursor Agent
+- Task: DONE - Phase 1 AI chat quota tiers + context injection + UI/i18n
+- Changes: src/data/aiQuotaTiers.ts, src/store/aiChatStore.ts, src/services/ai/assistantContextSnapshot.ts, src/services/ai/spiritualAssistantProfile.ts, src/hooks/useSpiritualAssistant.ts, src/screens/AiChatScreen.tsx, src/screens/DonationScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass); npm run typecheck (pre-existing i18n typing errors elsewhere; no errors in new Phase 1 modules)
+- Result: done
+
+## 2026-05-29 20:33
+- Agent: Codex
+- Task: DONE - end-to-end naprawa wydmuszek i dodatki zwiekszajace zaangazowanie.
+- Changes: app/_layout.tsx, app/review.tsx, src/components/GlobalAudioBar.tsx, src/components/audio/GlobalAudioBar.tsx, src/services/audio/audioEngine.ts, src/screens/ReaderScreen.tsx, src/screens/AiChatScreen.tsx, src/components/dashboard/AdMobBannerCard.tsx, src/components/dashboard/NativeAdCard.tsx, src/screens/HomeScreen.tsx, src/components/dashboard/ReadingPlanCard.tsx, src/services/db/scriptureRepository.ts, src/hooks/useVerseStudy.ts, src/store/verseReviewStore.ts, src/screens/VerseReviewScreen.tsx, src/components/dashboard/VotdCommentsSheet.tsx, src/services/social/commentQueue.ts, src/services/social/votdSocialRepository.ts, src/services/notifications/reminderService.ts, src/services/ads/adConfig.ts, src/services/ads/interstitialAdService.ts, supabase/migrations/004_votd_realtime.sql, supabase/migrations/008_votd_comment_replies.sql, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass, 1345 keys); npm run typecheck (pass)
 - Result: done

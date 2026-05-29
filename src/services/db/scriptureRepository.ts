@@ -150,6 +150,29 @@ export async function getVerseOfTheDay(
   );
 }
 
+export async function getVerseByReference(
+  bookSlug: string,
+  chapterNumber: number,
+  verseNumber: number,
+  translation: ScriptureTranslation = "en"
+): Promise<VerseWithReference | null> {
+  const db = await getDatabase();
+  return db.getFirstAsync<VerseWithReference>(
+    `SELECT v.id, v.chapter_id, v.number, v.translation, v.text,
+            b.id AS book_id, b.name AS book_name, b.slug AS book_slug,
+            c.number AS chapter_number
+     FROM verses v
+     INNER JOIN chapters c ON c.id = v.chapter_id
+     INNER JOIN books b ON b.id = c.book_id
+     WHERE b.slug = ? AND c.number = ? AND v.number = ? AND v.translation = ?
+     LIMIT 1`,
+    bookSlug,
+    chapterNumber,
+    verseNumber,
+    translation
+  );
+}
+
 export async function hasFullBibleTranslation(
   translation: ScriptureTranslation
 ): Promise<boolean> {

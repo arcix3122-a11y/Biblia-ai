@@ -16,6 +16,7 @@ export interface VotdComment {
   user_id: string;
   verse_ref: string;
   body: string;
+  parent_comment_id?: string | null;
   created_at: string;
 }
 
@@ -53,6 +54,42 @@ function isSchemaMissing(error: unknown): boolean {
     message.includes("Could not find the table") ||
     (message.includes("relation") && message.includes("does not exist"))
   );
+}
+
+function isColumnMissing(error: unknown, column: string): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+  const code = "code" in error ? String((error as { code?: string }).code) : "";
+  const message =
+    "message" in error && typeof (error as { message?: string }).message === "string"
+      ? (error as { message: string }).message
+      : "";
+  return code === "42703" || code === "PGRST204" || message.includes(column);
+}
+
+function orderThreadedComments(comments: VotdComment[]): VotdComment[] {
+  const roots: VotdComment[] = [];
+  const replies = new Map<string, VotdComment[]>();
+  const knownIds = new Set(comments.map((comment) => comment.id));
+
+  for (const comment of comments) {
+    const parentId = comment.parent_comment_id;
+    if (parentId && knownIds.has(parentId)) {
+      const list = replies.get(parentId) ?? [];
+      list.push(comment);
+      replies.set(parentId, list);
+    } else {
+      roots.push(comment);
+    }
+  }
+
+  roots.sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  for (const list of replies.values()) {
+    list.sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+  }
+
+  return roots.flatMap((comment) => [comment, ...(replies.get(comment.id) ?? [])]);
 }
 
 export function isSocialAvailable(): boolean {
@@ -164,12 +201,33 @@ export async function listComments(verseRef: string, limit = 50): Promise<VotdCo
   try {
     const { data, error } = await supabase
       .from("votd_comments")
-      .select("id, user_id, verse_ref, body, created_at")
+      .select("id, user_id, verse_ref, body, parent_comment_id, created_at")
       .eq("verse_ref", verseRef)
       .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) {
+      if (isColumnMissing(error, "parent_comment_id")) {
+        const fallback = await supabase
+          .from("votd_comments")
+          .select("id, user_id, verse_ref, body, created_at")
+          .eq("verse_ref", verseRef)
+          .order("created_at", { ascending: false })
+          .limit(limit);
+        if (fallback.error) {
+          if (isNetworkFailure(fallback.error) || isSchemaMissing(fallback.error)) {
+            return pending;
+          }
+          throw fallback.error;
+        }
+        const remote = ((fallback.data ?? []) as VotdComment[]).map((comment) => ({
+          ...comment,
+          parent_comment_id: null,
+        }));
+        const remoteBodies = new Set(remote.map((c) => c.body));
+        const unmatchedPending = pending.filter((c) => !remoteBodies.has(c.body));
+        return orderThreadedComments([...unmatchedPending, ...remote]);
+      }
       if (isNetworkFailure(error) || isSchemaMissing(error)) {
         return pending;
       }
@@ -178,7 +236,7 @@ export async function listComments(verseRef: string, limit = 50): Promise<VotdCo
     const remote = (data ?? []) as VotdComment[];
     const remoteBodies = new Set(remote.map((c) => c.body));
     const unmatchedPending = pending.filter((c) => !remoteBodies.has(c.body));
-    return [...unmatchedPending, ...remote];
+    return orderThreadedComments([...unmatchedPending, ...remote]);
   } catch (error) {
     if (isNetworkFailure(error) || isSchemaMissing(error)) {
       return pending;
@@ -212,7 +270,11 @@ export async function getCommentCount(verseRef: string): Promise<number> {
   }
 }
 
-export async function postComment(verseRef: string, body: string): Promise<VotdComment> {
+export async function postComment(
+  verseRef: string,
+  body: string,
+  parentCommentId?: string | null
+): Promise<VotdComment> {
   const supabase = getSupabaseClient();
   if (!supabase || !isCommentsEnabled()) {
     throw new Error("Comments disabled");
@@ -233,13 +295,36 @@ export async function postComment(verseRef: string, body: string): Promise<VotdC
   try {
     const { data, error } = await supabase
       .from("votd_comments")
-      .insert({ user_id: userId, verse_ref: verseRef, body: trimmed })
-      .select("id, user_id, verse_ref, body, created_at")
+      .insert({
+        user_id: userId,
+        verse_ref: verseRef,
+        body: trimmed,
+        parent_comment_id: parentCommentId ?? null,
+      })
+      .select("id, user_id, verse_ref, body, parent_comment_id, created_at")
       .single();
 
     if (error || !data) {
+      if (error && isColumnMissing(error, "parent_comment_id")) {
+        const fallback = await supabase
+          .from("votd_comments")
+          .insert({ user_id: userId, verse_ref: verseRef, body: trimmed })
+          .select("id, user_id, verse_ref, body, created_at")
+          .single();
+        if (fallback.error || !fallback.data) {
+          if (
+            fallback.error &&
+            (isNetworkFailure(fallback.error) || isSchemaMissing(fallback.error))
+          ) {
+            const queued = await enqueueComment(verseRef, trimmed, null);
+            return pendingToVotdComment(queued, userId);
+          }
+          throw fallback.error ?? new Error("Insert failed");
+        }
+        return { ...(fallback.data as VotdComment), parent_comment_id: null };
+      }
       if (error && (isNetworkFailure(error) || isSchemaMissing(error))) {
-        const queued = await enqueueComment(verseRef, trimmed);
+        const queued = await enqueueComment(verseRef, trimmed, parentCommentId ?? null);
         return pendingToVotdComment(queued, userId);
       }
       throw error ?? new Error("Insert failed");
@@ -247,7 +332,7 @@ export async function postComment(verseRef: string, body: string): Promise<VotdC
     return data as VotdComment;
   } catch (error) {
     if (isNetworkFailure(error) || isSchemaMissing(error)) {
-      const queued = await enqueueComment(verseRef, trimmed);
+      const queued = await enqueueComment(verseRef, trimmed, parentCommentId ?? null);
       return pendingToVotdComment(queued, userId);
     }
     throw error;
@@ -275,11 +360,27 @@ export async function flushPendingComments(): Promise<void> {
     try {
       const { data, error } = await supabase
         .from("votd_comments")
-        .insert({ user_id: userId, verse_ref: item.verse_ref, body: item.body })
+        .insert({
+          user_id: userId,
+          verse_ref: item.verse_ref,
+          body: item.body,
+          parent_comment_id: item.parent_comment_id ?? null,
+        })
         .select("id")
         .single();
 
       if (error) {
+        if (isColumnMissing(error, "parent_comment_id")) {
+          const fallback = await supabase
+            .from("votd_comments")
+            .insert({ user_id: userId, verse_ref: item.verse_ref, body: item.body })
+            .select("id")
+            .single();
+          if (!fallback.error && fallback.data) {
+            await removePendingComment(item.localId);
+          }
+          continue;
+        }
         if (isNetworkFailure(error)) {
           return;
         }

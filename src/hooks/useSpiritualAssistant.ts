@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAiChatStore } from "@/store/aiChatStore";
+import { useDonorStore } from "@/store/donorStore";
+import { useActiveTranslation } from "@/store/translationStore";
 import { logError } from "@/services/errors/errorLogger";
+import {
+  buildAssistantContextSnapshot,
+  type AssistantContextSnapshot,
+} from "@/services/ai/assistantContextSnapshot";
+import { isUnlimitedQuotaTier } from "@/data/aiQuotaTiers";
 import {
   buildLlmApiConfig,
   callLiveChatCompletion,
@@ -90,12 +97,18 @@ function ensureCurrentUserTurn(
 async function callLiveAssistant(
   history: Array<{ role: "user" | "assistant"; content: string }>,
   verse: SelectedVerse | null,
-  locale: "en" | "pl"
+  locale: "en" | "pl",
+  context: AssistantContextSnapshot | null
 ): Promise<string> {
   const messages: ChatCompletionMessage[] = [
     {
       role: "system",
-      content: buildAssistantSystemPrompt(locale, verse, latestUserText(history)),
+      content: buildAssistantSystemPrompt(
+        locale,
+        verse,
+        latestUserText(history),
+        context
+      ),
     },
     ...history.map((item) => ({ role: item.role, content: item.content })),
   ];
@@ -106,6 +119,8 @@ async function callLiveAssistant(
 
 export function useSpiritualAssistant() {
   const { t, locale } = useAppTranslation();
+  const translation = useActiveTranslation(locale);
+  const donorTier = useDonorStore((state) => state.donorTier);
   const {
     addUserMessage,
     addAssistantMessage,
@@ -115,6 +130,7 @@ export function useSpiritualAssistant() {
     messageCount,
     limit,
     syncDailyQuota,
+    syncLimitFromDonorTier,
   } = useAiChatStore();
   const [isThinking, setIsThinking] = useState(false);
   const [connectionWarning, setConnectionWarning] = useState<string | null>(null);
@@ -128,6 +144,12 @@ export function useSpiritualAssistant() {
   useEffect(() => {
     syncDailyQuota();
   }, [syncDailyQuota]);
+
+  useEffect(() => {
+    syncLimitFromDonorTier(donorTier);
+  }, [donorTier, syncLimitFromDonorTier]);
+
+  const isUnlimitedQuota = isUnlimitedQuotaTier(donorTier);
 
   const clearConnectionWarning = useCallback(() => {
     setConnectionWarning(null);
@@ -157,12 +179,14 @@ export function useSpiritualAssistant() {
         trimmed
       );
 
+      const context = await buildAssistantContextSnapshot(locale, translation);
+
       try {
         let reply = "";
         let replySource: "live" | "offline" = "offline";
 
         if (useLiveApi) {
-          reply = await callLiveAssistant(history, verse, locale);
+          reply = await callLiveAssistant(history, verse, locale, context);
           replySource = "live";
           setLastResponseMode("LIVE_GROQ");
           setLastReplyUsedTemplate(false);
@@ -198,7 +222,7 @@ export function useSpiritualAssistant() {
         const fallbackMessages: ChatCompletionMessage[] = [
           {
             role: "system",
-            content: buildAssistantSystemPrompt(locale, verse, trimmed),
+            content: buildAssistantSystemPrompt(locale, verse, trimmed, context),
           },
           ...history.map((item) => ({ role: item.role, content: item.content })),
         ];
@@ -243,6 +267,7 @@ export function useSpiritualAssistant() {
       locale,
       syncDailyQuota,
       t,
+      translation,
     ]
   );
 
@@ -314,6 +339,8 @@ export function useSpiritualAssistant() {
     remaining,
     messageCount,
     limit,
+    isUnlimitedQuota,
+    donorTier,
     hasApiKey,
     assistantMode,
     modeLabel,

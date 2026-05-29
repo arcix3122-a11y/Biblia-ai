@@ -28,7 +28,7 @@ import { callLiveChatCompletion, hasLlmApiKey, type ChatCompletionMessage } from
 import { useNotesStore } from "@/store/notesStore";
 import { useReminderStore } from "@/store/reminderStore";
 import { useActiveTranslation } from "@/store/translationStore";
-import { scheduleDailyReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
+import { scheduleGuidedPrayerReminder, requestNotificationPermission } from "@/services/notifications/reminderService";
 import type { VerseWithReference } from "@/types/scripture";
 import { formatBookReference } from "@/i18n/bookNames";
 
@@ -319,7 +319,7 @@ export default function GuidedPrayerScreen() {
       }
 
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      await scheduleDailyReminder(
+      await scheduleGuidedPrayerReminder(
         hour,
         minute,
         t("common.appName"),

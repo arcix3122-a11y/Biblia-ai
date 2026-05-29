@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
 import { GlassCard } from "@/components/GlassCard";
 import { DONATION_TIERS, type DonorTierId } from "@/data/donationTiers";
+import { AI_QUOTA_BY_TIER } from "@/data/aiQuotaTiers";
 import { useDonationIap } from "@/hooks/useDonationIap";
 import type { DonationIapMessageKey } from "@/services/donation/iapService";
 import {
@@ -144,6 +145,13 @@ export default function DonationScreen() {
                           {displayPrice}
                         </Text>
                         <DonorTierBadge tierId={tier.id} compact />
+                        <Text style={styles.tierPerk}>
+                          {tier.id === "mecenas"
+                            ? t("donation.perks.aiUnlimited")
+                            : t("donation.perks.aiQuota", {
+                                count: AI_QUOTA_BY_TIER[tier.id],
+                              })}
+                        </Text>
                         <Text style={styles.tierCta}>{t("donation.donateNow")}</Text>
                       </>
                     )}
@@ -308,6 +316,12 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
     fontWeight: "600",
+  },
+  tierPerk: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: "center",
+    lineHeight: 18,
   },
   previewText: {
     ...typography.body,

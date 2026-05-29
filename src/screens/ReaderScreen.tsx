@@ -27,7 +27,7 @@ import { VerseRow } from "@/components/VerseRow";
 import { useChrome } from "@/context/ChromeContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useBook, useChapterVerses, useDatabaseReady } from "@/hooks/useScripture";
-import { useChapterTTS } from "@/hooks/useChapterTTS";
+import { audioEngine } from "@/services/audio/audioEngine";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
 import { HighlightColorPicker } from "@/components/reader/HighlightColorPicker";
@@ -37,6 +37,7 @@ import { captureVerseStory } from "@/services/share/verseImageExporter";
 import { shareVerse } from "@/services/share/shareVerse";
 import { recordChapterRead } from "@/services/stats/userStats";
 import { useHistoryStore } from "@/store/historyStore";
+import { useAudioStore } from "@/store/audioStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useReaderStore } from "@/store/readerStore";
 import { useSelectionStore } from "@/store/selectionStore";
@@ -74,6 +75,9 @@ export default function ReaderScreen() {
   const dismissKjvBanner = useOnboardingStore((s) => s.dismissKjvBanner);
   const selectedVerse = useSelectionStore((s) => s.selectedVerse);
   const setSelectedVerse = useSelectionStore((s) => s.setSelectedVerse);
+  const audioStatus = useAudioStore((s) => s.status);
+  const currentAudioBookId = useAudioStore((s) => s.currentBookId);
+  const currentAudioChapter = useAudioStore((s) => s.currentChapter);
 
   const flatListRef = useRef<FlatList<Verse>>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -81,7 +85,6 @@ export default function ReaderScreen() {
   const [sharing, setSharing] = useState(false);
 
   const chapterKey = `${slug}-${chapterNumber}`;
-  const tts = useChapterTTS(verses, translation, chapterKey);
 
   useEffect(() => {
     scrollY.setValue(0);
@@ -258,6 +261,59 @@ export default function ReaderScreen() {
         : t("settings.translation.enName");
     return t("reader.translationLabel", { name: translationName });
   }, [t, translation]);
+  const chapterAudioIsCurrent =
+    book != null && currentAudioBookId === book.id && currentAudioChapter === chapterNumber;
+  const chapterAudioPlaying = chapterAudioIsCurrent && audioStatus === "playing";
+  const chapterAudioLoading = chapterAudioIsCurrent && audioStatus === "loading";
+
+  const toggleChapterAudio = useCallback(async () => {
+    if (!book || chapterAudioLoading) {
+      return;
+    }
+
+    void hapticLight();
+    if (chapterAudioPlaying) {
+      await audioEngine.pause();
+      return;
+    }
+
+    if (!chapterAudioIsCurrent) {
+      await audioEngine.load({
+        bookId: book.id,
+        bookName: bookDisplayName,
+        bookSlug: book.slug,
+        chapter: chapterNumber,
+      });
+    }
+    await audioEngine.play();
+  }, [
+    book,
+    bookDisplayName,
+    chapterAudioIsCurrent,
+    chapterAudioLoading,
+    chapterAudioPlaying,
+    chapterNumber,
+  ]);
+
+  const openChapterFollowUp = useCallback(() => {
+    if (!book || verses.length === 0) {
+      return;
+    }
+
+    const anchorVerse = verses[0];
+    if (anchorVerse) {
+      setSelectedVerse({
+        bookId: book.id,
+        bookName: bookDisplayName,
+        bookSlug: book.slug,
+        chapter: chapterNumber,
+        verse: anchorVerse.number,
+        text: anchorVerse.text,
+      });
+    }
+
+    router.push("/(tabs)/ai?starterMood=chapter");
+  }, [book, bookDisplayName, chapterNumber, router, setSelectedVerse, verses]);
 
   const readerHeroPhotoExpanded = useMemo(
     () => (book ? getBookPhotoUrl(book.slug, 900, 480) : ""),
@@ -377,23 +433,27 @@ export default function ReaderScreen() {
           </Pressable>
           <View style={styles.topBarRight}>
             <Pressable
-              onPress={tts.toggle}
+              onPress={() => void toggleChapterAudio()}
               hitSlop={10}
-              style={[styles.ttsButton, tts.isPlaying && styles.ttsButtonActive]}
+              style={[styles.ttsButton, chapterAudioPlaying && styles.ttsButtonActive]}
               accessibilityRole="button"
               accessibilityLabel={
-                tts.isPlaying ? t("reader.stopReading") : t("reader.readAloud")
+                chapterAudioPlaying ? t("reader.stopReading") : t("reader.readAloud")
               }
             >
               <Ionicons
-                name={tts.isPlaying ? "pause" : "volume-high-outline"}
+                name={chapterAudioPlaying ? "pause" : "volume-high-outline"}
                 size={14}
-                color={tts.isPlaying ? colors.canvas : colors.accent}
+                color={chapterAudioPlaying ? colors.canvas : colors.accent}
               />
               <Text
-                style={[styles.ttsButtonText, tts.isPlaying && styles.ttsButtonTextActive]}
+                style={[styles.ttsButtonText, chapterAudioPlaying && styles.ttsButtonTextActive]}
               >
-                {tts.isPlaying ? t("reader.stopReading") : t("reader.readAloud")}
+                {chapterAudioLoading
+                  ? t("common.loading")
+                  : chapterAudioPlaying
+                    ? t("reader.stopReading")
+                    : t("reader.readAloud")}
               </Text>
             </Pressable>
             <FontControls
@@ -420,6 +480,29 @@ export default function ReaderScreen() {
           contentContainerStyle={styles.verseList}
           showsVerticalScrollIndicator={!immersiveMode}
           ListHeaderComponent={listHeader}
+          ListFooterComponent={
+            !immersiveMode && verses.length > 0 ? (
+              <Pressable
+                onPress={openChapterFollowUp}
+                style={styles.chapterFollowUp}
+                accessibilityRole="button"
+                accessibilityLabel={t("reader.aiChapterFollowUp")}
+              >
+                <View style={styles.chapterFollowUpIcon}>
+                  <Ionicons name="chatbubbles-outline" size={18} color={colors.accent} />
+                </View>
+                <View style={styles.chapterFollowUpCopy}>
+                  <Text style={styles.chapterFollowUpTitle}>
+                    {t("reader.aiChapterFollowUp")}
+                  </Text>
+                  <Text style={styles.chapterFollowUpSub}>
+                    {t("reader.aiChapterFollowUpSub")}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+              </Pressable>
+            ) : null
+          }
           onScrollToIndexFailed={(info) => {
             setTimeout(() => {
               flatListRef.current?.scrollToIndex({
@@ -607,6 +690,41 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl * 2,
     paddingBottom: spacing.xxl * 2.2,
     paddingHorizontal: spacing.sm,
+  },
+  chapterFollowUp: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.backgroundElevated,
+  },
+  chapterFollowUpIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: colors.accentMuted,
+    backgroundColor: colors.accentGlow,
+  },
+  chapterFollowUpCopy: {
+    flex: 1,
+  },
+  chapterFollowUpTitle: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    fontWeight: "800",
+  },
+  chapterFollowUpSub: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: 2,
   },
   floatingBottom: {
     position: "absolute",

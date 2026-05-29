@@ -26,16 +26,22 @@ export interface PracticeDeepLinkTarget {
   day: number;
 }
 
+export interface GuidedPrayerDeepLinkTarget {
+  type: "guided-prayer";
+}
+
 export type AppDeepLinkTarget =
   | ReaderDeepLinkTarget
   | InviteDeepLinkTarget
   | StreakDeepLinkTarget
-  | PracticeDeepLinkTarget;
+  | PracticeDeepLinkTarget
+  | GuidedPrayerDeepLinkTarget;
 
 const READER_PATH = /^\/reader\/([^/?#]+)\/(\d+)(?:\/(\d+))?/;
 const STREAK_PATH = /^\/streak\/?$/;
 const INVITE_PATH = /^\/invite\/?$/;
 const PRACTICE_PATH = /^\/practice\/([^/?#]+)\/?$/;
+const GUIDED_PRAYER_PATH = /^\/guided-prayer\/?$/;
 const PRACTICE_IDS: readonly PracticeId[] = ["fasting", "stations", "rosary"];
 
 function isPracticeId(value: string): value is PracticeId {
@@ -131,12 +137,20 @@ function parsePracticePath(pathname: string, searchParams: URLSearchParams): Pra
   return { type: "practice", practiceId, day };
 }
 
+function parseGuidedPrayerPath(pathname: string): GuidedPrayerDeepLinkTarget | null {
+  if (!GUIDED_PRAYER_PATH.test(pathname)) {
+    return null;
+  }
+  return { type: "guided-prayer" };
+}
+
 function parseAppPath(pathname: string, searchParams: URLSearchParams): AppDeepLinkTarget | null {
   return (
     parseReaderPath(pathname, searchParams) ??
     parseInvitePath(pathname) ??
     parseStreakPath(pathname, searchParams) ??
-    parsePracticePath(pathname, searchParams)
+    parsePracticePath(pathname, searchParams) ??
+    parseGuidedPrayerPath(pathname)
   );
 }
 

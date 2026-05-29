@@ -79,6 +79,26 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return status === "granted";
 }
 
+export async function updateEveningRescueStatus(): Promise<void> {
+  const Notifications = await getNotificationsModule();
+  if (!Notifications) return;
+
+  try {
+    const { useDailyRhythmStore } = await import("@/store/dailyRhythmStore");
+    const { useReminderStore } = await import("@/store/reminderStore");
+    
+    const isCompleted = useDailyRhythmStore.getState().isCompleteToday();
+    const reminderEnabled = useReminderStore.getState().enabled;
+    const eveningEnabled = useReminderStore.getState().eveningRescueEnabled;
+
+    if (isCompleted || !reminderEnabled || !eveningEnabled) {
+      await Notifications.cancelScheduledNotificationAsync(EVENING_REMINDER_ID);
+    }
+  } catch (err) {
+    console.warn("Failed to update evening rescue status:", err);
+  }
+}
+
 export async function scheduleDailyReminder(
   hour: number,
   minute: number,
@@ -105,9 +125,36 @@ export async function scheduleDailyReminder(
     });
   }
 
+  let fullBody = body;
+  let deepLinkUrl = "biblia-ai://(tabs)/library";
+
+  try {
+    const { getVerseOfTheDay } = await import("@/services/db/scriptureRepository");
+    const { formatBookReference } = await import("@/i18n/bookNames");
+    const votd = await getVerseOfTheDay("en");
+    if (votd) {
+      const ref = formatBookReference(
+        votd.book_slug,
+        votd.chapter_number,
+        votd.number,
+        "en",
+        votd.book_name
+      );
+      fullBody = `${body}\n\n"${votd.text}" - ${ref}`;
+      deepLinkUrl = `biblia-ai://reader/${votd.book_slug}/${votd.chapter_number}?verse=${votd.number}`;
+    }
+  } catch (err) {
+    console.warn("Could not load VOTD text for morning reminder:", err);
+  }
+
   await Notifications.scheduleNotificationAsync({
     identifier: MORNING_REMINDER_ID,
-    content: { title, body, sound: false },
+    content: {
+      title,
+      body: fullBody,
+      sound: false,
+      data: { url: deepLinkUrl }
+    },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour,
@@ -122,6 +169,7 @@ export async function scheduleDailyReminder(
         title: eveningRescue.title,
         body: eveningRescue.body,
         sound: false,
+        data: { url: "biblia-ai://(tabs)" }
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -130,6 +178,9 @@ export async function scheduleDailyReminder(
         channelId: Platform.OS === "android" ? "evening-rescue" : undefined,
       },
     });
+
+    // Check if tasks already completed today and cancel if so
+    void updateEveningRescueStatus();
   }
 }
 
@@ -141,4 +192,128 @@ export async function cancelDailyReminder(): Promise<void> {
 
   await Notifications.cancelScheduledNotificationAsync(MORNING_REMINDER_ID);
   await Notifications.cancelScheduledNotificationAsync(EVENING_REMINDER_ID);
+}
+
+const GUIDED_PRAYER_REMINDER_ID = "biblia-guided-prayer";
+const PRACTICE_REMINDER_ID_PREFIX = "biblia-practice-";
+
+export async function scheduleGuidedPrayerReminder(
+  hour: number,
+  minute: number,
+  title: string,
+  body: string
+): Promise<void> {
+  const Notifications = await ensureNotificationHandler();
+  if (!Notifications) {
+    return;
+  }
+
+  await Notifications.cancelScheduledNotificationAsync(GUIDED_PRAYER_REMINDER_ID);
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("guided-prayer", {
+      name: "Guided Prayer Reminder",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: GUIDED_PRAYER_REMINDER_ID,
+    content: {
+      title,
+      body,
+      sound: false,
+      data: { url: "biblia-ai://guided-prayer" }
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour,
+      minute,
+    },
+  });
+}
+
+export async function cancelGuidedPrayerReminder(): Promise<void> {
+  const Notifications = await getNotificationsModule();
+  if (!Notifications) return;
+  await Notifications.cancelScheduledNotificationAsync(GUIDED_PRAYER_REMINDER_ID);
+}
+
+export async function schedulePracticeReminder(
+  practiceId: string,
+  hour: number,
+  minute: number,
+  title: string,
+  body: string
+): Promise<void> {
+  const Notifications = await ensureNotificationHandler();
+  if (!Notifications) {
+    return;
+  }
+
+  const identifier = `${PRACTICE_REMINDER_ID_PREFIX}${practiceId}`;
+  await Notifications.cancelScheduledNotificationAsync(identifier);
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("practices", {
+      name: "Spiritual Practices Reminders",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    identifier,
+    content: {
+      title,
+      body,
+      sound: false,
+      data: { url: `biblia-ai://practice/${practiceId}` }
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour,
+      minute,
+    },
+  });
+}
+
+export async function cancelPracticeReminder(practiceId: string): Promise<void> {
+  const Notifications = await getNotificationsModule();
+  if (!Notifications) return;
+  await Notifications.cancelScheduledNotificationAsync(`${PRACTICE_REMINDER_ID_PREFIX}${practiceId}`);
+}
+
+export async function presentLocalNotification(
+  identifier: string,
+  title: string,
+  body: string,
+  url?: string
+): Promise<void> {
+  const Notifications = await ensureNotificationHandler();
+  if (!Notifications) {
+    return;
+  }
+
+  const permissions = await Notifications.getPermissionsAsync();
+  if (permissions.status !== "granted") {
+    return;
+  }
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("community", {
+      name: "Community",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    identifier,
+    content: {
+      title,
+      body,
+      sound: false,
+      data: url ? { url } : undefined,
+    },
+    trigger: null,
+  });
 }

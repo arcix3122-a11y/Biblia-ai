@@ -7,6 +7,7 @@ export interface PendingVotdComment {
   localId: string;
   verse_ref: string;
   body: string;
+  parent_comment_id?: string | null;
   created_at: string;
 }
 
@@ -37,6 +38,7 @@ export function pendingToVotdComment(item: PendingVotdComment, userId: string): 
     user_id: userId,
     verse_ref: item.verse_ref,
     body: item.body,
+    parent_comment_id: item.parent_comment_id ?? null,
     created_at: item.created_at,
   };
 }
@@ -46,11 +48,16 @@ export async function getPendingComments(verseRef: string): Promise<PendingVotdC
   return queue.filter((item) => item.verse_ref === verseRef);
 }
 
-export async function enqueueComment(verseRef: string, body: string): Promise<PendingVotdComment> {
+export async function enqueueComment(
+  verseRef: string,
+  body: string,
+  parentCommentId?: string | null
+): Promise<PendingVotdComment> {
   const item: PendingVotdComment = {
     localId: makeLocalId(),
     verse_ref: verseRef,
     body,
+    parent_comment_id: parentCommentId ?? null,
     created_at: new Date().toISOString(),
   };
   const queue = await readQueue();
