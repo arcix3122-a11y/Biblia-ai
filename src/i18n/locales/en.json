@@ -138,10 +138,10 @@
     "reminderFunnelBody": "Turn on one daily reminder. It takes a second and helps you keep your rhythm and streak.",
     "reminderFunnelEnable": "Enable reminders",
     "reminderFunnelLater": "Not now",
-    "ratingPromptTitle": "Help others find God's Word",
-    "ratingPromptBody": "If this app helps you, leave us a 5-star rating. It helps more people discover the Bible.",
-    "ratingPromptRateNow": "Give 5 stars",
-    "ratingPromptLater": "Not now",
+    "ratingPromptTitle": "Enjoying Biblia AI?",
+    "ratingPromptBody": "Could you take a moment to rate us on Google Play? It helps others find our peaceful reading experience.",
+    "ratingPromptRateNow": "Rate now",
+    "ratingPromptLater": "Maybe later",
     "exploreHeading": "Explore",
     "tileLibrary": "Scripture library",
     "tileLibrarySub": "Browse all 66 books",
@@ -151,8 +151,8 @@
     "tileCompanionSub": "Ask about a verse",
     "tilePlan": "Reading plan",
     "tilePlanSub": "Bible-in-a-year progress",
-    "tileReview": "Verse review",
-    "tileReviewSub": "Repeat saved verses",
+    "tileReview": "Daily Review",
+    "tileReviewSub": "Practice your memorized verses",
     "tilePrayer": "Prayer",
     "tilePrayerSub": "Guided session",
     "tileStats": "Stats",
@@ -343,8 +343,8 @@
     "retry": "Try again",
     "queuedMessage": "We'll send when you're back online.",
     "pendingLabel": "Waiting to send",
-    "anonAuthDisabled": "Anonymous sign-in is disabled in Supabase. Enable it in Dashboard → Authentication → Providers → Anonymous to publish comments.",
-    "offlineHint": "Comments require a Supabase connection. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in your .env file.",
+    "anonAuthDisabled": "Comments are currently unavailable. Please try again later.",
+    "offlineHint": "Comments require an active internet connection.",
     "deleteTitle": "Delete comment?",
     "deleteMessage": "This action cannot be undone.",
     "count_one": "{{count}} comment",
@@ -573,12 +573,12 @@
   "ai": {
     "responsesRemaining": "Remaining today: {{remaining}} of {{limit}} replies",
     "quota": {
-      "dailyRemaining": "Remaining today: {{remaining}} of {{limit}} replies",
-      "unlimited": "Unlimited daily replies (supporter perk)",
-      "tierBonus": "{{tier}} tier - expanded daily AI limit",
-      "limitReachedTitle": "Daily AI limit reached",
-      "limitReachedBody": "You used today's free replies. Supporters get more companion conversations each day.",
-      "upgradeCta": "Unlock more replies"
+      "dailyRemaining": "{{remaining}} / {{limit}} responses left today",
+      "unlimited": "Unlimited daily responses (supporter rank)",
+      "tierBonus": "Tier {{tier}} — expanded daily AI quota",
+      "limitReachedTitle": "Daily AI Limit Reached",
+      "limitReachedBody": "You have used your free responses for today. Supporters receive more interactive chats with the companion each day.",
+      "upgradeCta": "Unlock more responses"
     },
     "clearChat": "Clear chat history",
     "clear": "Clear",
@@ -878,33 +878,33 @@
     "readerFontHint": "Adjusts verse text in the Scripture reader.",
     "currentFontSize": "Current size: {{size}}px",
     "currentSize": "Current size: {{size}}px",
-    "immersiveMode": "Immersive mode: {{state}}",
-    "immersiveReading": "Immersive reading",
-    "immersiveHint": "Hide chrome while reading. Toggle from the reader toolbar or below.",
-    "immersiveOn": "Immersive mode: on",
-    "immersiveOff": "Immersive mode: off",
+    "immersiveMode": "Deep focus: {{state}}",
+    "immersiveReading": "Deep focus",
+    "immersiveHint": "Hide interface elements while reading to focus entirely on the Scripture text.",
+    "immersiveOn": "Deep focus: on",
+    "immersiveOff": "Deep focus: off",
     "language": "Language",
-    "privacyPolicy": "Privacy policy",
-    "privacyPolicyHint": "Read how Biblia AI protects your data and what services are used.",
-    "privacyPolicyView": "View policy",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyHint": "Read our privacy policy to learn how we protect your data and what services are used.",
+    "privacyPolicyView": "Open privacy policy",
     "languageHint": "Choose the app interface language.",
     "languagePl": "Polish",
     "languageEn": "English",
-    "aiService": "AI service",
-    "aiCompanionStatus": "AI Companion Status",
-    "aiCompanionHint": "Daily message quota and chat reset. Live responses use your configured API key.",
-    "aiServiceHint": "Live diagnostics for the configured LLM provider.",
+    "aiService": "Prayer Assistant",
+    "aiCompanionStatus": "Assistant Status",
+    "aiCompanionHint": "Daily message quota and chat reset. Connected responses use your configured API key.",
+    "aiServiceHint": "Information about the configuration and status of the Assistant.",
     "advanced": "Advanced",
-    "advancedHint": "AI status, cloud sync, and more.",
+    "advancedHint": "Assistant status, synchronization, and more.",
     "basic": "Essentials",
-    "aiStatusConfigured": "Status: API key configured",
-    "aiStatusMissing": "Status: API key missing",
-    "aiHealthChecking": "Connection check in progress…",
-    "aiHealthOk": "Connection healthy",
+    "aiStatusConfigured": "Assistant: Cloud mode active (API key)",
+    "aiStatusMissing": "Assistant: Local mode active (offline)",
+    "aiHealthChecking": "Checking connection...",
+    "aiHealthOk": "Connection active",
     "aiHealthError": "Connection failed",
     "aiProviderValue": "Provider: {{value}}",
     "aiModelValue": "Model: {{value}}",
-    "aiEndpointValue": "Endpoint: {{value}}",
+    "aiEndpointValue": "Endpoint address: {{value}}",
     "scriptureTranslation": "Scripture translation",
     "scriptureTranslationHint": "The app ships the full Bible: Biblia Gdańska 1881 (Polish) and King James Version (English) — 66 books in each language.",
     "translation": {
@@ -929,7 +929,7 @@
     "notificationsHint": "Receive a daily nudge to read Scripture.",
     "notificationsBenefits": "A morning nudge starts your daily missions. Optional evening reminder if you have not finished yet.",
     "notificationsBody": "Time for today's missions — open Biblia AI and keep your streak.",
-    "notificationsExpoGoNote": "Scheduled reminders need a development or store build. In Expo Go you can preview settings; they apply after installing the full app.",
+    "notificationsExpoGoNote": "Note: Scheduled reminders will activate once the full store application is installed.",
     "pickReminderTime": "Reminder time",
     "eveningRescue": "Evening streak rescue",
     "eveningRescueHint": "Around 20:30 we remind you if today's missions are still incomplete.",
@@ -946,7 +946,7 @@
     "chaptersPerDay_few": "{{count}} chapters / day",
     "chaptersPerDay_many": "{{count}} chapters / day",
     "cloudSync": "Cloud sync",
-    "cloudSyncHint": "Highlights, notes, and reading progress sync when online. Requires Anonymous Auth in Supabase.",
+    "cloudSyncHint": "Highlights, notes, and reading progress sync online automatically.",
     "lastSyncAt": "Last sync: {{time}}",
     "lastSyncNever": "Not synced yet (offline or first launch).",
     "ecosystem": "Our Apps",
@@ -961,7 +961,11 @@
     "clearLibraryTitle": "Delete local Scripture database?",
     "clearLibraryMessage": "This permanently deletes all locally imported books, chapters, and verses from this device. Bookmarks and reading history remain, but may point to missing text. The app will re-import the bundled library on next launch. This cannot be undone.",
     "clearLibraryConfirm": "Delete library",
-    "clearLibrarySuccess": "Library cleared. Restart the app or pull to refresh on Home to re-import Scripture."
+    "clearLibrarySuccess": "Library cleared. Restart the app or pull to refresh on Home to re-import Scripture.",
+    "dataPortability": "Export spiritual journal",
+    "dataPortabilityHint": "Download a complete Markdown backup of your theological notes, bookmarks, and highlights under GDPR Art. 20 requirements.",
+    "dataPortabilityAction": "Export journal",
+    "dataPortabilitySuccess": "Spiritual journal exported successfully."
   },
   "languageSwitcher": {
     "pl": "PL",
@@ -1401,11 +1405,11 @@
     }
   },
   "practices": {
-    "hubTitle": "Spiritual practices hub",
+    "hubTitle": "Spiritual practices",
     "hubSubtitle": "Choose the practice that fits your heart today.",
     "hubIntroTitle": "One place for every practice",
     "hubIntroBody": "Start with fasting, step into the Stations of the Cross, or pray the rosary in a steady decade flow.",
-    "hubTileTitle": "Practices hub",
+    "hubTileTitle": "Spiritual practices",
     "hubTileSub": "Fasting, Stations, or Rosary",
     "meta": "{{steps}} steps · ~{{minutes}} min",
     "streak": "Streak: {{count}} days",
@@ -1472,11 +1476,11 @@
     }
   },
   "devotionals": {
-    "title": "Devotional hub",
+    "title": "Spiritual practices",
     "subtitle": "Choose the practice that fits your heart today.",
     "introTitle": "One place for every practice",
     "introBody": "Start with fasting, step into the Stations of the Cross, or pray the rosary in a steady decade flow.",
-    "hubTileTitle": "Devotional hub",
+    "hubTileTitle": "Spiritual practices",
     "hubTileSub": "Choose fasting, stations, or rosary",
     "fastingTitle": "40-Day Fast",
     "fastingSub": "Focused surrender and prayer",
@@ -1488,6 +1492,22 @@
   "stations": {
     "title": "Stations of the Cross",
     "subtitle": "A guided path of prayer, suffering, and steadfast hope.",
+    "items": {
+      "station1": { "title": "Station I: Jesus is condemned to death" },
+      "station2": { "title": "Station II: Jesus takes up His cross" },
+      "station3": { "title": "Station III: Jesus falls the first time" },
+      "station4": { "title": "Station IV: Jesus meets His mother" },
+      "station5": { "title": "Station V: Simon helps carry the cross" },
+      "station6": { "title": "Station VI: Veronica wipes the face of Jesus" },
+      "station7": { "title": "Station VII: Jesus falls the second time" },
+      "station8": { "title": "Station VIII: Jesus meets the women of Jerusalem" },
+      "station9": { "title": "Station IX: Jesus falls the third time" },
+      "station10": { "title": "Station X: Jesus is stripped of His garments" },
+      "station11": { "title": "Station XI: Jesus is nailed to the cross" },
+      "station12": { "title": "Station XII: Jesus dies on the cross" },
+      "station13": { "title": "Station XIII: Jesus is taken down from the cross" },
+      "station14": { "title": "Station XIV: Jesus is laid in the tomb" }
+    },
     "startJourney": "Start journey",
     "notStartedTitle": "Begin the Stations",
     "notStartedBody": "Walk through each station slowly. Read the anchors, sit with the reflection, and let prayer meet your real life.",
@@ -1498,8 +1518,8 @@
     "verseSectionTitle": "Scripture anchors",
     "reflectionSectionTitle": "Reflection",
     "prayerSectionTitle": "Prayer prompt",
-    "reflectionBody": "Let this station remind you that Jesus meets you in pain, pressure, and weakness. Stay present with {{station}} and notice where God is speaking to your own story.",
-    "prayerBody": "Lord, in {{station}}, teach me to stay with You rather than escape. Give me courage, compassion, and a steady heart.",
+    "reflectionBody": "Let this station remind you that Jesus meets you in pain, pressure, and weakness. Stay present with this station: {{station}}, and notice where God is speaking to your own story.",
+    "prayerBody": "Lord, as I contemplate this station: {{station}} — teach me to stay with You rather than escape. Give me courage, compassion, and a steady heart.",
     "markDone": "Mark station complete",
     "alreadyDone": "Station completed",
     "resetJourney": "Reset journey",
@@ -1512,21 +1532,69 @@
   "rosary": {
     "title": "Rosary",
     "subtitle": "A steady decade flow through mystery, Scripture, and prayer.",
+    "sets": {
+      "joyful": {
+        "title": "Joyful Mysteries",
+        "subtitle": "A path of humility, obedience, and quiet joy."
+      },
+      "luminous": {
+        "title": "Luminous Mysteries",
+        "subtitle": "A path of revelation, mission, and the light of Christ."
+      },
+      "sorrowful": {
+        "title": "Sorrowful Mysteries",
+        "subtitle": "A path of surrender through pain, loss, and redemption."
+      },
+      "glorious": {
+        "title": "Glorious Mysteries",
+        "subtitle": "A path of hope, victory, and new creation."
+      }
+    },
+    "mysteries": {
+      "joyful": {
+        "annunciation": "The Annunciation",
+        "visitation": "The Visitation",
+        "nativity": "The Nativity",
+        "presentation": "The Presentation",
+        "findingInTemple": "The Finding in the Temple"
+      },
+      "luminous": {
+        "baptism": "The Baptism in the Jordan",
+        "cana": "The Wedding at Cana",
+        "proclamation": "The Proclamation of the Kingdom",
+        "transfiguration": "The Transfiguration",
+        "eucharist": "The Institution of the Eucharist"
+      },
+      "sorrowful": {
+        "agony": "The Agony in the Garden",
+        "scourging": "The Scourging at the Pillar",
+        "crowning": "The Crowning with Thorns",
+        "carrying": "The Carrying of the Cross",
+        "crucifixion": "The Crucifixion"
+      },
+      "glorious": {
+        "resurrection": "The Resurrection",
+        "ascension": "The Ascension",
+        "descent": "The Descent of the Holy Spirit",
+        "assumption": "The Assumption",
+        "coronation": "The Coronation of Mary"
+      }
+    },
     "startJourney": "Start rosary",
     "notStartedTitle": "Choose a mystery set",
     "notStartedBody": "Pick the set you want to pray today, then begin the five-decade rhythm.",
     "setLabel": "Set: {{set}}",
     "decadeLabel": "Decade {{current}} of {{total}}",
-    "beadCountLabel": "Beads prayed: {{count}} / {{total}}",
+    "beadCountLabel": "Beads: {{count}} / {{total}}",
     "progressLabel": "{{percent}}% complete",
     "chooseSetTitle": "Choose a set",
     "chooseSetBody": "Joyful, Luminous, Sorrowful, or Glorious — pick the set that fits your prayer moment.",
     "verseSectionTitle": "Scripture anchors",
     "meditationSectionTitle": "Meditation",
     "prayerSectionTitle": "Prayer prompt",
-    "mysteryPrompt": "Stay with {{mystery}} and let the mystery shape your prayer.",
-    "meditationBody": "Hold {{mystery}} slowly. Notice one word, one image, and one invitation for your life today.",
-    "prayerBody": "Lord, through {{mystery}}, draw my attention back to Christ and teach me to pray with trust and tenderness.",
+    "mysteryPrompt": "Stay present with the mystery of the {{mystery}} and let it shape your prayer.",
+    "meditationBody": "Contemplate the mystery of the {{mystery}}. Pause and notice one word, one image, and one invitation for your life today.",
+    "prayerBody": "Lord, through the mystery of the {{mystery}}, draw my attention back to Christ and teach me to pray with trust and tenderness.",
     "countBead": "Pray one bead",
     "resetJourney": "Reset rosary",
     "resetConfirmTitle": "Reset the rosary?",
@@ -1610,8 +1678,8 @@
     "chooseAmount": "Choose an amount",
     "chooseAmountHint": "Each tier unlocks a donor rank badge on your profile.",
     "perks": {
-      "aiUnlimited": "Unlimited AI companion replies",
-      "aiQuota": "{{count}} AI companion replies per day"
+      "aiUnlimited": "Unlimited AI Companion responses daily",
+      "aiQuota": "{{count}} AI Companion responses daily"
     },
     "amountPln": "{{amount}} PLN",
     "donateNow": "Give now",
@@ -1627,7 +1695,7 @@
         "purchaseFailed": "Purchase failed. Please try again.",
         "verifyFailed": "Payment received but could not be verified. Contact support if you were charged.",
         "unknownProduct": "Unknown product. Contact support if you were charged.",
-        "billingUnavailable": "Google Play Billing is unavailable on this device. Check Play Store sign-in and try again.",
+        "billingUnavailable": "Play Store payments are unavailable on this device. Please check your Google account sign-in and try again.",
         "pending": "Payment is pending. Your donor rank will unlock when Google Play confirms the charge.",
         "alreadyOwned": "A previous gift is still processing. We are finishing it — try again in a moment."
       }
@@ -1654,8 +1722,8 @@
   },
   "audio": {
     "nowPlaying": "Now playing: {{reference}}",
-    "play": "Play chapter",
-    "pause": "Pause chapter",
+    "play": "Play",
+    "pause": "Pause",
     "previousChapter": "Previous chapter",
     "nextChapter": "Next chapter",
     "verseSpoken": "Verse {{number}}. {{text}}",
@@ -1681,7 +1749,7 @@
   "ad": {
     "sponsorLabel": "AD",
     "fallbackTitle": "Ad slot unavailable here",
-    "fallbackBody": "Real AdMob banners render in dev, preview, or store builds with the native ads module."
+    "fallbackBody": "A sponsored message or scripture reflection will appear here."
   },
   "donorTier": {
     "supporter": "Supporter",

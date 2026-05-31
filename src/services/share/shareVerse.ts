@@ -2,6 +2,7 @@ import { Platform, Share } from "react-native";
 import * as Sharing from "expo-sharing";
 import i18n from "@/i18n";
 import { buildReaderDeepLink, buildShareUrl, formatShareLinkLine } from "@/utils/deepLinks";
+import { shareVerseImage } from "./verseImageExporter";
 
 const EXCERPT_MAX = 140;
 
@@ -46,29 +47,12 @@ export async function shareVerse(
 
   if (imageUri) {
     try {
-      const sharingAvailable = await Sharing.isAvailableAsync();
-      if (sharingAvailable) {
-        if (Platform.OS === "ios") {
-          await Share.share({ message, url: imageUri, title });
-          return;
-        }
-
-        // Android: prefer combined sheet when supported; otherwise image-only then text fallback.
-        try {
-          await Share.share({ message, url: imageUri, title });
-          return;
-        } catch {
-          await Sharing.shareAsync(imageUri, {
-            mimeType: "image/png",
-            dialogTitle: title,
-            UTI: "public.png",
-          });
-          await Share.share({ message, title });
-          return;
-        }
+      const success = await shareVerseImage(imageUri, message);
+      if (success) {
+        return;
       }
-    } catch {
-      // fall through to text-only
+    } catch (err) {
+      console.warn("Failed to share verse image, falling back to text:", err);
     }
   }
 

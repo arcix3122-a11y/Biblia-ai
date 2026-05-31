@@ -1,3 +1,5 @@
+import { decryptKeyIfNeeded } from "../security/keyObfuscator";
+
 export type LlmProvider = "groq" | "openai";
 
 export interface LlmApiConfig {
@@ -125,7 +127,9 @@ export function getLlmApiKeys(): string[] {
   for (const source of sources) {
     if (!source) continue;
     for (const part of source.split(",")) {
-      const key = part.trim();
+      const rawKey = part.trim();
+      if (!rawKey) continue;
+      const key = decryptKeyIfNeeded(rawKey);
       if (isUsableKey(key) && !keys.includes(key)) {
         keys.push(key);
       }

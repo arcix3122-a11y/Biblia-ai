@@ -138,10 +138,10 @@
     "reminderFunnelBody": "Włącz jedno codzienne przypomnienie. To tylko chwila, a pomaga trzymać rytm i nie gubić streaku.",
     "reminderFunnelEnable": "Włącz przypomnienia",
     "reminderFunnelLater": "Nie teraz",
-    "ratingPromptTitle": "Pomóż innym znaleźć Słowo Boże",
-    "ratingPromptBody": "Jeśli aplikacja Ci pomaga, zostaw ocenę 5 gwiazdek. Dzięki temu więcej osób trafi do Biblii.",
-    "ratingPromptRateNow": "Daj 5 gwiazdek",
-    "ratingPromptLater": "Nie teraz",
+    "ratingPromptTitle": "Podoba Ci się Biblia AI?",
+    "ratingPromptBody": "Czy mógłbyś poświęcić chwilę na ocenę w Google Play? Pomaga to innym znaleźć naszą spokojną aplikację.",
+    "ratingPromptRateNow": "Oceń teraz",
+    "ratingPromptLater": "Może później",
     "exploreHeading": "Odkryj",
     "tileLibrary": "Biblioteka Pisma",
     "tileLibrarySub": "Przeglądaj wszystkie 66 ksiąg",
@@ -151,8 +151,8 @@
     "tileCompanionSub": "Zapytaj o werset",
     "tilePlan": "Plan czytania",
     "tilePlanSub": "Postęp rocznego planu",
-    "tileReview": "Powtórki wersetów",
-    "tileReviewSub": "Wracaj do zapisanych",
+    "tileReview": "Codzienna powtórka",
+    "tileReviewSub": "Ćwicz zapamiętane wersety",
     "tilePrayer": "Modlitwa",
     "tilePrayerSub": "Z przewodnikiem",
     "tileStats": "Statystyki",
@@ -343,8 +343,8 @@
     "retry": "Spróbuj ponownie",
     "queuedMessage": "Wyślemy, gdy wrócisz online.",
     "pendingLabel": "Oczekuje na wysłanie",
-    "anonAuthDisabled": "Logowanie anonimowe jest wyłączone w Supabase. Włącz je w Dashboard → Authentication → Providers → Anonymous, aby publikować komentarze.",
-    "offlineHint": "Komentarze wymagają połączenia z Supabase. Ustaw EXPO_PUBLIC_SUPABASE_URL i EXPO_PUBLIC_SUPABASE_ANON_KEY w pliku .env.",
+    "anonAuthDisabled": "Komentarze są w tej chwili niedostępne. Spróbuj ponownie później.",
+    "offlineHint": "Komentarze wymagają aktywnego połączenia z internetem.",
     "deleteTitle": "Usunąć komentarz?",
     "deleteMessage": "Tej operacji nie można cofnąć.",
     "count_one": "{{count}} komentarz",
@@ -567,15 +567,15 @@
     "crossRefTheme": "{{theme}}",
     "noCrossRefs": "Brak powiązanych fragmentów dla tego rozdziału.",
     "deepStudy": "Głębokie studium Pisma",
-    "aiChapterFollowUp": "Porozmawiaj z Towarzyszem",
-    "aiChapterFollowUpSub": "Zadaj jedno spokojne pytanie po tym rozdziale."
+    "aiChapterFollowUp": "Rozważ z Asystentem",
+    "aiChapterFollowUpSub": "Zadaj jedno konkretne pytanie uzupełniające do tego rozdziału."
   },
   "ai": {
     "responsesRemaining": "Pozostało dziś {{remaining}} z {{limit}} odpowiedzi",
     "quota": {
       "dailyRemaining": "Pozostało dziś {{remaining}} z {{limit}} odpowiedzi",
       "unlimited": "Nielimitowane odpowiedzi dziennie (przywilej wspierającego)",
-      "tierBonus": "Poziom {{tier}} - rozszerzony dzienny limit AI",
+      "tierBonus": "Poziom {{tier}} — rozszerzony dzienny limit AI",
       "limitReachedTitle": "Osiągnięto dzienny limit AI",
       "limitReachedBody": "Wykorzystałeś darmowe odpowiedzi na dziś. Wspierający otrzymują więcej rozmów z towarzyszem każdego dnia.",
       "upgradeCta": "Odblokuj więcej odpowiedzi"
@@ -748,7 +748,7 @@
     "pillHope": "Wydobądź nadzieję z tego wersetu",
     "templatePrayer": "Zamień {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" w krótką modlitwę, którą mogę wypowiedzieć teraz.",
     "templateHope": "Wydobądź nadzieję, pocieszenie i zachętę z {{bookName}} {{chapter}}:{{verse}} - \"{{text}}\" dla osoby, która dziś potrzebuje siły.",
-    "chapterReflectionStarter": "Pomóż mi rozważyć rozdział, który właśnie przeczytałem. Pokaż główny temat, jedno uczciwe pytanie do zabrania ze sobą i jeden następny krok modlitwy albo posłuszeństwa."
+    "chapterReflectionStarter": "Pomóż mi rozważyć rozdział, który właśnie przeczytałem. Pokaż główny temat, jedno szczere pytanie do przemyślenia i kolejny krok modlitwy lub posłuszeństwa."
   },
   "workspace": {
     "title": "Notatki",
@@ -878,33 +878,33 @@
     "readerFontHint": "Reguluje rozmiar tekstu wersetów w czytniku.",
     "currentFontSize": "Aktualny rozmiar: {{size}} px",
     "currentSize": "Aktualny rozmiar: {{size}} px",
-    "immersiveMode": "Tryb immersyjny: {{state}}",
-    "immersiveReading": "Czytanie immersyjne",
-    "immersiveHint": "Ukryj pasek podczas czytania. Przełącz z paska czytnika lub poniżej.",
-    "immersiveOn": "Tryb immersyjny: wł.",
-    "immersiveOff": "Tryb immersyjny: wył.",
+    "immersiveMode": "Głębokie skupienie: {{state}}",
+    "immersiveReading": "Głębokie skupienie",
+    "immersiveHint": "Ukryj elementy interfejsu podczas czytania, aby w pełni skupić się na tekście Pisma.",
+    "immersiveOn": "Głębokie skupienie: włączone",
+    "immersiveOff": "Głębokie skupienie: wyłączone",
     "language": "Język",
     "privacyPolicy": "Polityka prywatności",
-    "privacyPolicyHint": "Zobacz, jak Biblia AI chroni dane i z jakich usług korzysta.",
-    "privacyPolicyView": "Otwórz politykę",
+    "privacyPolicyHint": "Przeczytaj naszą politykę prywatności, aby dowiedzieć się, jak chronimy Twoje dane i jakie usługi są wykorzystywane.",
+    "privacyPolicyView": "Otwórz politykę prywatności",
     "languageHint": "Wybierz język interfejsu aplikacji.",
     "languagePl": "Polski",
     "languageEn": "Angielski",
-    "aiService": "Usługa AI",
-    "aiCompanionStatus": "Status Asystenta AI",
-    "aiCompanionHint": "Dzienny limit wiadomości i reset czatu. Odpowiedzi na żywo korzystają ze skonfigurowanego klucza API.",
-    "aiServiceHint": "Diagnostyka konfiguracji dostawcy LLM na żywo.",
+    "aiService": "Asystent modlitewny",
+    "aiCompanionStatus": "Status Asystenta",
+    "aiCompanionHint": "Dzienny limit wiadomości i reset czatu. Odpowiedzi korzystają ze skrzydeł chmury.",
+    "aiServiceHint": "Informacje o konfiguracji i statusie Asystenta.",
     "advanced": "Zaawansowane",
-    "advancedHint": "Status AI, synchronizacja w chmurze i więcej.",
+    "advancedHint": "Status Asystenta, synchronizacja i więcej.",
     "basic": "Podstawowe",
-    "aiStatusConfigured": "Status: klucz API skonfigurowany",
-    "aiStatusMissing": "Status: brak klucza API",
-    "aiHealthChecking": "Trwa sprawdzanie połączenia…",
-    "aiHealthOk": "Połączenie działa poprawnie",
+    "aiStatusConfigured": "Asystent: Działa w chmurze (klucz API)",
+    "aiStatusMissing": "Asystent: Działa lokalnie (tryb offline)",
+    "aiHealthChecking": "Sprawdzanie łączności z siecią…",
+    "aiHealthOk": "Połączenie aktywne",
     "aiHealthError": "Błąd połączenia",
     "aiProviderValue": "Dostawca: {{value}}",
     "aiModelValue": "Model: {{value}}",
-    "aiEndpointValue": "Endpoint: {{value}}",
+    "aiEndpointValue": "Adres usługi: {{value}}",
     "scriptureTranslation": "Tłumaczenie Pisma",
     "scriptureTranslationHint": "Aplikacja zawiera pełną Biblię: Biblia Gdańska 1881 (polski) i King James Version (angielski) — 66 ksiąg w każdym języku.",
     "translation": {
@@ -931,7 +931,7 @@
     "notificationsHint": "Otrzymuj codzienne przypomnienie o czytaniu Pisma.",
     "notificationsBenefits": "Poranne przypomnienie pomaga zacząć misje dnia. Wieczorem — dodatkowy sygnał, jeśli jeszcze ich nie ukończyłeś.",
     "notificationsBody": "Czas na dzisiejsze misje — otwórz Biblia AI i utrzymaj streak.",
-    "notificationsExpoGoNote": "Zaplanowane powiadomienia działają w buildzie deweloperskim lub ze sklepu. W Expo Go możesz ustawić preferencje — zadziałają po instalacji pełnej aplikacji.",
+    "notificationsExpoGoNote": "Uwaga: Codzienne przypomnienia zostaną aktywowane po zainstalowaniu pełnej wersji aplikacji ze sklepu.",
     "pickReminderTime": "Godzina przypomnienia",
     "eveningRescue": "Wieczorny ratunek streaku",
     "eveningRescueHint": "Około 20:30 przypomnimy Ci, jeśli dzisiejsze misje są jeszcze nieukończone.",
@@ -946,7 +946,7 @@
     "appVersion": "Wersja {{version}}",
     "buildNumber": "Build {{build}}",
     "cloudSync": "Synchronizacja w chmurze",
-    "cloudSyncHint": "Podświetlenia, notatki i postęp planów synchronizują się online. W Supabase włącz Anonymous Auth.",
+    "cloudSyncHint": "Podświetlenia, notatki i postęp planów synchronizują się automatycznie po połączeniu z siecią.",
     "lastSyncAt": "Ostatnia synchronizacja: {{time}}",
     "lastSyncNever": "Jeszcze nie zsynchronizowano (offline lub pierwsze uruchomienie).",
     "ecosystem": "Nasze aplikacje",
@@ -961,7 +961,11 @@
     "clearLibraryTitle": "Usunąć lokalną bazę Pisma?",
     "clearLibraryMessage": "To trwale usuwa wszystkie zaimportowane księgi, rozdziały i wersety z tego urządzenia. Zakładki i historia czytania pozostają, ale mogą wskazywać brakujący tekst. Aplikacja ponownie zaimportuje bibliotekę z paczki przy następnym uruchomieniu. Tej operacji nie można cofnąć.",
     "clearLibraryConfirm": "Usuń bibliotekę",
-    "clearLibrarySuccess": "Biblioteka wyczyszczona. Uruchom ponownie aplikację lub odśwież ekran główny, aby ponownie zaimportować Pismo."
+    "clearLibrarySuccess": "Biblioteka wyczyszczona. Uruchom ponownie aplikację lub odśwież ekran główny, aby ponownie zaimportować Pismo.",
+    "dataPortability": "Eksport dziennika duchowego",
+    "dataPortabilityHint": "Pobierz pełną kopię zapasową swoich notatek teologicznych, zakładek i podświetleń w formacie Markdown (RODO Art. 20).",
+    "dataPortabilityAction": "Eksportuj dziennik",
+    "dataPortabilitySuccess": "Dziennik duchowy został wyeksportowany pomyślnie."
   },
   "languageSwitcher": {
     "pl": "PL",
@@ -1401,11 +1405,11 @@
     }
   },
   "practices": {
-    "hubTitle": "Hub duchowych praktyk",
+    "hubTitle": "Praktyki duchowe",
     "hubSubtitle": "Wybierz praktykę, która najlepiej pasuje do Twojego serca dziś.",
     "hubIntroTitle": "Jedno miejsce dla wszystkich praktyk",
     "hubIntroBody": "Zacznij od postu, przejdź Drogę Krzyżową albo odmawiaj różaniec w spokojnym rytmie dziesiątek.",
-    "hubTileTitle": "Hub praktyk",
+    "hubTileTitle": "Praktyki duchowe",
     "hubTileSub": "Post, Droga Krzyżowa lub różaniec",
     "meta": "{{steps}} kroków · ~{{minutes}} min",
     "streak": "Seria: {{count}} dni",
@@ -1472,11 +1476,11 @@
     }
   },
   "devotionals": {
-    "title": "Hub duchowych praktyk",
+    "title": "Praktyki duchowe",
     "subtitle": "Wybierz praktykę, która najlepiej pasuje do Twojego serca dziś.",
     "introTitle": "Jedno miejsce dla wszystkich praktyk",
     "introBody": "Zacznij od postu, przejdź Drogę Krzyżową albo odmawiaj różaniec w spokojnym rytmie dziesiątek.",
-    "hubTileTitle": "Hub praktyk",
+    "hubTileTitle": "Praktyki duchowe",
     "hubTileSub": "Wybierz post, Drogę Krzyżową lub różaniec",
     "fastingTitle": "40-dniowy post",
     "fastingSub": "Skupione oddanie i modlitwa",
@@ -1488,6 +1492,22 @@
   "stations": {
     "title": "Droga Krzyżowa",
     "subtitle": "Prowadzona ścieżka modlitwy, cierpienia i wytrwałej nadziei.",
+    "items": {
+      "station1": { "title": "Stacja I: Pan Jezus na śmierć skazany" },
+      "station2": { "title": "Stacja II: Pan Jezus bierze krzyż na swoje ramiona" },
+      "station3": { "title": "Stacja III: Pan Jezus upada pod krzyżem po raz pierwszy" },
+      "station4": { "title": "Stacja IV: Pan Jezus spotyka swą Matkę" },
+      "station5": { "title": "Stacja V: Szymon z Cyreny pomaga nieść krzyż Jezusowi" },
+      "station6": { "title": "Stacja VI: Święta Weronika ociera twarz Jezusowi" },
+      "station7": { "title": "Stacja VII: Pan Jezus upada pod krzyżem po raz drugi" },
+      "station8": { "title": "Stacja VIII: Pan Jezus pociesza płaczące niewiasty" },
+      "station9": { "title": "Stacja IX: Pan Jezus upada pod krzyżem po raz trzeci" },
+      "station10": { "title": "Stacja X: Pan Jezus z szat obnażony" },
+      "station11": { "title": "Stacja XI: Pan Jezus do krzyża przybity" },
+      "station12": { "title": "Stacja XII: Pan Jezus umiera na krzyżu" },
+      "station13": { "title": "Stacja XIII: Pan Jezus z krzyża zdjęty" },
+      "station14": { "title": "Stacja XIV: Pan Jezus do grobu złożony" }
+    },
     "startJourney": "Rozpocznij drogę",
     "notStartedTitle": "Rozpocznij Drogę Krzyżową",
     "notStartedBody": "Przechodź przez kolejne stacje powoli. Czytaj kotwice, zatrzymaj się przy refleksji i pozwól, aby modlitwa dotknęła Twojego życia.",
@@ -1498,8 +1518,8 @@
     "verseSectionTitle": "Kotwice Pisma",
     "reflectionSectionTitle": "Refleksja",
     "prayerSectionTitle": "Wskazówka do modlitwy",
-    "reflectionBody": "Niech ta stacja przypomina Ci, że Jezus spotyka Cię w bólu, presji i słabości. Zostań przy {{station}} i zobacz, gdzie Bóg mówi do Twojej historii.",
-    "prayerBody": "Panie, w {{station}} ucz mnie trwać przy Tobie zamiast uciekać. Daj mi odwagę, współczucie i spokojne serce.",
+    "reflectionBody": "Zatrzymaj się przy tej stacji: {{station}}. Niech przypomina Ci ona, że Jezus towarzyszy Ci w każdym cierpieniu, presji i słabości. Zobacz, w którym miejscu Bóg dotyka dziś Twojej własnej historii.",
+    "prayerBody": "Panie, rozważając tę stację: {{station}} – naucz mnie trwać przy Tobie zamiast uciekać. Daj mi odwagę, współczucie i spokojne serce.",
     "markDone": "Oznacz stację jako ukończoną",
     "alreadyDone": "Stacja ukończona",
     "resetJourney": "Zresetuj drogę",
@@ -1512,22 +1532,70 @@
   "rosary": {
     "title": "Różaniec",
     "subtitle": "Spokojny rytm dziesiątek przez tajemnicę, Pismo i modlitwę.",
+    "sets": {
+      "joyful": {
+        "title": "Tajemnice radosne",
+        "subtitle": "Droga pokory, posłuszeństwa i cichej radości."
+      },
+      "luminous": {
+        "title": "Tajemnice światła",
+        "subtitle": "Droga objawienia, misji i światłości Chrystusa."
+      },
+      "sorrowful": {
+        "title": "Tajemnice bolesne",
+        "subtitle": "Droga oddania przez cierpienie, stratę i odkupienie."
+      },
+      "glorious": {
+        "title": "Tajemnice chwalebne",
+        "subtitle": "Droga nadziei, zwycięstwa i nowego stworzenia."
+      }
+    },
+    "mysteries": {
+      "joyful": {
+        "annunciation": "Zwiastowanie Najświętszej Maryi Pannie",
+        "visitation": "Nawiedzenie św. Elżbiety",
+        "nativity": "Narodzenie Pana Jezusa",
+        "presentation": "Ofiarowanie Pana Jezusa w Świątyni",
+        "findingInTemple": "Odnalezienie Pana Jezusa w Świątyni"
+      },
+      "luminous": {
+        "baptism": "Chrzest Pana Jezusa w Jordanie",
+        "cana": "Objawienie się Pana Jezusa na weselu w Kanie",
+        "proclamation": "Głoszenie Królestwa Bożego i wzywanie do nawrócenia",
+        "transfiguration": "Przemienienie Pana Jezusa na górze Tabor",
+        "eucharist": "Ustanowienie Najświętszego Sakramentu"
+      },
+      "sorrowful": {
+        "agony": "Modlitwa Pana Jezusa w Ogrójcu",
+        "scourging": "Biczowanie Pana Jezusa",
+        "crowning": "Cierniem ukoronowanie Pana Jezusa",
+        "carrying": "Droga Krzyżowa Pana Jezusa",
+        "crucifixion": "Śmierć Pana Jezusa na krzyżu"
+      },
+      "glorious": {
+        "resurrection": "Zmartwychwstanie Pana Jezusa",
+        "ascension": "Wniebowstąpienie Pana Jezusa",
+        "descent": "Zesłanie Ducha Świętego",
+        "assumption": "Wniebowzięcie Najświętszej Maryi Panny",
+        "coronation": "Ukoronowanie Najświętszej Maryi Panny na Królową nieba i ziemi"
+      }
+    },
     "startJourney": "Rozpocznij różaniec",
     "notStartedTitle": "Wybierz zestaw tajemnic",
     "notStartedBody": "Wybierz zestaw na dziś, a potem rozpocznij pięciodziesiątkowy rytm modlitwy.",
     "setLabel": "Zestaw: {{set}}",
     "decadeLabel": "Dziesiątka {{current}} z {{total}}",
-    "beadCountLabel": "Odmawiane pacierze: {{count}} / {{total}}",
+    "beadCountLabel": "Koraliki: {{count}} / {{total}}",
     "progressLabel": "Ukończono {{percent}}%",
     "chooseSetTitle": "Wybierz zestaw",
     "chooseSetBody": "Radosne, Światła, Bolesne albo Chwalebne — wybierz zestaw pasujący do chwili modlitwy.",
     "verseSectionTitle": "Kotwice Pisma",
     "meditationSectionTitle": "Medytacja",
     "prayerSectionTitle": "Wskazówka do modlitwy",
-    "mysteryPrompt": "Zostań przy tajemnicy {{mystery}} i pozwól, aby kształtowała Twoją modlitwę.",
-    "meditationBody": "Trzymaj {{mystery}} powoli. Zauważ jedno słowo, jeden obraz i jedno zaproszenie dla swojego życia dziś.",
-    "prayerBody": "Panie, przez tajemnicę {{mystery}} kieruj moją uwagę ku Chrystusowi i ucz mnie modlić się z ufnością i czułością.",
-    "countBead": "Odmów jedną pacierzę",
+    "mysteryPrompt": "Zatrzymaj się przy rozważaniu tej tajemnicy: {{mystery}} i pozwól, aby kształtowała Twoją dzisiejszą modlitwę.",
+    "meditationBody": "Rozważaj tę tajemnicę: {{mystery}}. Zatrzymaj się i pozwól Słowu zapuścić korzenie w Twoim sercu. Zauważ jedno słowo, jeden obraz i jedno zaproszenie dla swojego życia na dziś.",
+    "prayerBody": "Panie, rozważając tę tajemnicę: {{mystery}} – kieruj moje serce i myśli ku Chrystusowi. Ucz mnie modlić się z głęboką ufnością i czułością.",
+    "countBead": "Przesuń koralik",
     "resetJourney": "Zresetuj różaniec",
     "resetConfirmTitle": "Zresetować różaniec?",
     "resetConfirmBody": "To usunie wybrany zestaw i bieżący rytm dziesiątek.",
@@ -1610,7 +1678,7 @@
     "chooseAmount": "Wybierz kwotę",
     "chooseAmountHint": "Każdy próg odblokowuje rangę darczyńcy na Twoim profilu.",
     "perks": {
-      "aiUnlimited": "Nielimitowane odpowiedzi Towarzysza AI",
+      "aiUnlimited": "Nielimitowane odpowiedzi Towarzysza AI dziennie",
       "aiQuota": "{{count}} odpowiedzi Towarzysza AI dziennie"
     },
     "amountPln": "{{amount}} zł",
@@ -1627,7 +1695,7 @@
         "purchaseFailed": "Zakup nie powiódł się. Spróbuj ponownie.",
         "verifyFailed": "Płatność otrzymana, ale nie udało się jej zweryfikować. Skontaktuj się z nami, jeśli pobrano opłatę.",
         "unknownProduct": "Nieznany produkt. Skontaktuj się z nami, jeśli pobrano opłatę.",
-        "billingUnavailable": "Google Play Billing jest niedostępny na tym urządzeniu. Sprawdź logowanie w Sklepie Play i spróbuj ponownie.",
+        "billingUnavailable": "Płatności Sklepu Play są niedostępne na tym urządzeniu. Sprawdź logowanie na swoim koncie Google i spróbuj ponownie.",
         "pending": "Płatność oczekuje. Ranga darczyńcy odblokuje się po potwierdzeniu przez Google Play.",
         "alreadyOwned": "Poprzedni datek jest jeszcze przetwarzany. Kończymy go — spróbuj ponownie za chwilę."
       }
@@ -1654,7 +1722,7 @@
   },
   "audio": {
     "nowPlaying": "Teraz odtwarzane: {{reference}}",
-    "play": "Odtwórz rozdział",
+    "play": "Odtwórz",
     "pause": "Pauza",
     "previousChapter": "Poprzedni rozdział",
     "nextChapter": "Następny rozdział",
@@ -1662,16 +1730,16 @@
     "chapterSpoken": "Rozdział {{chapter}} Księgi {{book}}."
   },
   "review": {
-    "title": "Powtórki wersetów",
-    "subtitle": "Powtarzaj wersety zapisane w zakładkach i podświetleniach.",
-    "loading": "Przygotowuję talię powtórek...",
-    "emptyTitle": "Nie ma jeszcze wersetów do powtórki",
-    "emptyBody": "Dodaj zakładkę albo podświetlenie w czytniku, a werset stanie się tutaj fiszką.",
+    "title": "Powtórka wersetów",
+    "subtitle": "Powtarzaj wersety zapisane w zakładkach i wyróżnieniach.",
+    "loading": "Przygotowywanie talii powtórek...",
+    "emptyTitle": "Brak wersetów do powtórki",
+    "emptyBody": "Dodaj do zakładek lub wyróżnij wersety w czytniku, a pojawią się tutaj jako fiszki.",
     "openWorkspace": "Otwórz zapisane wersety",
     "progress": "{{current}} / {{total}}",
     "sourceBookmark": "Zakładka",
-    "sourceHighlight": "Podświetlenie",
-    "hiddenHint": "Stuknij, aby odkryć werset.",
+    "sourceHighlight": "Wyróżnienie",
+    "hiddenHint": "Dotknij, aby odkryć werset.",
     "cardRevealed": "Werset odkryty",
     "reveal": "Odkryj",
     "reviewLater": "Powtórz później",
@@ -1679,9 +1747,9 @@
     "openInReader": "Otwórz w czytniku"
   },
   "ad": {
-    "sponsorLabel": "REKLAMA",
+    "sponsorLabel": "SPONSOROWANE",
     "fallbackTitle": "Miejsce na reklamę niedostępne",
-    "fallbackBody": "Prawdziwe bannery AdMob renderują się w buildzie dev, preview albo sklepowym z modułem natywnym."
+    "fallbackBody": "W tym miejscu pojawi się sponsorowany werset lub przesłanie."
   },
   "donorTier": {
     "supporter": "Wspierający",

@@ -14,6 +14,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { captureRef } from "react-native-view-shot";
 import { shareVerse } from "@/services/share/shareVerse";
+import { ShareVerseCard } from "@/components/dashboard/ShareVerseCard";
+import { captureVerseStory } from "@/services/share/verseImageExporter";
 import { getVerseOfTheDay } from "@/services/db/scriptureRepository";
 import { getUserStats } from "@/services/stats/userStats";
 import {
@@ -57,6 +59,7 @@ export function VotdFeedCard({ onVerse }: VotdFeedCardProps) {
   const translation = useActiveTranslation(locale);
   const router = useRouter();
   const cardRef = useRef<View>(null);
+  const shareRef = useRef<View>(null);
 
   const [verse, setVerse] = useState<VerseWithReference | null>(null);
   const [streak, setStreak] = useState(0);
@@ -179,11 +182,9 @@ export function VotdFeedCard({ onVerse }: VotdFeedCardProps) {
       );
       let imageUri: string | null = null;
       try {
-        if (cardRef.current) {
-          imageUri = await captureRef(cardRef, { format: "png", quality: 0.95 });
-        }
-      } catch {
-        // image optional — text share still works offline
+        imageUri = await captureVerseStory(shareRef);
+      } catch (err) {
+        console.warn("Failed to capture verse image story:", err);
       }
       await shareVerse(
         {
@@ -314,6 +315,14 @@ export function VotdFeedCard({ onVerse }: VotdFeedCardProps) {
         onClose={() => setCommentsOpen(false)}
         onCountChange={setCommentCount}
       />
+
+      <View style={styles.offscreen} pointerEvents="none">
+        <ShareVerseCard
+          ref={shareRef}
+          reference={reference}
+          text={verse.text}
+        />
+      </View>
     </View>
   );
 }
@@ -424,4 +433,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   statTextMet: { color: colors.success },
+  offscreen: {
+    position: "absolute",
+    left: -9999,
+    top: 0,
+    opacity: 0,
+  },
 });

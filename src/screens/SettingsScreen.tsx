@@ -32,6 +32,7 @@ import { EcosystemModal } from "@/components/EcosystemModal";
 import { InviteFriendsCard } from "@/components/InviteFriendsCard";
 import { DonorTierBadge } from "@/components/donation/DonorTierBadge";
 import { useDonorStore } from "@/store/donorStore";
+import { exportSpiritualJournal } from "@/services/share/dataPortabilityService";
 
 export default function SettingsScreen() {
   const { t } = useAppTranslation();
@@ -58,6 +59,7 @@ export default function SettingsScreen() {
   const [dailyGoal, setDailyGoalState] = useState(1);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [ecosystemVisible, setEcosystemVisible] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     syncDailyQuota();
@@ -227,8 +229,25 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const handleExportJournal = async () => {
+    setExporting(true);
+    try {
+      const success = await exportSpiritualJournal(locale as "en" | "pl");
+      if (success) {
+        Alert.alert(t("common.success"), t("settings.dataPortabilitySuccess"));
+      } else {
+        Alert.alert(t("errors.somethingWrong"), t("errors.generic"));
+      }
+    } catch (err) {
+      console.warn("Failed to export spiritual journal:", err);
+      Alert.alert(t("errors.somethingWrong"), t("errors.generic"));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleOpenPrivacyPolicy = useCallback(async () => {
-    const url = process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL || "https://biblia-asystent-privacy.surge.sh/privacy-policy.html";
+    const url = process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL || "https://biblia-ai-sandy.vercel.app";
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {
@@ -464,16 +483,20 @@ export default function SettingsScreen() {
 
               {hasApiKey ? (
                 <View style={styles.aiDetails}>
-                  <Text style={styles.aiDetailText}>
-                    {t("settings.aiProviderValue", { value: provider })}
-                  </Text>
-                  <Text style={styles.aiDetailText}>
-                    {t("settings.aiModelValue", { value: model })}
-                  </Text>
-                  {endpoint ? (
-                    <Text style={styles.aiDetailText} numberOfLines={1}>
-                      {t("settings.aiEndpointValue", { value: endpoint })}
-                    </Text>
+                  {false ? (
+                    <>
+                      <Text style={styles.aiDetailText}>
+                        {t("settings.aiProviderValue", { value: provider })}
+                      </Text>
+                      <Text style={styles.aiDetailText}>
+                        {t("settings.aiModelValue", { value: model })}
+                      </Text>
+                      {endpoint ? (
+                        <Text style={styles.aiDetailText} numberOfLines={1}>
+                          {t("settings.aiEndpointValue", { value: endpoint })}
+                        </Text>
+                      ) : null}
+                    </>
                   ) : null}
 
                   <View style={styles.healthRow}>
@@ -539,6 +562,28 @@ export default function SettingsScreen() {
           <GlassCard style={styles.nestedCard}>
             <Text style={styles.sectionTitle}>{t("settings.appearance")}</Text>
             <Text style={styles.note}>{t("settings.appearanceNote")}</Text>
+          </GlassCard>
+
+          <GlassCard style={styles.nestedCard}>
+            <Text style={styles.sectionTitle}>{t("settings.dataPortability")}</Text>
+            <Text style={styles.hint}>{t("settings.dataPortabilityHint")}</Text>
+            <Pressable
+              onPress={() => void handleExportJournal()}
+              disabled={exporting}
+              style={styles.ecosystemButton}
+              accessibilityRole="button"
+              accessibilityLabel={t("settings.dataPortabilityAction")}
+            >
+              <Ionicons
+                name={exporting ? "hourglass-outline" : "download-outline"}
+                size={16}
+                color={colors.accent}
+                style={{ marginRight: 6 }}
+              />
+              <Text style={styles.ecosystemButtonText}>
+                {exporting ? t("common.loading") : t("settings.dataPortabilityAction")}
+              </Text>
+            </Pressable>
           </GlassCard>
 
           <GlassCard style={styles.nestedCard}>

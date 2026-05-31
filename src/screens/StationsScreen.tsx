@@ -184,7 +184,7 @@ export default function StationsScreen() {
 
           {currentStation ? (
             <GlassCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{currentStation.title}</Text>
+              <Text style={styles.sectionTitle}>{t(currentStation.titleKey as any)}</Text>
               <Text style={styles.sectionSubtitle}>{t("stations.currentStationHint")}</Text>
             </GlassCard>
           ) : null}
@@ -216,14 +216,14 @@ export default function StationsScreen() {
           {currentStation ? (
             <GlassCard style={styles.card}>
               <Text style={styles.sectionTitle}>{t("stations.reflectionSectionTitle")}</Text>
-              <Text style={styles.practiceText}>{t("stations.reflectionBody", { station: currentStation.title })}</Text>
+              <Text style={styles.practiceText}>{t("stations.reflectionBody", { station: t(currentStation.titleKey as any) })}</Text>
             </GlassCard>
           ) : null}
 
           {currentStation ? (
             <GlassCard style={styles.card}>
               <Text style={styles.sectionTitle}>{t("stations.prayerSectionTitle")}</Text>
-              <Text style={styles.practiceText}>{t("stations.prayerBody", { station: currentStation.title })}</Text>
+              <Text style={styles.practiceText}>{t("stations.prayerBody", { station: t(currentStation.titleKey as any) })}</Text>
             </GlassCard>
           ) : null}
 

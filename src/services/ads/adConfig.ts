@@ -55,3 +55,26 @@ export function getCoreInterstitialUnitId(): string {
 
   return TEST_INTERSTITIAL_ID;
 }
+
+export async function requestAdsConsentIfNeeded(): Promise<void> {
+  if (!canServeAdMob()) {
+    return;
+  }
+
+  try {
+    const ads = require("react-native-google-mobile-ads");
+    if (ads && ads.AdsConsent) {
+      console.log("[AdConsent] Requesting consent info update...");
+      const consentInfo = await ads.AdsConsent.requestInfoUpdate();
+      
+      if (consentInfo.isConsentFormAvailable && consentInfo.status === "REQUIRED") {
+        console.log("[AdConsent] Consent is required, presenting UMP form...");
+        await ads.AdsConsent.showForm();
+      } else {
+        console.log("[AdConsent] Consent check passed or not required. Status:", consentInfo.status);
+      }
+    }
+  } catch (err) {
+    console.warn("[AdConsent] Failed to run UMP consent check:", err);
+  }
+}

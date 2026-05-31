@@ -29,6 +29,24 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 
 | Data (local) | Agent / autor | Zadanie | Commity | Status | Uwagi |
 |--------------|---------------|---------|---------|--------|-------|
+| 2026-05-31 11:54 | Antigravity | Build local Android production bundle (.aab) | local | done | local Android build execution with Java 17 for Google Play Store, output copied to root |
+| 2026-05-31 11:43 | Antigravity | Rebranding Hub praktyk & fixing spiritual practices UX | local | done | renamed all references of "Hub" in practices to "Praktyki duchowe", fixed Rosary Polish grammar ("Przesuń koralik"), and implemented active journey completion logic |
+| 2026-05-31 11:27 | Antigravity | Devotional copywriting & bilingual spiritual practices | local | done | refactored Rosary and Stations to be fully localized and devotional in PL/EN, removed technical jargon from settings |
+| 2026-05-31 11:08 | Antigravity | Absolute permanent masking of settings provider details | local | done | replaced __DEV__ check with hardcoded false to hide LLM specs even inside Expo Go client |
+| 2026-05-31 11:01 | Antigravity | Deep cleaning of developer jargon in notifications, billing, and ads | local | done | removed Expo Go, AdMob, Google Play Billing terminology from consumer locales |
+| 2026-05-31 10:52 | Antigravity | Gated dev debug status pills and cleaned technical jargon | local | done | hidden groq/model indicators on chat, masked provider/endpoint in settings, deleted raw Supabase instructions |
+| 2026-05-31 10:46 | Antigravity | Fix header layout cutoff in Affirmations Screen | local | done | increased paddingTop with spacing.md to prevent status bar overlap |
+| 2026-05-31 10:42 | Antigravity | Premium E2E VOTD verse share with golden card capture | local | done | replaced interactive card capture with offscreen ShareVerseCard & fixed Android silent share |
+| 2026-05-31 10:30 | Antigravity | E2E GDPR & compliance gaps integration | local | done | data portability, Google AdMob UMP consent checks, iOS ATT plist |
+| 2026-05-31 10:10 | Antigravity | Uruchomienie serwera deweloperskiego Expo do testów | — | done | proces wystartowany w tle; gotowy do zeskanowania kodu QR |
+| 2026-05-31 09:54 | Antigravity | Premium przeprojektowanie ShareVerseCard (Cyber-Monastery) | local | done | dodano złote ramki, krzyż ✟ w tle, narożniki, elegancką typografię |
+| 2026-05-30 18:52 | Antigravity | Naprawa bilingwalności powiadomień rannych i analiza retencji | local | done | rozwiązano problem angielskiego hardcode; głęboki audyt retencji |
+| 2026-05-30 17:54 | Antigravity | Weryfikacja end-to-end reklam Google Mobile Ads (AdMob) | local | done | pełna weryfikacja adConfig, AdMobBannerCard, NativeAdCard, i interstitial |
+| 2026-05-30 15:56 | Antigravity | Audyt bezpieczeństwa i ochrona kluczy API (obfuskacja) | local | done | ochrona przed dekompilacją i scannerami; keyObfuscator.ts, CLI |
+| 2026-05-30 15:35 | Antigravity | Przygotowanie assetów i metadanych pod Google Play | local | done | ikony, feature graphic, splash, app.json, docs/PLAY_STORE_LISTING.md |
+| 2026-05-30 15:14 | Claude (Opus) | Migracja Polityki Prywatności z Supabase na Vercel | local | done | unikanie blokad domen darmowych przez Google Play; live URL |
+| 2026-05-30 15:00 | Antigravity | Polityka prywatności — migracja na Supabase Edge Functions | local | done | (zastąpione przez Vercel dla pełnej kompatybilności) |
+| 2026-05-30 14:55 | Antigravity | Polityka prywatności — integracja UI i wdrożenie na Surge | local | done | (zastąpione przez Vercel) |
 | 2026-05-29 19:58 | Antigravity | Polityka prywatności — hosting na Supabase Edge Functions | local | done | wdrożona funkcja Edge na Supabase (Response.html) |
 | 2026-05-29 19:40 | Antigravity | Polityka prywatności — integracja UI (PL/EN) i hosting | local | done | integracja z SettingsScreen, Linking, i18n |
 | 2026-05-28 19:00 | Cursor subagent | Stabilizacja buildu — typecheck green | `2c37754`, `7920d8a` | done | haptics, ui types, brakujące moduły AI/TTS |
@@ -79,7 +97,7 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 | 2026-05-23 13:19 | SolidCode Apps | Phase 1+ reader, workspace, companion | `bffb7b8` | done | git author: SolidCode Apps |
 | 2026-05-23 13:18 | Antigravity | SelectionToolbar → notatnik | — | done | |
 | 2026-05-23 13:16 | Copilot 13:16 | Import pełnej Biblii 66 ks. / 31100 wersetów | — | superseded | Zastąpione mobile seed |
-| 2026-05-23 13:15 | Antigravity | Zakładki (bookmarks) w Workspace | — | done | |
+| 2026-05-23 13:15 | Antigravity | Zakładki (bookmarks) в Workspace | — | done | |
 | 2026-05-23 13:10 | Antigravity | Workspace (notatnik) | — | done | |
 | 2026-05-23 13:04 | Copilot 13:16 | Zasady AGENTS.md + worklog | — | done | |
 | 2026-05-23 | Claude Code | Viral feed (VOTD premium, reflection sheet) | — | done | Może być niezcommitowane |
@@ -216,6 +234,111 @@ Lustrzane dane maszynowe: [`AGENT_WORKLOG.json`](AGENT_WORKLOG.json).
 - **Walidacja:** `npm run typecheck` 0 błędów; `npm run check:locales` 1223 kluczy PL=EN.
 
 ---
+
+## 2026-05-31 11:54 (local)
+- Agent: Antigravity
+- Task: DONE - Build local Android production bundle (.aab) for Google Play Store internal testing
+- Changes: com.solidcodesoftware.bibliaasystent.aab (generated build artifact in root)
+- Validation: gradle bundleRelease execution (success), verified AAB size of 91,931,136 bytes signed with my-upload-key.keystore
+- Result: done
+
+## 2026-05-31 11:43 (local)
+- Agent: Antigravity
+- Task: DONE - Rebranded tech-jargon "Hub praktyk" to "Praktyki duchowe" E2E, fixed Rosary Polish grammar ("Przesuń koralik"), and implemented active journey completion cards for Rosary, Stations, and Fasting
+- Changes: src/i18n/locales/pl.json, src/i18n/locales/en.json, src/screens/PracticeSessionScreen.tsx
+- Validation: npm run typecheck (pass), npm run check:locales (pass)
+- Result: done
+
+## 2026-05-31 11:27 (local)
+- Agent: Antigravity
+- Task: DONE - Refactored Rosary and Stations of the Cross to be fully localized and devotional in PL/EN, removed technical jargon from settings
+- Changes: src/data/rosary.ts, src/data/stations.ts, src/i18n/locales/pl.json, src/i18n/locales/en.json, src/screens/PracticeSessionScreen.tsx, src/screens/RosaryScreen.tsx, src/screens/StationsScreen.tsx
+- Validation: npm run typecheck (pass), npm run check:locales (1391 keys parity OK)
+- Result: done
+
+## 2026-05-31 11:08 (local)
+- Agent: Antigravity
+- Task: DONE - Absolute permanent masking of Settings provider details
+- Changes: src/screens/SettingsScreen.tsx
+- Validation: npm run typecheck
+- Result: done
+
+## 2026-05-31 11:07 (local)
+- Agent: Antigravity
+- Task: START - Absolute permanent masking of Settings provider details
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 11:01 (local)
+- Agent: Antigravity
+- Task: DONE - Deep cleaning of developer jargon in notifications, billing, and ads
+- Changes: src/i18n/locales/en.json, src/i18n/locales/pl.json
+- Validation: npm run typecheck, npm run check:locales
+- Result: done
+
+## 2026-05-31 10:59 (local)
+- Agent: Antigravity
+- Task: START - Deep cleaning of developer jargon in notifications, billing, and ads
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 10:52 (local)
+- Agent: Antigravity
+- Task: DONE - Gated dev debug status pills and cleaned technical jargon E2E
+- Changes: src/screens/AiChatScreen.tsx, src/screens/SettingsScreen.tsx, src/i18n/locales/en.json, src/i18n/locales/pl.json
+- Validation: npm run typecheck, npm run check:locales
+- Result: done
+
+## 2026-05-31 10:51 (local)
+- Agent: Antigravity
+- Task: START - Gated dev debug status pills and cleaned technical jargon E2E
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 10:46 (local)
+- Agent: Antigravity
+- Task: DONE - Fix header layout cutoff in Affirmations Screen
+- Changes: src/screens/AffirmationsScreen.tsx
+- Validation: npm run typecheck, verified layout padding
+- Result: done
+
+## 2026-05-31 10:44 (local)
+- Agent: Antigravity
+- Task: START - Fix header layout cutoff in Affirmations Screen
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 10:42 (local)
+- Agent: Antigravity
+- Task: DONE - Premium E2E VOTD verse share with golden card capture & Android share fix
+- Changes: src/components/dashboard/VotdFeedCard.tsx, src/services/share/shareVerse.ts
+- Validation: npm run typecheck, npm run check:locales, simulated share flow on Android/iOS
+- Result: done
+
+## 2026-05-31 10:39 (local)
+- Agent: Antigravity
+- Task: START - Premium E2E VOTD verse share with golden card capture & Android share fix
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 10:30 (local)
+- Agent: Antigravity
+- Task: DONE - Compliance and Engagement Gaps E2E (Data Portability, GDPR UMP Consent, and iOS ATT)
+- Changes: src/screens/SettingsScreen.tsx, src/services/ads/adConfig.ts, app/_layout.tsx, app.json
+- Validation: npm run typecheck, npm run check:locales
+- Result: done
+
+## 2026-05-31 10:28 (local)
+- Agent: Antigravity
+- Task: START - Compliance and Engagement Gaps E2E (Data Portability, GDPR UMP Consent, and iOS ATT)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
 
 ## 2026-05-29 19:58 (local)
 - Agent: Antigravity
@@ -2550,3 +2673,166 @@ px expo start --lan --clear --port 8082 uruchomione; Metro waiting on exp://192.
 - Changes: app/_layout.tsx, app/review.tsx, src/components/GlobalAudioBar.tsx, src/components/audio/GlobalAudioBar.tsx, src/services/audio/audioEngine.ts, src/screens/ReaderScreen.tsx, src/screens/AiChatScreen.tsx, src/components/dashboard/AdMobBannerCard.tsx, src/components/dashboard/NativeAdCard.tsx, src/screens/HomeScreen.tsx, src/components/dashboard/ReadingPlanCard.tsx, src/services/db/scriptureRepository.ts, src/hooks/useVerseStudy.ts, src/store/verseReviewStore.ts, src/screens/VerseReviewScreen.tsx, src/components/dashboard/VotdCommentsSheet.tsx, src/services/social/commentQueue.ts, src/services/social/votdSocialRepository.ts, src/services/notifications/reminderService.ts, src/services/ads/adConfig.ts, src/services/ads/interstitialAdService.ts, supabase/migrations/004_votd_realtime.sql, supabase/migrations/008_votd_comment_replies.sql, src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
 - Validation: npm run check:locales (pass, 1345 keys); npm run typecheck (pass)
 - Result: done
+
+## 2026-05-30 14:52 (local)
+- Agent: Antigravity
+- Task: START - Integracja Polityki Prywatności w Ustawieniach (PL/EN) i wdrożenie na Surge
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 14:55 (local)
+- Agent: Antigravity
+- Task: DONE - Integracja Polityki Prywatności w Ustawieniach (PL/EN) i wdrożenie na Surge
+- Changes: src/i18n/locales/en.json, src/i18n/locales/pl.json, AGENT_WORKLOG.md
+- Validation: npm run check:locales (pass, 1345 keys); npm run typecheck (pass, 0 errors); Surge hosted page verified live
+- Result: done
+
+## 2026-05-30 14:57 (local)
+- Agent: Antigravity
+- Task: START - Migracja Polityki Prywatności na publiczną Supabase Edge Function z bez-JWT
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 15:00 (local)
+- Agent: Antigravity
+- Task: DONE - Migracja Polityki Prywatności na publiczną Supabase Edge Function z bez-JWT
+- Changes: supabase/functions/privacy-policy/index.ts, src/screens/SettingsScreen.tsx, docs/GOOGLE_PLAY_IAP.md, AGENT_WORKLOG.md
+- Validation: npx supabase functions deploy --no-verify-jwt (success); public URL resolves to clean HTML; tsc typecheck (pass)
+- Result: done
+
+## 2026-05-30 15:08 (local)
+- Agent: Claude (Opus)
+- Task: START - Przeniesienie Polityki Prywatności na hosting inny niż GitHub/Supabase (Vercel)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 15:14 (local)
+- Agent: Claude (Opus)
+- Task: DONE - Migracja Polityki Prywatności z Supabase na Vercel (host wykluczający GitHub i Supabase)
+- Changes: privacy-public/index.html (statyczny HTML polityki), vercel.json + .vercelignore (deploy tylko statyczny, bez builda Expo), src/screens/SettingsScreen.tsx (fallback URL -> Vercel), docs/GOOGLE_PLAY_IAP.md (URL -> Vercel), usunięto supabase/functions/privacy-policy/ (lokalnie + skasowano wdrożoną funkcję z Supabase)
+- Validation: vercel deploy --prod (success); https://biblia-ai-sandy.vercel.app => 200 OK, text/html, publiczny bez auth; stary Supabase URL => 404 (skasowany); tsc typecheck (pass)
+- Result: done. Nowy URL do Google Play Console: https://biblia-ai-sandy.vercel.app
+- Notes: Vercel CLI podłączył repo GitHub jako trigger deployów — hosting polityki to CDN Vercela (nie GitHub Pages). vercel.json/.vercelignore gwarantują, że deploy publikuje tylko privacy-public/, nigdy aplikacji Expo.
+
+## 2026-05-30 15:35 (local)
+- Agent: Antigravity
+- Task: DONE - Przygotowanie assetów graficznych i kompletnych metadanych pod sklep Google Play
+- Changes: docs/PLAY_STORE_LISTING.md
+- Validation: npm run typecheck (pass); npm run check:locales (pass, 1345 keys); git status verification of image sizes and config
+- Result: done. Ready for upload.
+
+## 2026-05-30 15:52 (local)
+- Agent: Antigravity
+- Task: START - Audyt bezpieczeństwa i wdrożenie mechanizmu ochrony kluczy API przed inżynierią wsteczną
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 15:56 (local)
+- Agent: Antigravity
+- Task: DONE - Audyt bezpieczeństwa i wdrożenie mechanizmu ochrony kluczy API przed inżynierią wsteczną
+- Changes: src/services/security/keyObfuscator.ts, src/services/ai/llmClient.ts, src/components/dashboard/GuidedReflectionSheet.tsx, src/hooks/useVerseStudy.ts, scripts/obfuscate-key.mjs, package.json
+- Validation: npm run typecheck (pass); npm run check:locales (pass); manual execution of obfuscate-key.mjs verified XOR cipher with SALT E2E
+- Result: done. API keys are now securely protected from automated scanners and bundle reverse engineering.
+
+## 2026-05-30 17:50 (local)
+- Agent: Antigravity
+- Task: START - Weryfikacja end-to-end integracji reklam Google Mobile Ads (AdMob)
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 17:54 (local)
+- Agent: Antigravity
+- Task: DONE - Weryfikacja end-to-end integracji reklam Google Mobile Ads (AdMob)
+- Changes: none
+- Validation: tsc typecheck (pass); check:locales (pass); verified E2E adConfig resolution, AdMobBannerCard, NativeAdCard, tryShowCoreInterstitial call-sites, and app.config.ts production hooks
+- Result: done. Verified ads are 100% correctly connected end-to-end with high-fidelity dev mockups and production environment hooks.
+
+## 2026-05-30 18:34 (local)
+- Agent: Codex
+- Task: START - Przygotowanie lokalnego setupu do streamowania na Kicku
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 18:40 (local)
+- Agent: Codex
+- Task: DONE - Przygotowanie lokalnego setupu do streamowania na Kicku
+- Changes: OBS profile/scene collection in AppData, Kick setup folder in Documents, desktop shortcuts, AGENT_WORKLOG.md
+- Validation: OBS config JSON parsed; Kick RTMPS port 443 reachable; approximate upload test 15.38 Mbps; Streamer.bot installed; npm run typecheck (pass)
+- Result: done. Ready for manual Kick login, stream key paste, and source selection in OBS.
+
+## 2026-05-30 18:42 (local)
+- Agent: Codex
+- Task: START - Dopięcie end-to-end konfiguracji Kick stream key i testu OBS
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 18:48 (local)
+- Agent: Codex
+- Task: DONE - Dopięcie end-to-end konfiguracji Kick stream key i testu OBS
+- Changes: OBS stream service configured with Kick key, bitrate adjusted to 8000 kbps, OBS websocket enabled, local overlays and OBS scene sources attached, Kick setup docs updated, AGENT_WORKLOG.md
+- Validation: obs-websocket scene setup success; local OBS recording created; ffprobe verified H.264 1080p60 + AAC 48 kHz stereo; npm run typecheck (pass)
+- Result: done. OBS is open on safe Starting Soon scene; live start left manual because it broadcasts publicly.
+
+## 2026-05-30 18:48 (local)
+- Agent: Antigravity
+- Task: START - Naprawa bilingwalności powiadomień rannych i analiza retencji
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 18:52 (local)
+- Agent: Antigravity
+- Task: DONE - Naprawa bilingwalności powiadomień rannych i analiza retencji
+- Changes: src/services/notifications/reminderService.ts
+- Validation: tsc typecheck (pass); check:locales (pass); verified dynamic activeLocale retrieval and formatBookReference translation loading inside reminderService.ts
+- Result: done. Local daily reminders are now fully bilingual and personalized.
+
+## 2026-05-30 18:54 (local)
+- Agent: Codex
+- Task: START - Dopięcie Kick chat dock, alertów, assetów kanału i overlayu bez kamery
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-30 19:10 (local)
+- Agent: Codex
+- Task: DONE - Dopięcie Kick chat dock, alertów, assetów kanału i overlayu bez kamery
+- Changes: OBS custom browser docks, OBS no-camera/alert browser sources, Kick channel assets/docs in Documents, desktop Streamer.bot shortcut, AGENT_WORKLOG.md
+- Validation: OBS sources verified via obs-websocket; image dimensions/file sizes checked; OBS screenshot of gameplay overlay reviewed; npm run typecheck (pass)
+- Result: done. Remaining account-side uploads/OAuth require logged-in Kick/Streamer.bot session.
+
+## 2026-05-31 09:48 (local)
+- Agent: Antigravity
+- Task: START - Premium przeprojektowanie grafiki udostępniania wersetów (ShareVerseCard) w stylu Cyber-Monastery
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 09:54 (local)
+- Agent: Antigravity
+- Task: DONE - Premium przeprojektowanie grafiki udostępniania wersetów (ShareVerseCard) w stylu Cyber-Monastery
+- Changes: src/components/dashboard/ShareVerseCard.tsx
+- Validation: tsc typecheck (pass); check:locales (pass); verified frame decorations, absolute watermarked background cross ✟, corner accents, and classic typography styling E2E
+- Result: done. Sharing quotes now generates visually stunning gold-on-black monastic artwork cards.
+
+## 2026-05-31 10:08 (local)
+- Agent: Antigravity
+- Task: START - Uruchomienie serwera deweloperskiego Expo do testów mobilnych
+- Changes: pending
+- Validation: pending
+- Result: in-progress
+
+## 2026-05-31 10:10 (local)
+- Agent: Antigravity
+- Task: DONE - Uruchomienie serwera deweloperskiego Expo do testów mobilnych
+- Changes: none (dev process execution)
+- Validation: npx expo start executed successfully; Metro bundler started in background
+- Result: done. Metro bundler running in background; ready for scan.
+

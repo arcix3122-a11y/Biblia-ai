@@ -28,6 +28,7 @@ import { useSeedProgressStore } from "@/store/seedProgressStore";
 import { useYearPlanStore } from "@/store/yearPlanStore";
 import { scheduleDailyReminder, requestNotificationPermission, updateEveningRescueStatus } from "@/services/notifications/reminderService";
 import { colors } from "@/theme";
+import { requestAdsConsentIfNeeded } from "@/services/ads/adConfig";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -177,6 +178,7 @@ export default function RootLayout() {
     initializeCrashDiagnostics();
     initializeErrorLogger();
     initSyncEngine();
+    void requestAdsConsentIfNeeded();
 
     void ensureAnonymousSession()
       .then(async (sessionReady) => {

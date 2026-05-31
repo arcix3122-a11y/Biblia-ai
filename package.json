@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "check:locales": "node scripts/check-locale-parity.mjs",
-    "ai:smoke": "node --experimental-strip-types scripts/ai-smoke-test.mjs"
+    "ai:smoke": "node --experimental-strip-types scripts/ai-smoke-test.mjs",
+    "obfuscate-key": "node scripts/obfuscate-key.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",

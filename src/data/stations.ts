@@ -6,7 +6,7 @@ export interface StationVerseReference {
 
 export interface StationOfCross {
   number: number;
-  title: string;
+  titleKey: string;
   verseRefs: readonly StationVerseReference[];
 }
 
@@ -15,7 +15,7 @@ export const STATION_TOTAL = 14;
 export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   {
     number: 1,
-    title: "Jesus is condemned to death",
+    titleKey: "stations.items.station1.title",
     verseRefs: [
       { bookSlug: "matthew", chapter: 27, verse: 22 },
       { bookSlug: "isaiah", chapter: 53, verse: 3 },
@@ -23,7 +23,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 2,
-    title: "Jesus takes up His cross",
+    titleKey: "stations.items.station2.title",
     verseRefs: [
       { bookSlug: "john", chapter: 19, verse: 17 },
       { bookSlug: "luke", chapter: 9, verse: 23 },
@@ -31,7 +31,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 3,
-    title: "Jesus falls the first time",
+    titleKey: "stations.items.station3.title",
     verseRefs: [
       { bookSlug: "isaiah", chapter: 53, verse: 4 },
       { bookSlug: "psalms", chapter: 38, verse: 4 },
@@ -39,7 +39,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 4,
-    title: "Jesus meets His mother",
+    titleKey: "stations.items.station4.title",
     verseRefs: [
       { bookSlug: "john", chapter: 19, verse: 25 },
       { bookSlug: "luke", chapter: 2, verse: 35 },
@@ -47,7 +47,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 5,
-    title: "Simon helps carry the cross",
+    titleKey: "stations.items.station5.title",
     verseRefs: [
       { bookSlug: "mark", chapter: 15, verse: 21 },
       { bookSlug: "galatians", chapter: 6, verse: 2 },
@@ -55,7 +55,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 6,
-    title: "Veronica wipes the face of Jesus",
+    titleKey: "stations.items.station6.title",
     verseRefs: [
       { bookSlug: "psalms", chapter: 27, verse: 8 },
       { bookSlug: "2-corinthians", chapter: 4, verse: 6 },
@@ -63,7 +63,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 7,
-    title: "Jesus falls the second time",
+    titleKey: "stations.items.station7.title",
     verseRefs: [
       { bookSlug: "psalms", chapter: 40, verse: 2 },
       { bookSlug: "isaiah", chapter: 53, verse: 5 },
@@ -71,7 +71,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 8,
-    title: "Jesus meets the women of Jerusalem",
+    titleKey: "stations.items.station8.title",
     verseRefs: [
       { bookSlug: "luke", chapter: 23, verse: 28 },
       { bookSlug: "lamentations", chapter: 3, verse: 31 },
@@ -79,7 +79,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 9,
-    title: "Jesus falls the third time",
+    titleKey: "stations.items.station9.title",
     verseRefs: [
       { bookSlug: "psalms", chapter: 22, verse: 14 },
       { bookSlug: "isaiah", chapter: 53, verse: 6 },
@@ -87,7 +87,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 10,
-    title: "Jesus is stripped of His garments",
+    titleKey: "stations.items.station10.title",
     verseRefs: [
       { bookSlug: "john", chapter: 19, verse: 23 },
       { bookSlug: "psalms", chapter: 22, verse: 18 },
@@ -95,7 +95,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 11,
-    title: "Jesus is nailed to the cross",
+    titleKey: "stations.items.station11.title",
     verseRefs: [
       { bookSlug: "luke", chapter: 23, verse: 33 },
       { bookSlug: "isaiah", chapter: 53, verse: 12 },
@@ -103,7 +103,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 12,
-    title: "Jesus dies on the cross",
+    titleKey: "stations.items.station12.title",
     verseRefs: [
       { bookSlug: "john", chapter: 19, verse: 30 },
       { bookSlug: "psalms", chapter: 31, verse: 5 },
@@ -111,7 +111,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 13,
-    title: "Jesus is taken down from the cross",
+    titleKey: "stations.items.station13.title",
     verseRefs: [
       { bookSlug: "john", chapter: 19, verse: 38 },
       { bookSlug: "mark", chapter: 15, verse: 46 },
@@ -119,7 +119,7 @@ export const STATIONS_OF_CROSS: readonly StationOfCross[] = [
   },
   {
     number: 14,
-    title: "Jesus is laid in the tomb",
+    titleKey: "stations.items.station14.title",
     verseRefs: [
       { bookSlug: "matthew", chapter: 27, verse: 59 },
       { bookSlug: "romans", chapter: 6, verse: 4 },

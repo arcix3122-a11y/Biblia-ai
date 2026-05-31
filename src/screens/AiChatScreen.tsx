@@ -72,7 +72,7 @@ export default function AiChatScreen() {
     lastLlmStatusCode,
   } = useSpiritualAssistant();
 
-  const showDevLlmDebug = __DEV__;
+  const showDevLlmDebug = false;
   const [devDebugExpanded, setDevDebugExpanded] = useState(false);
 
   const quickPrompts = useMemo(() => getAssistantQuickPrompts(), []);

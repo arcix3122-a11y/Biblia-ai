@@ -168,7 +168,7 @@ export default function RosaryScreen() {
                 style={[styles.setChip, selectedSetId === set.id && styles.setChipActive]}
               >
                 <Text style={[styles.setChipText, selectedSetId === set.id && styles.setChipTextActive]}>
-                  {set.title}
+                  {t(set.titleKey as any)}
                 </Text>
               </Pressable>
             ))}
@@ -188,7 +188,7 @@ export default function RosaryScreen() {
           ) : null}
 
           <GlassCard style={styles.card}>
-            <Text style={styles.dayLabel}>{t("rosary.setLabel", { set: selectedSet.title })}</Text>
+            <Text style={styles.dayLabel}>{t("rosary.setLabel", { set: t(selectedSet.titleKey as any) })}</Text>
             <Text style={styles.progressPercent}>{t("rosary.progressLabel", { percent: progress })}</Text>
             <View style={styles.progressBarBg}>
               <View style={[styles.progressBarFill, { width: `${progress}%` as `${number}%` }]} />
@@ -199,9 +199,9 @@ export default function RosaryScreen() {
 
           {currentMystery ? (
             <GlassCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{currentMystery.title}</Text>
-              <Text style={styles.sectionSubtitle}>{selectedSet.subtitle}</Text>
-              <Text style={styles.sectionMeta}>{t("rosary.mysteryPrompt", { mystery: currentMystery.title })}</Text>
+              <Text style={styles.sectionTitle}>{t(currentMystery.titleKey as any)}</Text>
+              <Text style={styles.sectionSubtitle}>{t(selectedSet.subtitleKey as any)}</Text>
+              <Text style={styles.sectionMeta}>{t("rosary.mysteryPrompt", { mystery: t(currentMystery.titleKey as any) })}</Text>
             </GlassCard>
           ) : null}
 
@@ -232,14 +232,14 @@ export default function RosaryScreen() {
           {currentMystery ? (
             <GlassCard style={styles.card}>
               <Text style={styles.sectionTitle}>{t("rosary.meditationSectionTitle")}</Text>
-              <Text style={styles.practiceText}>{t("rosary.meditationBody", { mystery: currentMystery.title })}</Text>
+              <Text style={styles.practiceText}>{t("rosary.meditationBody", { mystery: t(currentMystery.titleKey as any) })}</Text>
             </GlassCard>
           ) : null}
 
           {currentMystery ? (
             <GlassCard style={styles.card}>
               <Text style={styles.sectionTitle}>{t("rosary.prayerSectionTitle")}</Text>
-              <Text style={styles.practiceText}>{t("rosary.prayerBody", { mystery: currentMystery.title })}</Text>
+              <Text style={styles.practiceText}>{t("rosary.prayerBody", { mystery: t(currentMystery.titleKey as any) })}</Text>
             </GlassCard>
           ) : null}
 

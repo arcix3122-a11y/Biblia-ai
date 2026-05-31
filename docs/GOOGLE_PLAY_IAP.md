@@ -98,7 +98,7 @@ Or upload the AAB manually in Play Console → **Release** → **Testing** → *
 - [ ] Internal testing purchase successful on physical device
 - [ ] Closed testing (optional) with real payment profile
 - [x] Privacy policy UI integrated in app (Settings screen)
-- [ ] Privacy policy URL set in Play Console (donations = payments) — e.g. hosted at `https://biblia-asystent-privacy.surge.sh/privacy-policy.html` (via Surge static web publishing)
+- [ ] Privacy policy URL set in Play Console (donations = payments) — hosted at `https://biblia-ai-sandy.vercel.app` (static site on Vercel)
 - [ ] App content / target audience forms complete
 - [ ] Production release promoted after QA
 

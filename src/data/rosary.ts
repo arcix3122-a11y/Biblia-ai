@@ -8,14 +8,14 @@ export interface RosaryVerseReference {
 
 export interface RosaryMystery {
   number: number;
-  title: string;
+  titleKey: string;
   verseRefs: readonly RosaryVerseReference[];
 }
 
 export interface RosarySet {
   id: RosarySetId;
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
   mysteries: readonly RosaryMystery[];
 }
 
@@ -23,50 +23,50 @@ export const ROSARY_TOTAL_DECADES = 5;
 export const ROSARY_SETS: readonly RosarySet[] = [
   {
     id: "joyful",
-    title: "Joyful Mysteries",
-    subtitle: "A path of humility, obedience, and quiet joy.",
+    titleKey: "rosary.sets.joyful.title",
+    subtitleKey: "rosary.sets.joyful.subtitle",
     mysteries: [
-      { number: 1, title: "The Annunciation", verseRefs: [{ bookSlug: "luke", chapter: 1, verse: 38 }, { bookSlug: "luke", chapter: 1, verse: 46 }] },
-      { number: 2, title: "The Visitation", verseRefs: [{ bookSlug: "luke", chapter: 1, verse: 41 }, { bookSlug: "luke", chapter: 1, verse: 45 }] },
-      { number: 3, title: "The Nativity", verseRefs: [{ bookSlug: "luke", chapter: 2, verse: 11 }, { bookSlug: "luke", chapter: 2, verse: 14 }] },
-      { number: 4, title: "The Presentation", verseRefs: [{ bookSlug: "luke", chapter: 2, verse: 22 }, { bookSlug: "luke", chapter: 2, verse: 29 }] },
-      { number: 5, title: "The Finding in the Temple", verseRefs: [{ bookSlug: "luke", chapter: 2, verse: 49 }, { bookSlug: "luke", chapter: 2, verse: 52 }] },
+      { number: 1, titleKey: "rosary.mysteries.joyful.annunciation", verseRefs: [{ bookSlug: "luke", chapter: 1, verse: 38 }, { bookSlug: "luke", chapter: 1, verse: 46 }] },
+      { number: 2, titleKey: "rosary.mysteries.joyful.visitation", verseRefs: [{ bookSlug: "luke", chapter: 1, verse: 41 }, { bookSlug: "luke", chapter: 1, verse: 45 }] },
+      { number: 3, titleKey: "rosary.mysteries.joyful.nativity", verseRefs: [{ bookSlug: "luke", chapter: 2, verse: 11 }, { bookSlug: "luke", chapter: 2, verse: 14 }] },
+      { number: 4, titleKey: "rosary.mysteries.joyful.presentation", verseRefs: [{ bookSlug: "luke", chapter: 2, verse: 22 }, { bookSlug: "luke", chapter: 2, verse: 29 }] },
+      { number: 5, titleKey: "rosary.mysteries.joyful.findingInTemple", verseRefs: [{ bookSlug: "luke", chapter: 2, verse: 49 }, { bookSlug: "luke", chapter: 2, verse: 52 }] },
     ],
   },
   {
     id: "luminous",
-    title: "Luminous Mysteries",
-    subtitle: "A path of revelation, mission, and the light of Christ.",
+    titleKey: "rosary.sets.luminous.title",
+    subtitleKey: "rosary.sets.luminous.subtitle",
     mysteries: [
-      { number: 1, title: "The Baptism in the Jordan", verseRefs: [{ bookSlug: "matthew", chapter: 3, verse: 16 }, { bookSlug: "mark", chapter: 1, verse: 11 }] },
-      { number: 2, title: "The Wedding at Cana", verseRefs: [{ bookSlug: "john", chapter: 2, verse: 5 }, { bookSlug: "john", chapter: 2, verse: 11 }] },
-      { number: 3, title: "The Proclamation of the Kingdom", verseRefs: [{ bookSlug: "mark", chapter: 1, verse: 15 }, { bookSlug: "luke", chapter: 4, verse: 18 }] },
-      { number: 4, title: "The Transfiguration", verseRefs: [{ bookSlug: "matthew", chapter: 17, verse: 2 }, { bookSlug: "luke", chapter: 9, verse: 35 }] },
-      { number: 5, title: "The Institution of the Eucharist", verseRefs: [{ bookSlug: "luke", chapter: 22, verse: 19 }, { bookSlug: "1-corinthians", chapter: 11, verse: 26 }] },
+      { number: 1, titleKey: "rosary.mysteries.luminous.baptism", verseRefs: [{ bookSlug: "matthew", chapter: 3, verse: 16 }, { bookSlug: "mark", chapter: 1, verse: 11 }] },
+      { number: 2, titleKey: "rosary.mysteries.luminous.cana", verseRefs: [{ bookSlug: "john", chapter: 2, verse: 5 }, { bookSlug: "john", chapter: 2, verse: 11 }] },
+      { number: 3, titleKey: "rosary.mysteries.luminous.proclamation", verseRefs: [{ bookSlug: "mark", chapter: 1, verse: 15 }, { bookSlug: "luke", chapter: 4, verse: 18 }] },
+      { number: 4, titleKey: "rosary.mysteries.luminous.transfiguration", verseRefs: [{ bookSlug: "matthew", chapter: 17, verse: 2 }, { bookSlug: "luke", chapter: 9, verse: 35 }] },
+      { number: 5, titleKey: "rosary.mysteries.luminous.eucharist", verseRefs: [{ bookSlug: "luke", chapter: 22, verse: 19 }, { bookSlug: "1-corinthians", chapter: 11, verse: 26 }] },
     ],
   },
   {
     id: "sorrowful",
-    title: "Sorrowful Mysteries",
-    subtitle: "A path of surrender through pain, loss, and redemption.",
+    titleKey: "rosary.sets.sorrowful.title",
+    subtitleKey: "rosary.sets.sorrowful.subtitle",
     mysteries: [
-      { number: 1, title: "The Agony in the Garden", verseRefs: [{ bookSlug: "matthew", chapter: 26, verse: 39 }, { bookSlug: "luke", chapter: 22, verse: 44 }] },
-      { number: 2, title: "The Scourging at the Pillar", verseRefs: [{ bookSlug: "john", chapter: 19, verse: 1 }, { bookSlug: "isaiah", chapter: 53, verse: 5 }] },
-      { number: 3, title: "The Crowning with Thorns", verseRefs: [{ bookSlug: "matthew", chapter: 27, verse: 29 }, { bookSlug: "mark", chapter: 15, verse: 17 }] },
-      { number: 4, title: "The Carrying of the Cross", verseRefs: [{ bookSlug: "luke", chapter: 23, verse: 26 }, { bookSlug: "matthew", chapter: 16, verse: 24 }] },
-      { number: 5, title: "The Crucifixion", verseRefs: [{ bookSlug: "luke", chapter: 23, verse: 46 }, { bookSlug: "john", chapter: 19, verse: 30 }] },
+      { number: 1, titleKey: "rosary.mysteries.sorrowful.agony", verseRefs: [{ bookSlug: "matthew", chapter: 26, verse: 39 }, { bookSlug: "luke", chapter: 22, verse: 44 }] },
+      { number: 2, titleKey: "rosary.mysteries.sorrowful.scourging", verseRefs: [{ bookSlug: "john", chapter: 19, verse: 1 }, { bookSlug: "isaiah", chapter: 53, verse: 5 }] },
+      { number: 3, titleKey: "rosary.mysteries.sorrowful.crowning", verseRefs: [{ bookSlug: "matthew", chapter: 27, verse: 29 }, { bookSlug: "mark", chapter: 15, verse: 17 }] },
+      { number: 4, titleKey: "rosary.mysteries.sorrowful.carrying", verseRefs: [{ bookSlug: "luke", chapter: 23, verse: 26 }, { bookSlug: "matthew", chapter: 16, verse: 24 }] },
+      { number: 5, titleKey: "rosary.mysteries.sorrowful.crucifixion", verseRefs: [{ bookSlug: "luke", chapter: 23, verse: 46 }, { bookSlug: "john", chapter: 19, verse: 30 }] },
     ],
   },
   {
     id: "glorious",
-    title: "Glorious Mysteries",
-    subtitle: "A path of hope, victory, and new creation.",
+    titleKey: "rosary.sets.glorious.title",
+    subtitleKey: "rosary.sets.glorious.subtitle",
     mysteries: [
-      { number: 1, title: "The Resurrection", verseRefs: [{ bookSlug: "matthew", chapter: 28, verse: 6 }, { bookSlug: "john", chapter: 20, verse: 18 }] },
-      { number: 2, title: "The Ascension", verseRefs: [{ bookSlug: "acts", chapter: 1, verse: 9 }, { bookSlug: "mark", chapter: 16, verse: 19 }] },
-      { number: 3, title: "The Descent of the Holy Spirit", verseRefs: [{ bookSlug: "acts", chapter: 2, verse: 4 }, { bookSlug: "acts", chapter: 2, verse: 17 }] },
-      { number: 4, title: "The Assumption", verseRefs: [{ bookSlug: "luke", chapter: 1, verse: 48 }, { bookSlug: "revelation", chapter: 12, verse: 1 }] },
-      { number: 5, title: "The Coronation of Mary", verseRefs: [{ bookSlug: "psalms", chapter: 45, verse: 9 }, { bookSlug: "revelation", chapter: 12, verse: 10 }] },
+      { number: 1, titleKey: "rosary.mysteries.glorious.resurrection", verseRefs: [{ bookSlug: "matthew", chapter: 28, verse: 6 }, { bookSlug: "john", chapter: 20, verse: 18 }] },
+      { number: 2, titleKey: "rosary.mysteries.glorious.ascension", verseRefs: [{ bookSlug: "acts", chapter: 1, verse: 9 }, { bookSlug: "mark", chapter: 16, verse: 19 }] },
+      { number: 3, titleKey: "rosary.mysteries.glorious.descent", verseRefs: [{ bookSlug: "acts", chapter: 2, verse: 4 }, { bookSlug: "acts", chapter: 2, verse: 17 }] },
+      { number: 4, titleKey: "rosary.mysteries.glorious.assumption", verseRefs: [{ bookSlug: "luke", chapter: 1, verse: 48 }, { bookSlug: "revelation", chapter: 12, verse: 1 }] },
+      { number: 5, titleKey: "rosary.mysteries.glorious.coronation", verseRefs: [{ bookSlug: "psalms", chapter: 45, verse: 9 }, { bookSlug: "revelation", chapter: 12, verse: 10 }] },
     ],
   },
 ] as const;

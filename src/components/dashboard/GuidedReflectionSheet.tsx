@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { logError } from "@/services/errors/errorLogger";
 import { useDailyEngagementStore } from "@/store/dailyEngagementStore";
 import { colors, radii, spacing, typography } from "@/theme";
+import { decryptKeyIfNeeded } from "@/services/security/keyObfuscator";
 
 export type ReflectionVariant = "meditation" | "silence";
 
@@ -53,7 +54,8 @@ export function GuidedReflectionSheet({ visible, variant, verseText, verseRefere
     setDisplayText("");
     indexRef.current = 0;
 
-    const apiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
+    const rawApiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
+    const apiKey = rawApiKey ? decryptKeyIfNeeded(rawApiKey) : undefined;
     const endpoint =
       process.env.EXPO_PUBLIC_AI_API_URL?.trim() ||
       "https://api.groq.com/openai/v1/chat/completions";

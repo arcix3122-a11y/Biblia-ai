@@ -8,9 +8,17 @@
     "scheme": "biblia-ai",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.solidcodesoftware.bibliaasystent"
+      "bundleIdentifier": "com.solidcodesoftware.bibliaasystent",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+      }
     },
     "android": {
       "adaptiveIcon": {

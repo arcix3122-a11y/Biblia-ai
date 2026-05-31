@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import * as scriptureRepo from "@/services/db/scriptureRepository";
 import { logError } from "@/services/errors/errorLogger";
+import { decryptKeyIfNeeded } from "@/services/security/keyObfuscator";
 import type { SelectedVerse } from "@/store/selectionStore";
 import type { ScriptureTranslation, VerseWithReference } from "@/types/scripture";
 
@@ -117,7 +118,8 @@ export function useVerseStudy() {
     setLoading(true);
     setError(null);
 
-    const apiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
+    const rawApiKey = process.env.EXPO_PUBLIC_AI_API_KEY?.trim();
+    const apiKey = rawApiKey ? decryptKeyIfNeeded(rawApiKey) : undefined;
     if (!apiKey) {
       setDetails(await buildLocalStudyData(verse));
       setLoading(false);

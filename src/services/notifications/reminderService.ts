@@ -131,13 +131,18 @@ export async function scheduleDailyReminder(
   try {
     const { getVerseOfTheDay } = await import("@/services/db/scriptureRepository");
     const { formatBookReference } = await import("@/i18n/bookNames");
-    const votd = await getVerseOfTheDay("en");
+    const { useLocaleStore } = await import("@/store/localeStore");
+    
+    const locale = useLocaleStore.getState().locale || "en";
+    const translation = locale === "pl" ? "pl" : "en";
+    
+    const votd = await getVerseOfTheDay(translation);
     if (votd) {
       const ref = formatBookReference(
         votd.book_slug,
         votd.chapter_number,
         votd.number,
-        "en",
+        locale,
         votd.book_name
       );
       fullBody = `${body}\n\n"${votd.text}" - ${ref}`;

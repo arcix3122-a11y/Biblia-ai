@@ -168,7 +168,7 @@ export default function AffirmationsScreen() {
   }, []);
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View style={[styles.root, { paddingTop: insets.top + spacing.md }]}>
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.headerRow}>

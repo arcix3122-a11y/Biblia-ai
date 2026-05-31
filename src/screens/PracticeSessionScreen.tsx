@@ -210,7 +210,7 @@ export default function PracticeSessionScreen() {
     return t("practices.session.rosaryStep", {
       decade: rosaryCurrentDecade + 1,
       total: ROSARY_TOTAL_DECADES,
-      set: set.title,
+      set: t(set.titleKey as any),
     });
   }, [practice, fastingStartDate, fastingCompletedDays, stationsCompleted, rosarySelectedSetId, rosaryCurrentDecade, t, fastingGetCurrentDay, stationsGetCurrent]);
 
@@ -366,15 +366,17 @@ export default function PracticeSessionScreen() {
     if (practice.id === "stations") {
       const stationNum = stationsGetCurrent();
       const station = getStation(stationNum);
+      const stationTitle = station ? t(station.titleKey as any) : "";
       speak(
-        `${station?.title ?? ""}. ${t("stations.reflectionBody", { station: station?.title ?? "" })}`
+        `${stationTitle}. ${t("stations.reflectionBody", { station: stationTitle })}`
       );
       return;
     }
 
     const set = getRosarySet(rosarySelectedSetId) ?? ROSARY_SETS[0]!;
     const mystery = set.mysteries[Math.min(rosaryCurrentDecade, ROSARY_TOTAL_DECADES - 1)];
-    speak(`${mystery?.title ?? ""}. ${t("rosary.meditationBody", { mystery: mystery?.title ?? "" })}`);
+    const mysteryTitle = mystery ? t(mystery.titleKey as any) : "";
+    speak(`${mysteryTitle}. ${t("rosary.meditationBody", { mystery: mysteryTitle })}`);
   }, [practice, fastingGetCurrentDay, stationsGetCurrent, rosarySelectedSetId, rosaryCurrentDecade, speak, t, verses]);
 
   const started = useMemo(() => {
@@ -408,6 +410,22 @@ export default function PracticeSessionScreen() {
 
     return rosaryIsJourneyComplete();
   }, [practice, started, fastingIsDayComplete, fastingGetCurrentDay, stationsIsComplete, stationsGetCurrent, rosaryIsJourneyComplete]);
+
+  const journeyComplete = useMemo(() => {
+    if (!practice || !started) {
+      return false;
+    }
+    switch (practice.id) {
+      case "fasting":
+        return fastingCompletedDays.length >= practice.stepCount;
+      case "stations":
+        return stationsCompleted.length >= STATION_TOTAL;
+      case "rosary":
+        return rosaryIsJourneyComplete();
+      default:
+        return false;
+    }
+  }, [practice, started, fastingCompletedDays.length, stationsCompleted.length, rosaryIsJourneyComplete]);
 
   if (!practice) {
     return (
@@ -466,7 +484,7 @@ export default function PracticeSessionScreen() {
                       rosarySelectedSetId === set.id && styles.setChipTextSelected,
                     ]}
                   >
-                    {set.title}
+                    {t(set.titleKey as any)}
                   </Text>
                 </Pressable>
               ))}
@@ -496,71 +514,97 @@ export default function PracticeSessionScreen() {
             </Pressable>
           </GlassCard>
 
-          {practice.id === "fasting" && fastingTheme ? (
+          {journeyComplete ? (
             <GlassCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{t(fastingTheme.titleKey)}</Text>
-              <Text style={styles.sectionBody}>{t(fastingTheme.subtitleKey)}</Text>
-            </GlassCard>
-          ) : null}
-
-          {practice.id === "stations" && station ? (
-            <GlassCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{station.title}</Text>
-              <Text style={styles.sectionBody}>
-                {t("stations.reflectionBody", { station: station.title })}
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={44}
+                color={colors.accent}
+                style={{ alignSelf: "center", marginBottom: spacing.xs }}
+              />
+              <Text
+                style={[
+                  styles.cardTitle,
+                  { textAlign: "center", color: colors.accent, fontWeight: "800" },
+                ]}
+              >
+                {t(`${practice.id}.journeyCompleteTitle` as any)}
+              </Text>
+              <Text style={[styles.cardBody, { textAlign: "center", lineHeight: 22, marginTop: spacing.xs }]}>
+                {t(`${practice.id}.journeyCompleteBody` as any)}
               </Text>
             </GlassCard>
           ) : null}
 
-          {practice.id === "rosary" && rosaryMystery ? (
-            <GlassCard style={styles.card}>
-              <Text style={styles.sectionTitle}>{rosaryMystery.title}</Text>
-              <Text style={styles.sectionBody}>
-                {t("rosary.meditationBody", { mystery: rosaryMystery.title })}
-              </Text>
-              <Text style={styles.meta}>
-                {t("rosary.beadCountLabel", { count: rosaryBeadCount, total: 10 })}
-              </Text>
-            </GlassCard>
-          ) : null}
+          {!journeyComplete ? (
+            <>
+              {practice.id === "fasting" && fastingTheme ? (
+                <GlassCard style={styles.card}>
+                  <Text style={styles.sectionTitle}>{t(fastingTheme.titleKey)}</Text>
+                  <Text style={styles.sectionBody}>{t(fastingTheme.subtitleKey)}</Text>
+                </GlassCard>
+              ) : null}
 
-          <GlassCard style={styles.card}>
-            <Text style={styles.sectionTitle}>{t("practices.session.versesTitle")}</Text>
-            {loadingVerses ? (
-              <Text style={styles.muted}>{t("common.loading")}</Text>
-            ) : verses.length === 0 ? (
-              <Text style={styles.muted}>{t("practices.session.noVerses")}</Text>
-            ) : (
-              verses.map((verse) => (
-                <Pressable key={verse.id} onPress={() => void handleOpenVerse(verse)} style={styles.verseRow}>
-                  <Text style={styles.verseRef}>
-                    {formatBookReference(
-                      verse.book_slug,
-                      verse.chapter_number,
-                      verse.number,
-                      locale,
-                      verse.book_name
-                    )}
+              {practice.id === "stations" && station ? (
+                <GlassCard style={styles.card}>
+                  <Text style={styles.sectionTitle}>{t(station.titleKey as any)}</Text>
+                  <Text style={styles.sectionBody}>
+                    {t("stations.reflectionBody", { station: t(station.titleKey as any) })}
                   </Text>
-                  <Text style={styles.verseText}>{verse.text}</Text>
-                </Pressable>
-              ))
-            )}
-          </GlassCard>
+                </GlassCard>
+              ) : null}
 
-          <Pressable
-            onPress={stepDone && practice.id !== "rosary" ? undefined : () => void handleCompleteStep()}
-            style={[styles.primaryBtn, stepDone && practice.id !== "rosary" && styles.primaryBtnDisabled]}
-            disabled={stepDone && practice.id !== "rosary"}
-          >
-            <Text style={styles.primaryBtnText}>
-              {practice.id === "rosary"
-                ? t("rosary.countBead")
-                : stepDone
-                  ? t("practices.session.stepDone")
-                  : t("practices.session.completeStep")}
-            </Text>
-          </Pressable>
+              {practice.id === "rosary" && rosaryMystery ? (
+                <GlassCard style={styles.card}>
+                  <Text style={styles.sectionTitle}>{t(rosaryMystery.titleKey as any)}</Text>
+                  <Text style={styles.sectionBody}>
+                    {t("rosary.meditationBody", { mystery: t(rosaryMystery.titleKey as any) })}
+                  </Text>
+                  <Text style={styles.meta}>
+                    {t("rosary.beadCountLabel", { count: rosaryBeadCount, total: 10 })}
+                  </Text>
+                </GlassCard>
+              ) : null}
+
+              <GlassCard style={styles.card}>
+                <Text style={styles.sectionTitle}>{t("practices.session.versesTitle")}</Text>
+                {loadingVerses ? (
+                  <Text style={styles.muted}>{t("common.loading")}</Text>
+                ) : verses.length === 0 ? (
+                  <Text style={styles.muted}>{t("practices.session.noVerses")}</Text>
+                ) : (
+                  verses.map((verse) => (
+                    <Pressable key={verse.id} onPress={() => void handleOpenVerse(verse)} style={styles.verseRow}>
+                      <Text style={styles.verseRef}>
+                        {formatBookReference(
+                          verse.book_slug,
+                          verse.chapter_number,
+                          verse.number,
+                          locale,
+                          verse.book_name
+                        )}
+                      </Text>
+                      <Text style={styles.verseText}>{verse.text}</Text>
+                    </Pressable>
+                  ))
+                )}
+              </GlassCard>
+
+              <Pressable
+                onPress={stepDone && practice.id !== "rosary" ? undefined : () => void handleCompleteStep()}
+                style={[styles.primaryBtn, stepDone && practice.id !== "rosary" && styles.primaryBtnDisabled]}
+                disabled={stepDone && practice.id !== "rosary"}
+              >
+                <Text style={styles.primaryBtnText}>
+                  {practice.id === "rosary"
+                    ? t("rosary.countBead")
+                    : stepDone
+                      ? t("practices.session.stepDone")
+                      : t("practices.session.completeStep")}
+                </Text>
+              </Pressable>
+            </>
+          ) : null}
 
           <Pressable onPress={handleReset} style={styles.resetBtn}>
             <Text style={styles.resetText}>{t("practices.session.reset")}</Text>
